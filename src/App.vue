@@ -35,6 +35,10 @@ export default {
 </script>
 
 <style lang="scss">
+
+// Import liquido specific global styles
+@import 'styles/liquido.scss';
+
 // setting Buefy variables from the _variables.scss file
 @import "~bulma/sass/utilities/_all";
 $primary-invert: findColorInvert($primary);
@@ -116,7 +120,7 @@ a:hover {
 
 #appContent {
 	flex-grow: 1;
-	padding: 0.75rem;
+	padding: 0.5rem;
 }
 
 .fadePage-enter-active,
@@ -133,21 +137,5 @@ a:hover {
   color: $blue;
   font-weight: bold;
 }
-
-
-
-// margin and padding shortcuts (inspired by bootstrap)
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1.0rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1.0rem; }
-.mt-3 { margin-top: 1.5rem; }
-.my-1 { margin-top: 0.5rem; padding-bottom: 0.5rem; }
-.my-2 { margin-top: 1.0rem; padding-bottom: 1.0rem; }
-.my-3 { margin-top: 1.5rem; padding-bottom: 1.5rem; }
-.p-0  { padding: 0; }
-.px-0 { padding-left: 0; padding-right: 0; }
-.py-0 { padding-top: 0; padding-bottom: 0; }
 
 </style>

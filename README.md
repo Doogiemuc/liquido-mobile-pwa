@@ -18,7 +18,7 @@ This is a mobile client for [LIQUIDO](http://www.liquido.vote). Based on the awe
 * Automatic removal of unused CSS/SCSS
 * Global SCSS variables and easy theme customization
 * Linting and formatting with [eslint](https://github.com/eslint/eslint) and [prettier](https://github.com/prettier/prettier)
-* Uses [Buefy](https://buefy.github.io/#/) for styling
+* Uses [Buefy](https://buefy.github.io/#/) which is baded on [Bulma](https://bulma.io/) for styling
 
 
 ## Running

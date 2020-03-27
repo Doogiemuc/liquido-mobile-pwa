@@ -1,89 +1,116 @@
 <template>
-  <section class="section">
-    <div class="container">
-      <p class="mb-2">Sort the proposals of this poll into your personally preferred order.</p>
-			<div class="card">
-				<header class="card-header">
-					<p class="card-header-title">
-						No sports in the morning
-					</p>
-				</header>
-				<div class="card-content">
-					<div class="content">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-					</div>
-				</div>
-				<div class="prop-footer level is-mobile">
-					<div class="level-left">
-						<div class="level-item">
-							<img src="img/avatars/Avatar1.png" class="avatar"/>
-							<div>
-							<b-icon pack="far" icon="user" size="is-small"/> User Name <br/>
-							<b-icon pack="far" icon="clock" size="is-small"/> yesterday
-							</div>
-						</div>
-					</div>
-					<div class="level-left">
-						<div class="level-item">
-							Middle
-						</div>
-					</div>
-					<div class="level-left">
-						<div class="level-item">
-							Right
-						</div>
-					</div>
-				</div>
+	<section class="section">
+		<div class="container">
+			<p>Sort the proposals of this poll into your personally preferred order.</p>
+
+			<div id="ballot" class="ballot">
+				<draggable v-model="laws" group="ballot" :swapThreshold="0.5">
+					<law-panel v-for="law in laws" :law="law" :readOnly="false" :key="law.id"></law-panel>
+				</draggable>
 			</div>
-    </div>
-  </section>
+
+		</div>
+		<b-button type="is-primary" icon-pack="fas" icon-right="angle-double-right" class="is-pulled-right">
+				Next
+		</b-button>
+	</section>
 </template>
 
 <script>
+import lawPanel from '../components/law-panel'
+//import Sortable from 'sortablejs'
+import draggable from 'vuedraggable'
+
 export default {
-  name: "Index",
-  components: {},
+	name: "Index",
+	components: {	lawPanel, draggable	},
   mixins: [],
   data() {
-    return {}
-  },
-  beforeCreate() {},
-  created() {},
-  beforeMount() {},
-  mounted() {},
-  computed: {},
-  methods: {},
-  filters: {},
-  beforeUpdate() {},
-  updated() {},
-  beforeDestroy() {},
+    return {
+			laws: [
+				{
+					id: 1,
+					title: "Just some example very long title gasdkfljasdjf lkdjsa lkf flknwe rtmnwre,m nwm,e rwerfln werflkwe rln welrnlwlerk ",
+					description: "Law description which is very helpfull ...",
+					createdAt: new Date(),
+					createdBy: {
+						email: "user@liquido.vote",
+						profile: {
+							name: "John Doe",
+							picture: "/img/avatars/Avatar1.png"
+						}
+					},
+					numSupporters: 23
+				},
+				{
+					id: 2,
+					title: "Just some example very long title 2 222 asd fag ewtrevcvderv we ew",
+					description: "Law description which is very helpfull ...",
+					createdAt: new Date(),
+					createdBy: {
+						email: "user@liquido.vote",
+						profile: {
+							name: "Able Dune",
+							picture: "/img/avatars/Avatar3.png"
+						}
+					},
+					numSupporters: 14,
+					supportedByCurrentUser: true
+				},
+				{
+					id: 3,
+					title: "Just some example very long 333333 ",
+					description: "Law description which is very helpfull ...",
+					createdAt: new Date(),
+					createdBy: {
+						email: "user@liquido.vote",
+						profile: {
+							name: "Simon Donahugh",
+							picture: "/img/avatars/Avatar2.png"
+						}
+					},
+					numSupporters: 12,
+					supportedByCurrentUser: true
+				},
+			]
+
+		}
+	},
+	beforeCreate() {},
+	created() {},
+	beforeMount() {},
+	mounted() {
+		var el = document.getElementById('ballot');
+		console.log(el)
+		/*
+		new Sortable(el, {
+				animation: 150,
+				//ghostClass: 'blue-background-class'
+		});
+		*/		
+	},
+	computed: {},
+	methods: {},
+	filters: {},
+	beforeUpdate() {},
+	updated() {},
+	beforeDestroy() {},
 }
 </script>
 
-<style lang="scss" scoped>
-.card-header {
-	box-shadow: none;
-	background-color: #f3f3f3;;
-	
+<style lang="scss">
+.ballot {
+	padding: 1rem 0.5rem;
+	margin: 0 -0.5rem 1em -0.5rem;
+	background: #f0f0f0;
 }
-.card-header-title {
-	padding: 0.2rem 0.5rem;
+.law-panel {
+	cursor: grab;
+	//margin-bottom: 0.5em;
 }
-.card-content {
-	padding: 0;
+
+.sortable-ghost {
+	opacity: 0.2;
 }
-.card-content .content {
-	padding: 0.5rem;
-}
-.avatar {
-	margin-right: 0.25rem;
-}
-.prop-footer {
-	color: grey;
-	font-size: 12px;
-	background-color: #f3f3f3;
-	width: 100%;
-	padding: 3px 0.5rem;
-}
+
 </style>
