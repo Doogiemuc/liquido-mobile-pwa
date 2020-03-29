@@ -35,9 +35,8 @@ export default {
 </script>
 
 <style lang="scss">
-
 // Import liquido specific global styles
-@import 'styles/liquido.scss';
+@import "styles/liquido.scss";
 
 // setting Buefy variables from the _variables.scss file
 @import "~bulma/sass/utilities/_all";
@@ -119,8 +118,8 @@ a:hover {
 }
 
 #appContent {
-	flex-grow: 1;
-	padding: 0.5rem;
+  flex-grow: 1;
+  padding: 0.5rem;
 }
 
 .fadePage-enter-active,
@@ -137,5 +136,4 @@ a:hover {
   color: $blue;
   font-weight: bold;
 }
-
 </style>

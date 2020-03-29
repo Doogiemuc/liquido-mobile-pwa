@@ -26,3 +26,9 @@
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Opera and Firefox */
 }
+
+.liquido:after {
+	content: "LIQUIDO";
+	font-family: 'Libre Baskerville', serif;
+	color: $primary;
+}
