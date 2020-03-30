@@ -13,7 +13,7 @@ module.exports = {
     "generator-star-spacing": 0,
     "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-    indent: [2, 2],
+    indent: ["warn", "tab"],
     eqeqeq: 1,
     "no-var": 2,
     quotes: [
@@ -24,7 +24,7 @@ module.exports = {
       },
     ],
     "vue/html-indent": ["error", 2],
-    "vue/html-self-closing": "error",
+    //"vue/html-self-closing": "error",
     "vue/attributes-order": "error",
   },
   extends: [

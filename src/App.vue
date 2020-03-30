@@ -12,25 +12,21 @@
 import GlobalNavbar from "@/components/navbar-comp"
 
 export default {
-  name: "App",
-  components: {
-    GlobalNavbar,
-    GlobalFooter: () => import("@/components/footer-comp"),
-  },
-  mixins: [],
-  data() {
-    return {}
-  },
-  beforeCreate() {},
-  created() {},
-  beforeMount() {},
-  mounted() {},
-  computed: {},
-  methods: {},
-  filters: {},
-  beforeUpdate() {},
-  updated() {},
-  beforeDestroy() {},
+	name: "App",
+	components: {
+		GlobalNavbar,
+		GlobalFooter: () => import("@/components/footer-comp"),
+	},
+	mixins: [],
+	data() {
+		return {}
+	},
+	created() {},
+	mounted() {},
+	computed: {},
+	methods: {},
+	updated() {},
+	beforeDestroy() {},
 }
 </script>
 
@@ -38,90 +34,12 @@ export default {
 // Import liquido specific global styles
 @import "styles/liquido.scss";
 
-// setting Buefy variables from the _variables.scss file
-@import "~bulma/sass/utilities/_all";
-$primary-invert: findColorInvert($primary);
-$colors: (
-  "white": (
-    $white,
-    $black,
-  ),
-  "black": (
-    $black,
-    $white,
-  ),
-  "light": (
-    $light,
-    $light-invert,
-  ),
-  "dark": (
-    $dark,
-    $dark-invert,
-  ),
-  "primary": (
-    $primary,
-    $primary-invert,
-  ),
-  "info": (
-    $info,
-    $info-invert,
-  ),
-  "success": (
-    $success,
-    $success-invert,
-  ),
-  "warning": (
-    $warning,
-    $warning-invert,
-  ),
-  "danger": (
-    $danger,
-    $danger-invert,
-  ),
-);
-$link: $primary;
-$link-invert: $primary-invert;
-$link-focus-border: $primary;
-@import "~bulma";
-@import "~buefy/src/scss/buefy";
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  line-height: 1.5;
-  box-sizing: border-box;
-  overflow-x: hidden;
-}
-
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
-
-a,
-a:visited,
-a:hover {
-  text-decoration: none;
-}
-
 #app {
-  margin: 0;
-  padding: 0;
-  z-index: 1;
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  min-height: 94vh;
-  min-height: calc(100vh - #{$stickyNavHeight + 2px});
+	max-width: 1024px;   // iPad horizontal
+	margin: 0 auto;
 }
 
-#appContent {
-  flex-grow: 1;
-  padding: 0.5rem;
-}
-
+/*
 .fadePage-enter-active,
 .fadePage-leave-active {
   transition: opacity 0.1s;
@@ -136,4 +54,5 @@ a:hover {
   color: $blue;
   font-weight: bold;
 }
+*/
 </style>

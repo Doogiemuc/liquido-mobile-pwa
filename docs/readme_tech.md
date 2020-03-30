@@ -3,12 +3,33 @@
 Designed for small groups, e.g. social societeies, SMEs, pupils (suggest age >10), open source communities
 Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.vote
 
-## Use Case Flow
+## Use Cases
 
- 0. Open www.liquido.me -> First user automatically becomes Admin
- 1. Create a new poll
- 2. Invite users (e.g. pupils, members, people who are allowed to vote) by sharing a link.
- 3. Every user can add one(!) proposal to that poll
+### Open www.liquido.me on mobile
+
+ * IF user has a stored JWT, then log him in. Goto User Home
+ * ELSE Welcome message. User can decide to create a new team or join an existing one (with invitation code).
+
+### Create a new team
+
+ * Ask for username.
+ * First user becomes admin for this team
+ * Invite other users (e.g. pupils, members, people who are allowed to vote)
+   * share a link
+	 * share QR code
+	 * share alphanumeric invitation code
+
+### Join a team
+
+ * Pre: USer clicked on invitation link or entered invitation code
+ * Ask for username, then user joins team
+   * Error if username or e-mail alreadey exists in that team
+ * Goto User Home, where user can see proposals and open for voting polls
+
+### Create a new poll
+
+ 1. Create a new poll with title (topic, theme)
+ 3. Every user in the team can add one(!) proposal to that poll
  4. Admin, eg. the teacher, starts the voting phase
  5. User's cast their vote
  6. Admin closes the voting phase
@@ -16,15 +37,13 @@ Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.v
 
 ## Tennant
 
-One tennant contains
+One tennant / team contains
 
  * one admin user
  * a list of users (that are allowed to vote)
  * a list of polls
  * proposals (new, elaboration, in voting)
  * agreed laws
-
-
 
 ## Screenflow
 

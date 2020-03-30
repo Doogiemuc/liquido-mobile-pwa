@@ -1,8 +1,8 @@
 <template>
-  <footer v-if="showFooter">
+  <footer>
     <router-link to="/about" class="navbar-item">About</router-link>
     <router-link to="/contact" class="navbar-item">Contact</router-link>
-    <p>&copy; {{ year }}</p>
+    <span>&copy; {{ year }}</span>
   </footer>
 </template>
 
@@ -34,15 +34,12 @@ export default {
 
 <style lang="scss" scoped>
 footer {
-  border-top: 1px solid $primary;
+	width: 100%;
+	border-top: 1px solid $primary;
+	padding-top: 5px;
+	padding-bottom: 5px;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
-  padding-bottom: 1vh;
-
-  p {
-    margin: 8px;
-    margin-right: 16px;
-  }
+  justify-content: space-around;
 }
 </style>

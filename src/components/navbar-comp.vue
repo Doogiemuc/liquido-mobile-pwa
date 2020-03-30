@@ -1,62 +1,32 @@
 <template>
-  <nav v-if="showNavbar" class="navbar is-fixed-top" role="navigation">
-    <modal :component="modalComp" @exitModal="closeModal" />
-
-    <div class="navbar-brand">
-      <router-link class="navbar-item" to="/" exact>
-        <!-- <img src="/static/yourLogo.png" alt="Your Logo" width="112" height="28"> -->
-        <h1 id="logo"><span class="liquido" /></h1>
-      </router-link>
-
-      <div
-        :class="{ 'is-active': showMobileNav }"
-        class="navbar-burger burger"
-        @click="toggleMobileNav"
-      >
-        <span />
-        <span />
-        <span />
-      </div>
-    </div>
-
-    <div
-      id="navMenu"
-      :class="{ 'is-active': showMobileNav }"
-      class="navbar-menu"
+  <nav class="navbar fixed-top navbar-light bg-white">
+    <router-link to="/"><h1 class="navbar-brand mb-0"><span class="liquido" /></h1></router-link>
+    <button
+      class="navbar-toggler collapsed"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
     >
-      <div class="navbar-start">
-        <router-link v-if="isAdmin" to="/accounts" class="navbar-item"
-        >Accounts</router-link
-        >
-      </div>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
 
-      <div class="navbar-end">
-        <span v-if="!isLoggedIn" class="navbar-item">
-          <a class="navbar-item button accNav is-info" @click="openSignup()">
-            Sign Up</a
-            >
-          <a class="navbar-item button accNav" @click="openLogin()">Log In</a>
-        </span>
-
-        <div v-if="isLoggedIn" class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link is-active">
-            Account
-          </a>
-          <div class="navbar-dropdown ">
-            <router-link to="/account" class="navbar-item">
-              Overview
-            </router-link>
-            <hr class="navbar-divider" >
-            <div class="navbar-item">
-              <div>
-                <small>
-                  <a data-no-instant @click="logout()">Sign Out</a>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div id="navbarSupportedContent" class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Proposals</a>
+        </li>
+        <li>
+          <a class="nav-link" href="#">Polls</a>
+        </li>
+        <li>
+          <a class="nav-link" href="#">Search</a>
+        </li>
+      </ul>
     </div>
   </nav>
 </template>
@@ -65,85 +35,104 @@
 import { get } from "vuex-pathify"
 
 export default {
-  name: "Navbar",
-  components: {},
-  mixins: [],
-  data() {
-    return {
-      modalComp: null,
-      showMobileNav: false,
-    }
-  },
-  beforeCreate() {},
-  created() {},
-  beforeMount() {},
-  mounted() {},
-  computed: {
-    showNavbar: get("ui/showNavbar"),
-    isLoggedIn: get("account/isAuthenticated"),
-    userRole: get("account/userRole"),
-    isAdmin: function() {
-      return this.userRole === "ADMIN"
-    },
-  },
-  methods: {
-    closeModal() {
-      this.modalComp = null
-    },
-    openSignup() {
-      this.modalComp = () => import("@/components/signup-form")
-    },
-    openLogin() {
-      this.modalComp = () => import("@/components/login-form")
-    },
-    logout() {
-      this.$accountAPI.logout()
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: "Signed Out",
-        position: "is-top",
-        type: "is-dark",
-      })
-      this.$router.push("/")
-    },
-    toggleMobileNav() {
-      this.showMobileNav = !this.showMobileNav
-    },
-  },
-  beforeUpdate() {},
-  updated() {},
-  beforeDestroy() {},
+	name: "Navbar",
+	components: {},
+	mixins: [],
+	data() {
+		return {
+			modalComp: null,
+			showMobileNav: false,
+		}
+	},
+	beforeCreate() {},
+	created() {},
+	beforeMount() {},
+	mounted() {},
+	computed: {
+		showNavbar: get("ui/showNavbar"),
+		isLoggedIn: get("account/isAuthenticated"),
+		userRole: get("account/userRole"),
+		isAdmin: function() {
+			return this.userRole === "ADMIN"
+		},
+	},
+	methods: {
+		closeModal() {
+			this.modalComp = null
+		},
+		openSignup() {
+			this.modalComp = () => import("@/components/signup-form")
+		},
+		openLogin() {
+			this.modalComp = () => import("@/components/login-form")
+		},
+		logout() {
+			this.$accountAPI.logout()
+			this.$buefy.toast.open({
+				duration: 1000,
+				message: "Signed Out",
+				position: "is-top",
+				type: "is-dark",
+			})
+			this.$router.push("/")
+		},
+		toggleMobileNav() {
+			this.showMobileNav = !this.showMobileNav
+		},
+	},
+	beforeUpdate() {},
+	updated() {},
+	beforeDestroy() {},
 }
 </script>
 
 <style lang="scss">
-nav {
+nav.navbar {
   border-bottom: 1px solid $primary;
-  right: 0;
-  left: 0;
-  z-index: 9;
-  height: $stickyNavHeight;
+  padding: 0 0.5rem;
 }
-
-.navbar-brand,
-.navbar-tabs {
-  min-height: 0;
-  height: $stickyNavHeight;
-}
-
-#logo {
-  font-weight: 700;
-  font-size: 1.5em;
-  color: $primary;
-}
-
-.is-active {
-  .accNav {
-    margin: 5px;
+.navbar-toggler {
+  padding: 0.25rem !important;
+	border: none !important;
+  .icon-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px;
+    transition: 300ms ease-in-out;
+    background-color: blue;
+    position: relative;
   }
-}
-
-.accNav {
-  margin-left: 5px;
+  .icon-bar + .icon-bar {
+    margin-top: 4px;
+  }
+  // beautiful animation for the icon when collapsing
+  .icon-bar:nth-child(1) {
+    opacity: 0;
+  }
+  .icon-bar:nth-child(3) {
+    -webkit-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    top: -7px;
+  }
+  .icon-bar:nth-child(2) {
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+    top: 0px;
+  }
+  &.collapsed {
+    .icon-bar {
+      -webkit-transform: rotate(0deg);
+      -ms-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      transform: rotate(0deg);
+      top: 0;
+      opacity: 1;
+    }
+  }
 }
 </style>
