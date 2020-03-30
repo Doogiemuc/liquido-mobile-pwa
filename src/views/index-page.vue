@@ -4,7 +4,8 @@
 			Welcome to <span class="liquido" /> - the free, secure and liquid eVoting platform.
 			With this mobile app you can create polls and then take votes with your team.
 		</b-card>
-		<b-card class="chat-bubble shadow-sm">
+
+		<b-card id="questionCard" class="chat-bubble shadow-sm">
 			Do you want to <em>join an existing team</em> with an invitation code or <em>create a new team</em>?
 		</b-card>
 
@@ -33,6 +34,11 @@
 					<span class="input-group-text">E-Mail</span>
 				</div>
 				<input type="text" class="form-control" placeholder="mail@domain.com">
+			</div>
+
+			<div class="mb-3 d-flex justify-content-between align-items-center">
+				<small><a href="#" @click="cancelJoinTeam()">Cancel</a></small>
+				<b-button variant="primary">Ok <i class="fas fa-angle-double-right"></i></b-button>
 			</div>
 		</form>
 
@@ -70,13 +76,18 @@ export default {
 	computed: {},
 	methods: {
 		clickJoinTeam() {
-			$('#createNewTeamButton').addClass('d-none')
-			$('#joinTeamButton').addClass('clicked')
+			$('#createNewTeamButton').addClass('fadeOut')
+			$('#joinTeamButton').addClass('moveToCenter')
 			$('#joinTeamForm').collapse('show')
 		},
+		cancelJoinTeam() {
+			$('#createNewTeamButton').removeClass('fadeOut')
+			$('#joinTeamButton').removeClass('moveToCenter')
+			$('#joinTeamForm').collapse('hide')
+		},
 		clickCreateNewTeam() {
-			$('#createNewTeamButton').addClass('clicked')
-			$('#joinTeamButton').addClass('d-none')
+			$('#createNewTeamButton').addClass('moveToCenter')
+			$('#joinTeamButton').addClass('fadeOut')
 			$('#createNewTeamCard').collapse('show')
 		},
 
@@ -130,10 +141,6 @@ export default {
 	left: 0;
 	top: 0;
 }
-#joinTeamButton.clicked {
-	left: 50%;
-  transform: translateX(-50%);
-}
 #createNewTeamButton {
 	-webkit-transition: all 0.5s ease-out;
 	-moz-transition: all 0.5s ease-out;
@@ -143,9 +150,11 @@ export default {
 	right: 0;
 	top: 0;
 }
-#createNewTeamButton.clicked {
-	left: 50%;
+.moveToCenter {
+	left: 50% !important;
   transform: translateX(-50%);
 }
-
+.fadeOut {
+	opacity: 0;
+}
 </style>
