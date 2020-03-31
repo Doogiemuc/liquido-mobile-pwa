@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer class="bg-white">
     <router-link to="/about" class="navbar-item">About</router-link>
     <router-link to="/contact" class="navbar-item">Contact</router-link>
     <span>&copy; {{ year }}</span>
@@ -35,6 +35,7 @@ export default {
 <style lang="scss" scoped>
 footer {
 	width: 100%;
+	margin-top: 5rem;
 	border-top: 1px solid $primary;
 	padding-top: 5px;
 	padding-bottom: 5px;

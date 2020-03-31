@@ -36,7 +36,9 @@ export default {
 
 #app {
 	max-width: 1024px;   // iPad horizontal
+	height: 100vh;
 	margin: 0 auto;
+	position: relative;
 }
 
 /*
