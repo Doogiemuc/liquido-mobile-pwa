@@ -35,7 +35,7 @@ export default {
 <style lang="scss" scoped>
 footer {
 	width: 100%;
-	margin-top: 5rem;
+	margin-top: 2rem;
 	border-top: 1px solid $primary;
 	padding-top: 5px;
 	padding-bottom: 5px;

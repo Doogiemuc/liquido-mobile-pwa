@@ -2,6 +2,14 @@
 	padding-top: 60px !important;  // for navbar
 }
 
+/** No iOS native button and input styling */
+button, [type="button"], [type="reset"], [type="submit"], input {
+	-webkit-appearance: none !important;
+	-moz-appearance: none !important;
+	appearance: none !important;
+	cursor: pointer;
+}
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -12,6 +20,7 @@
                                   supported by Chrome, Opera and Firefox */
 }
 
+/** LIQUIDO beautiful brand mark text */
 .liquido:after {
 	content: "LIQUIDO";
 	font-family: 'Libre Baskerville', serif;
