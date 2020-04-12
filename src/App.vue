@@ -4,7 +4,7 @@
     <transition name="fadePage" mode="out-in">
       <router-view id="appContent" :key="$route.fullPath" />
     </transition>
-    <GlobalFooter />
+    <GlobalFooter v-if="showFooter"/>
   </div>
 </template>
 
@@ -19,7 +19,9 @@ export default {
 	},
 	mixins: [],
 	data() {
-		return {}
+		return {
+			showFooter: false
+		}
 	},
 	created() {},
 	mounted() {},
@@ -35,11 +37,19 @@ export default {
 @import "styles/liquido.scss";
 
 #app {
-	max-width: 1024px;   // iPad horizontal
-	height: 100vh;
+	max-width: 1140px;   // bootstrap breakpoint of container-lg
+	//height: 100vh;
 	margin: 0 auto;
 	position: relative;
 }
+
+/** no horizintal scrolling */
+#appContent {
+	margin-top: 60px !important;  // for navbar
+	margin-bottom: 50px;  // for footer
+	overflow-x: hidden;
+}
+
 
 /*
 .fadePage-enter-active,

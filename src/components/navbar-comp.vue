@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar fixed-top navbar-light bg-white">
+  <nav class="navbar fixed-top navbar-light bg-white container-lg">
     <router-link to="/"><h1 class="navbar-brand mb-0"><span class="liquido" /></h1></router-link>
     <button
       class="navbar-toggler collapsed"
