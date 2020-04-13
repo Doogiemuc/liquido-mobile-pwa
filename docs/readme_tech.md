@@ -60,3 +60,13 @@ On next app starts
  * <userhome>
  * Bar at the bottom: proposals - polls - search
 
+
+# Test
+
+## Simulate test on mobile phone
+
+Very nice mobile simulator: http://mobiletest.me/apple_iphone_6s/8028826 
+
+
+# Links & Resources
+

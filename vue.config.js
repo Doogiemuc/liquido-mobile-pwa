@@ -31,7 +31,9 @@ module.exports = {
           "message",
           "delete",
           "button",
-          "loading-overlay",
+					"loading-overlay",
+					"is-valid",
+					"is-invalid"
         ],
       }),
     ],
@@ -44,7 +46,7 @@ module.exports = {
     },
   },
   pwa: {
-    name: "Peridot",
+    name: "LIQUIDO",
     themeColor: "#4DBA87",
     msTileColor: "#000000",
     appleMobileWebAppStatusBarStyle: "black",

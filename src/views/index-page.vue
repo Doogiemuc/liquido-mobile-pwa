@@ -11,8 +11,8 @@
 		<b-card class="chat-bubble chat-right" :class="{ 'hide-right': flowState < 3 }">
 			<div class="form-group mb-0">
 				<label for="userNameInput">{{$t('nickname')}}</label>
-				<b-form-input id="userNameInput" v-model="user.name" type="text" :state="userNameState" @keyup.enter="enterUserName()" @focusout="enterUserName()" trim></b-form-input>
-				<small class="text-danger">{{userNameError}}</small>
+				<b-form-input id="userNameInput" v-model="user.name" type="text" class="form-control" :state="userNameState" :disabled="flowState > 3" @keyup.enter="userNameEnter()" @blur="userNameEnter()" />
+				<div class="invalid-feedback">{{ $t('userNameInvalid') }}</div>
 			</div>
 		</b-card>
 
@@ -43,12 +43,14 @@
 			<form id="joinTeamForm">
 				<div class="form-group" :state="inviteState">
 					<label for="inviteInput">{{$t('inviteCode')}}</label>
-					<b-form-input id="inviteInput" v-model="user.invite" type="text" :state="inviteState" maxlength="6" placeholder="A3BD5F" trim></b-form-input>
+					<b-form-input id="inviteInput" v-model="user.invite" type="text" :state="inviteState" maxlength="6" placeholder="A3BD5F" trim @blur="inviteTouched = true"></b-form-input>
+					<div class="invalid-feedback">{{$t('inviteInvalid')}}</div>
 				</div>
 
 				<div class="form-group" :state="eMailState">
 					<label for="userEmailInput">{{$t('yourEMail')}}</label>
-					<b-form-input id="userEmailInput" v-model="user.email" type="email" :state="eMailState" :placeholder="$t('eMailPlaceholder')" trim></b-form-input>
+					<b-form-input id="userEmailInput" v-model="user.email" type="email" :state="eMailState" :placeholder="$t('eMailPlaceholder')" trim @blur="emailTouched = true"></b-form-input>
+					<div class="invalid-feedback">{{$t('emailInvalid')}}</div>
 				</div>
 
 				<div class="d-flex justify-content-between align-items-center">
@@ -64,13 +66,15 @@
 			<form id="createNewTeamForm">
 				<div class="form-group">
 					<label for="teamNameInput">{{$t('teamName')}}</label>
-					<b-form-input id="teamNameInput" v-model="newTeam.name" type="text" :state="teamNameState" trim></b-form-input>
+					<b-form-input id="teamNameInput" v-model="newTeam.name" type="text" :state="teamNameState" trim @blur="teamNameTouched = true"></b-form-input>
+					<div class="invalid-feedback">{{$t('teamNameInvalid')}}</div>
 				</div>
 
 				<div class="form-group">
 					<label for="adminEMailInput">{{$t('adminEmail')}}</label>
 					<b-form-input id="adminEMailInput" v-model="user.email" type="email" :state="eMailState" :placeholder="$t('eMailPlaceholder')" trim></b-form-input>
 					<small class="ml-1">{{$t('youWillBecomeAdmin')}}</small>
+					<div class="invalid-feedback">{{$t('emailInvalid')}}</div>
 				</div>
 
 				<div class="d-flex justify-content-between align-items-center">
@@ -112,21 +116,22 @@ export default {
 				welcome: 'Willkommen bei <span class="liquido"></span> - der freien, sicheren und liquiden e-voting App. Hier könnt ihr in eurem Team abstimmen.',
 				whatsYourName: 'Darf ich fragen wie du heißt?',
 				nickname: "Spitzname",
-				userNameInvalid: "Bitte gib mindestens 4 Buchstaben ein",
+				userNameInvalid: "Bitte mindestens 4 Zeichen!",
 				niceToMeetYou: 'Hallo {nickname}! Schön dich kennen zu lernen.',
 				createOrJoin: 'Möchtest du <ul><li>einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team</b> anlegen?</li></ul>',
 				
 				joinTeamButton: 'Team beitreten',
 				inviteCode: 'Einladungscode',
-				validInvite: 'Code verifiziert',
-				invalidInvite: 'Einladungscode ungültig',
+				inviteInvalid: 'Code muss genau 6 Zeichen lang sein.',
 				yourEMail: 'Deine E-Mail',
 				eMailPlaceholder: 'info@domain.de',
+				emailInvalid: 'E-Mail ungültig',
 
 				createNewTeamButton: 'Neues Team',
 				teamName: 'Team Name',
+				teamNameInvalid: 'Bitte mindestens 4 Zeichen als Teamname!',
 				adminEmail: 'Admin E-Mail',
-				youWillBecomeAdmin: 'Du wirst der Admin des neuen Teams.',
+				youWillBecomeAdmin: 'Du wirst Admin des neuen Teams.',
 
 			}
 		}
@@ -157,8 +162,11 @@ export default {
 				 7 - join team form
 				 8 - create new team form
 			*/
-			flowState: 0,   //TODO: store flow State, and re-use when user comes back
-			userNameError: "",
+			flowState: 0,   								//TODO: store flow State in vuex, and re-use when user comes back
+			usernameTouched: false,
+			inviteTouched:   false,
+			emailTouched:    false,
+			teamNameTouched: false,
 		}
 	},
 	created() {
@@ -168,15 +176,31 @@ export default {
 		window.setTimeout(() => { this.flowState = 3}, 3000)
 	},
 	mounted() {
-		this.$nextTick(() => {
-			$("html, body").scrollTop(0)
-		})		
+		$("html, body").scrollTop(0)
 	},
 	computed: {
-		userNameState()   { return this.user.name === undefined ? null : this.user.name.replace(/\s/g, '').length >= 4 },
-		inviteState()     { return this.user.invite === undefined ? null : this.user.invite.length == 6 },
-		eMailState()      { return this.user.email === undefined ? null : eMailRegEx.test(this.user.email) },
-		teamNameState()   { return this.newTeam.name === undefined ? null : this.newTeam.name.replace(/\s/g, '').length >= 5 },
+		/** 
+		 * Each form field may have one of three states:
+		 * 1) null:  The field has not been touched at all, or user is currently writing. Does not show any error or success message.
+		 * 2) false: The fields value is invalid. Show error message.
+		 * 3) true:  The fields value is valid. May show success message.
+		 */
+		userNameState()   { 
+			if (this.user.name === undefined || !this.usernameTouched) return null    // if username was not entered at all do not show a warning yet
+			return this.user.name.replace(/\s/g, '').length >= 4 
+		},
+		inviteState()     { 
+			if (this.user.invite === undefined || !this.inviteTouched) return null 
+			return this.user.invite.replace(/\s/g, '').length == 6 
+		},
+		eMailState()      { 
+			if (this.user.email === undefined || !this.emailTouched) return null 
+			return eMailRegEx.test(this.user.email)
+		},
+		teamNameState()   { 
+			if(this.newTeam.name === undefined || !this.teamNameTouched) return null
+			return this.newTeam.name.replace(/\s/g, '').length >= 4 
+		},
 		joinTeamButtonDisabled()      { return !this.inviteState   || !this.eMailState },
 		createNewTeamButtonDisabled() { return !this.teamNameState || !this.eMailState },
 	},
@@ -185,17 +209,16 @@ export default {
 			this.flowState++;
 		},
 
-		enterUserName() {
+		userNameEnter() {
+			this.usernameTouched = true
 			if (this.userNameState)	{
 				this.flowState = 4
-				this.userNameError = ""
 				$('#userNameInput').blur()
 				setTimeout(() => { this.flowState = 6 }, 1500)
-			} else {
-				this.userNameError = this.$t('userNameInvalid')
 			}
 		},
-		
+
+
 		clickJoinTeam() {
 			this.flowState = 7
 			this.scrollElemToTop('#joinTeamButton');
