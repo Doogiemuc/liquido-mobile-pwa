@@ -1,3 +1,8 @@
+h1,h2,h3,h4,h5,h6 {
+	//color: $primary;
+}
+
+
 /** No iOS native button and input styling */
 button, [type="button"], [type="reset"], [type="submit"], input {
 	-webkit-appearance: none !important;

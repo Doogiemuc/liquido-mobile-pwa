@@ -8,11 +8,21 @@ const routes = [
     path: "/about",
     name: "about",
     component: () => lazyLoadView(import("@/views/about-page")),
-  },
+	},
+	{
+		path: "/team",
+		name: "teamHome",
+		component: () => lazyLoadView(import("@/views/team-home")),
+	},
   {
     path: "/contact",
     name: "contact",
     component: () => lazyLoadView(import("@/views/contact-page")),
+	},
+	{
+    path: "/castVote",
+    name: "castVote",
+    component: () => lazyLoadView(import("@/views/cast-vote")),
   },
   {
     path: "/account",

@@ -17,12 +17,10 @@
       </div>
     </div>
     <b-button
-      type="is-primary"
-      icon-pack="fas"
-      icon-right="angle-double-right"
-      class="is-pulled-right"
-    >
-      Next
+      variant="primary"
+      class="float-right mr-2"
+			to="castVote">
+       Next&nbsp;<i class="fas fa-angle-double-right"></i>
     </b-button>
   </section>
 </template>
@@ -33,9 +31,7 @@ import lawPanel from "../components/law-panel"
 import draggable from "vuedraggable"
 
 export default {
-  name: "Index",
   components: { lawPanel, draggable },
-  mixins: [],
   data() {
     return {
       laws: [

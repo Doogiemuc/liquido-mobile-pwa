@@ -1,5 +1,5 @@
 <template>
-	<div class="container-lg">
+	<div id="" class="container-lg">
 		<b-card class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 1 }">
 			<b-card-text v-html="$t('welcome')"></b-card-text>
 		</b-card>
@@ -10,7 +10,7 @@
 
 		<b-card class="chat-bubble chat-right" :class="{ 'hide-right': flowState < 3 }">
 			<div class="form-group mb-0">
-				<label for="userNameInput">{{$t('nickname')}}</label>
+				<label for="userNameInput">{{$t('yourNickname')}}</label>
 				<b-form-input id="userNameInput" v-model="user.name" type="text" class="form-control" :state="userNameState" :disabled="flowState > 3" @keyup.enter="userNameEnter()" @blur="userNameEnter()" />
 				<div class="invalid-feedback">{{ $t('userNameInvalid') }}</div>
 			</div>
@@ -100,6 +100,7 @@
 </template>
 
 <script>
+
 const eMailRegEx = /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}\b/
 
 export default {
@@ -115,7 +116,7 @@ export default {
 			de: {
 				welcome: 'Willkommen bei <span class="liquido"></span> - der freien, sicheren und liquiden e-voting App. Hier könnt ihr in eurem Team abstimmen.',
 				whatsYourName: 'Darf ich fragen wie du heißt?',
-				nickname: "Spitzname",
+				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
 				niceToMeetYou: 'Hallo {nickname}! Schön dich kennen zu lernen.',
 				createOrJoin: 'Möchtest du <ul><li>einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team</b> anlegen?</li></ul>',
@@ -163,61 +164,56 @@ export default {
 				 8 - create new team form
 			*/
 			flowState: 0,   								//TODO: store flow State in vuex, and re-use when user comes back
-			usernameTouched: false,
-			inviteTouched:   false,
-			emailTouched:    false,
-			teamNameTouched: false,
+				/** 
+		 * Each form field may have one of three states:
+		 * 1) null:  The field has not yet been validated at all. Do not show any error or success message yet.
+		 * 2) false: The fields value is invalid. Show error message.
+		 * 3) true:  The fields value is valid. May show success message.
+		 */
+			usernameValidated: false,
+			inviteValidated:   false,
+			emailValidated:    false,
+			teamNameValidated: false,
 		}
 	},
 	created() {
-		$("html, body").scrollTop(0)
 		window.setTimeout(() => { this.flowState = 1}, 500)
 		window.setTimeout(() => { this.flowState = 2}, 2500)
 		window.setTimeout(() => { this.flowState = 3}, 3000)
 	},
 	mounted() {
-		$("html, body").scrollTop(0)
+		$("html, body").animate({ scrollTop: 0 }, 1000);
 	},
 	computed: {
-		/** 
-		 * Each form field may have one of three states:
-		 * 1) null:  The field has not been touched at all, or user is currently writing. Does not show any error or success message.
-		 * 2) false: The fields value is invalid. Show error message.
-		 * 3) true:  The fields value is valid. May show success message.
-		 */
 		userNameState()   { 
-			if (this.user.name === undefined || !this.usernameTouched) return null    // if username was not entered at all do not show a warning yet
-			return this.user.name.replace(/\s/g, '').length >= 4 
+			 if (this.user.name && this.user.name.replace(/\s/g, '').length >= 4) return this.usernameValidated = true
+			 return this.usernameValidated ? false : null
 		},
 		inviteState()     { 
-			if (this.user.invite === undefined || !this.inviteTouched) return null 
-			return this.user.invite.replace(/\s/g, '').length == 6 
+			if (this.user.invite && this.user.invite.replace(/\s/g, '').length == 6) return this.inviteValidated = true
+			return this.inviteValidated ? false : null
 		},
 		eMailState()      { 
-			if (this.user.email === undefined || !this.emailTouched) return null 
-			return eMailRegEx.test(this.user.email)
+			if (this.user.email && eMailRegEx.test(this.user.email)) return this.emailValidated = true
+			return this.emailValidated ? false : null
 		},
 		teamNameState()   { 
-			if(this.newTeam.name === undefined || !this.teamNameTouched) return null
-			return this.newTeam.name.replace(/\s/g, '').length >= 4 
+			if(this.newTeam.name && this.newTeam.name.replace(/\s/g, '').length >= 4) return this.teamNameValidated = true
+			return this.teamNameValidated ? false : null
 		},
 		joinTeamButtonDisabled()      { return !this.inviteState   || !this.eMailState },
 		createNewTeamButtonDisabled() { return !this.teamNameState || !this.eMailState },
 	},
 	methods: {
-		nextFlowState() {
-			this.flowState++;
-		},
 
 		userNameEnter() {
-			this.usernameTouched = true
+			this.usernameValidated = true
 			if (this.userNameState)	{
 				this.flowState = 4
 				$('#userNameInput').blur()
 				setTimeout(() => { this.flowState = 6 }, 1500)
 			}
 		},
-
 
 		clickJoinTeam() {
 			this.flowState = 7

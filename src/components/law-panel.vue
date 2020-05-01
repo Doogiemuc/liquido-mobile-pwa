@@ -1,31 +1,26 @@
 <template>
-  <div :class="{ 'no-select': readOnly }" class="box law-panel">
-    <div class="media">
-      <div class="media-left">
-        <figure class="image">
-          <img
-            :src="law.createdBy.profile.picture"
-            alt="avatar"
-            class="avatar"
-          />
-        </figure>
-      </div>
-      <div class="media-content">
-        <div class="content law-panel-content">
-          <h2>{{ law.title }}</h2>
-          <div class="author">
-            &ndash;{{ law.createdBy.profile.name }}
-            <span :class="{ supported: law.supportedByCurrentUser }"
-              ><b-icon pack="fas" icon="thumbs-up" size="is-small" />{{
-                law.numSupporters
-              }}</span
-            >
-          </div>
-          <!--b-button type="is-primary" icon-pack="fas" icon-right="thumbs-up" class="like-button" :class="{'read-only' : readOnly}"></b-button-->
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="law-panel">
+		<b-card :img-src="law.createdBy.profile.picture" 
+			img-alt="Law image" img-left 
+			class="law-card" 
+			:class="{ 'no-select': readOnly }"
+			:title="law.title"
+			no-body
+		>
+			<b-card-body>
+				<b-card-title>{{law.title}}</b-card-title>
+				<b-card-text>
+					{{law.description}}
+					<div class="author">
+						<i class="far fa-user"></i>&nbsp;{{ law.createdBy.profile.name }}&nbsp;
+						<span :class="{ supported: law.supportedByCurrentUser }">
+							<i :class="{'far': !law.supportedByCurrentUser, 'fas': law.supportedByCurrentUser}" class="fa-thumbs-up">&nbsp;{{law.numSupporters}}</i>
+						</span>
+					</div>
+				</b-card-text>
+			</b-card-body>
+		</b-card>
+	</div>
 </template>
 
 <script>
@@ -83,60 +78,59 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$avatar_size: 64px;
+$avatar_size: 84px;
 
-.law-panel {
-  height: $avatar_size;
-  max-height: $avatar_size;
-  min-height: $avatar_size;
-  overflow: hidden;
-  padding: 0;
-  position: relative;
-  margin-bottom: 0.5em;
-  h2 {
-    line-height: 20px;
-    padding: 0 5px;
-    font-size: 16px;
-    font-weight: normal;
-  }
-  .media-left {
-    margin: 0;
-    .like-button {
-      display: none;
-    }
-    &:hover .like-button:not(.read-only) {
-      display: flex;
-    }
-  }
-  .avatar {
-    min-width: $avatar_size;
-    max-width: $avatar_size;
-    width: $avatar_size;
-    min-height: $avatar_size;
-    max-height: $avatar_size;
-    height: $avatar_size;
-  }
-  .author {
-    font-size: 12px;
-    color: grey;
-    position: absolute;
-    background-color: white;
-    padding: 3px 5px 0 5px; // need some more white pixels above to hide h2 behind
-    right: 0;
-    bottom: 0;
-  }
-  .supported {
-    color: green;
-  }
-  .like-button {
-    position: absolute;
-    border-radius: 6px;
-    top: 0;
-    right: 0;
-    padding: 0 15px;
-    width: 2em;
-    height: 2em;
-    line-height: 1;
-  }
+.law-card {
+	height: 94px;
+	//max-height: $avatar_size;
+	//min-height: $avatar_size;
+
+	.card-body {
+		padding: 0.25rem;
+		font-size: 12px;
+		line-height: 15px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	
+	.card-title {
+		line-height: 20px;
+		font-size: 16px;
+		margin-bottom: 3px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	
+	.card-img-left {
+		margin: 0.25rem;
+		border-radius: 0.25rem;
+		min-width: $avatar_size;
+		max-width: $avatar_size;
+		width: $avatar_size;
+		min-height: $avatar_size;
+		max-height: $avatar_size;
+		height: $avatar_size;
+	}
 }
+	
+.author {
+	font-size: 10px;
+	line-height: 15px;
+	color: grey;
+	background-color: #f3f3f3;
+	border-top-left-radius: 15px;
+	// border-bottom-left-radius: 15px;
+	border-left: 5px solid white;
+	box-shadow: inset 2px 2px 2px 0px rgba(100,100,100, 0.1);
+	padding: 3px 5px 0 10px; // need some more white pixels above to hide h2 behind
+	position: absolute;
+	right: 0;
+	bottom: 0;	
+}
+.supported {
+	color: green;
+}
+
 </style>
