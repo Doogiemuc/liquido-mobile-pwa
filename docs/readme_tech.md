@@ -61,6 +61,17 @@ On next app starts
  * Bar at the bottom: proposals - polls - search
 
 
+# Logging
+
+## Logging on Mobile Device when developping
+
+https://github.com/christlee1989/vue-mobile-log
+
+# Debug
+
+//TODO: Use Visual Studio Code   Chrome Debugger  with Vue
+https://medium.com/@brockreece/how-i-stopped-using-console-log-when-debugging-vue-components-14e0f7aa280d
+
 # Test
 
 ## Simulate test on mobile phone

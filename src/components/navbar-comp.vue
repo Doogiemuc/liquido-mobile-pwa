@@ -5,8 +5,8 @@
 			class="navbar-toggler collapsed"
 			type="button"
 			data-toggle="collapse"
-			data-target="#navbarSupportedContent"
-			aria-controls="navbarSupportedContent"
+			data-target="#liquidoNavBar"
+			aria-controls="liquidoNavBar"
 			aria-expanded="false"
 			aria-label="Toggle navigation"
 		>
@@ -15,16 +15,19 @@
 			<span class="icon-bar"></span>
 		</button>
 
-		<div id="navbarSupportedContent" class="collapse navbar-collapse">
+		<div id="liquidoNavBar" class="collapse navbar-collapse">
 			<ul class="navbar-nav mr-auto">
 				<li class="nav-item active">
-					<router-link to="/team" class="navbar-item">Team</router-link>
+					<router-link to="/team" class="nav-link">Team</router-link>
 				</li>
 				<li>
-					<a class="nav-link" href="/about">About</a>
+					<router-link to="/castVote" class="nav-link">Cast Vote</router-link>
 				</li>
 				<li>
-					<a class="nav-link" href="/search">Search</a>
+					<router-link to="/about" class="nav-link">About</router-link>
+				</li>
+				<li>
+					<router-link to="/search" class="nav-link">Search</router-link>
 				</li>
 			</ul>
 		</div>
@@ -47,7 +50,12 @@ export default {
 	beforeCreate() {},
 	created() {},
 	beforeMount() {},
-	mounted() {},
+	mounted() {
+		// Close the navbar when clicked. https://stackoverflow.com/questions/14203279/bootstrap-close-responsive-menu-on-click
+		$('.navbar-collapse ul li a:not(.dropdown-toggle)').bind('click', function () {
+			$('.navbar-toggler:visible').click();
+		});
+	},
 	computed: {
 		showNavbar: get("ui/showNavbar"),
 		isLoggedIn: get("account/isAuthenticated"),

@@ -1,28 +1,35 @@
 <template>
-  <section class="section">
-    <div class="container">
-      <p>
-        Now sort these proposals into your personally preferred order. With your favorite proposal at the top.
-      </p>
+	<section class="section">
+		<div class="container">
+			<p>
+				Now sort these proposals into your personally preferred order. With your favorite proposal at the top.
+			</p>
 
-      <div id="ballot" class="ballot">
-        <draggable v-model="laws" :swap-threshold="0.5" group="ballot">
-          <law-panel
-            v-for="law in laws"
-            :law="law"
-            :read-only="false"
-            :key="law.id"
-          />
-        </draggable>
-      </div>
-    </div>
-    <b-button
-      variant="primary"
-      class="float-right mr-2"
-			to="castVote">
-       Next&nbsp;<i class="fas fa-angle-double-right"></i>
-    </b-button>
-  </section>
+			<div id="ballot" class="ballot">
+				<draggable 
+					v-model="laws"
+					:swap-threshold="0.5"
+					:animation="500"
+					:canScrollX="false"
+				>
+						<law-panel
+							v-for="law in laws"
+							class="mb-2"
+							:law="law"
+							:read-only="false"
+							:key="law.id"
+						/>
+
+				</draggable>
+			</div>
+		</div>
+		<b-button
+			variant="primary"
+			class="float-right mr-2"
+			to="castVote-step2">
+				Next&nbsp;<i class="fas fa-angle-double-right"></i>
+		</b-button>
+	</section>
 </template>
 
 <script>
@@ -87,16 +94,7 @@ export default {
   beforeCreate() {},
   created() {},
   beforeMount() {},
-  mounted() {
-    let el = document.getElementById("ballot")
-    console.log(el)
-    /*
-		new Sortable(el, {
-				animation: 150,
-				//ghostClass: 'blue-background-class'
-		});
-		*/
-  },
+  mounted() {},
   computed: {},
   methods: {},
   filters: {},
@@ -108,15 +106,14 @@ export default {
 
 <style lang="scss">
 .ballot {
-  padding: 1rem 0.5rem;
-  margin: 0.5rem -0.5rem 1em -0.5rem;
-  background: #f0f0f0;
+	padding: 1rem 0.5rem;
+	margin: 0.5rem -0.5rem 1em -0.5rem;
+	background: #f0f0f0;
 }
 .law-panel {
-  cursor: grab;
-  //margin-bottom: 0.5em;
+	cursor: grab;
 }
 .sortable-ghost {
-  opacity: 0.2;
+	opacity: 0.1;
 }
 </style>

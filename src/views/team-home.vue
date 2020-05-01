@@ -9,7 +9,7 @@
 					<h5><i class="fas fa-lightbulb"></i>&nbsp;New Ideas</h5>
 					<law-panel
 						v-for="prop in poll.proposals" :key="'p1'+prop.id"
-						class="mb-3"
+						class="mb-3 shadow-sm"
 						:law="prop"
 						:read-only="false"
 						
@@ -18,10 +18,9 @@
 					<h5><i class="fas fa-file-alt"></i>&nbsp;Proposals</h5>
 					<law-panel
 						v-for="prop in poll.proposals" :key="'k2'+prop.id"
-						class="mb-3"
+						class="mb-3 shadow-sm"
 						:law="prop"
 						:read-only="false"
-						
 					/>
 				</div>
 

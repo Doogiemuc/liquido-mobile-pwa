@@ -107,14 +107,14 @@ export default {
 	i18n: {
 		messages: {
 			en: {
-				welcome: 'Welcome to <span class="liquido"></span> - the free, secure and liquid eVoting platform. With this mobile app you can create polls and then take votes with your team.',
+				welcome: 'Welcome to  - the free, secure and liquid eVoting platform. With this mobile app you can create polls and then take votes with your team.',
 				whatsYourName: 'How shall I call you?',
 				createOrJoin: 'Do you want to <em>join an existing team</em> with an invitation code or <em>create a new team</em>?',
 				joinTeamButton: 'Join a team',
 				createNewTeamButton: 'Create new team',
 			},
 			de: {
-				welcome: 'Willkommen bei <span class="liquido"></span> - der freien, sicheren und liquiden e-voting App. Hier könnt ihr in eurem Team abstimmen.',
+				welcome: 'Willkommen in <span class="liquido"></span>, der freien, sicheren und liquiden e-voting App. Hier kannst du Abstimmung erstellen und wählen.',
 				whatsYourName: 'Darf ich fragen wie du heißt?',
 				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
@@ -282,6 +282,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 .chat-bubble {
 	background-color: #FBFBFB;
 	margin-bottom: 1rem;
