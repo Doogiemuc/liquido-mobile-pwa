@@ -1,53 +1,59 @@
 <template>
 	<div id="" class="container-lg">
-		<h1>Team Fabolous</h1>
+		<h3>Team Fabolous</h3>
 
 		<b-tabs content-class="mt-3" justified>
-			<b-tab :title="$t('proposals')">
-
-				<div v-for="poll in polls" :key="'p1-'+poll.id">
-					<h5><i class="fas fa-lightbulb"></i>&nbsp;New Ideas</h5>
+			<b-tab>
+				<template v-slot:title>
+					<i class="far fa-lightbulb"></i>
+				</template>				
 					<law-panel
-						v-for="prop in poll.proposals" :key="'p1'+prop.id"
+						v-for="idea in ideas" :key="'idea-'+idea.id"
 						class="mb-3 shadow-sm"
-						:law="prop"
+						:law="idea"
 						:read-only="false"
 						
 					/>
-
-					<h5><i class="fas fa-file-alt"></i>&nbsp;Proposals</h5>
+			</b-tab>
+			<b-tab>
+				<template v-slot:title>
+					<i class="far fa-file-alt"></i>
+				</template>
 					<law-panel
-						v-for="prop in poll.proposals" :key="'k2'+prop.id"
+						v-for="prop in polls[0].proposals" :key="'prop-'+prop.id"
 						class="mb-3 shadow-sm"
 						:law="prop"
 						:read-only="false"
 					/>
-				</div>
-
 			</b-tab>
 
-			<b-tab :title="$t('elaboration')">
-				<p>Elaboration</p>
+			<b-tab>
+				<template v-slot:title>
+					<i class="far fa-comments"></i>
+				</template>
 			</b-tab>
 
-			<b-tab :title="$t('inVoting')" active>
+			<b-tab active>
+				<template v-slot:title>
+					<i class="fas fa-vote-yea"></i>
+				</template>
 
-				<b-card v-for="poll in polls" :key="poll.id"
+				<b-card 
+				  v-for="poll in polls" :key="poll.id"
 					no-body 
-					class="mb-3 poll-panel" 
-					header-tag="header"
+					class="poll-panel mb-3 shadow-sm" 
 				>
 					<template v-slot:header>
 						<b-button variant="primary" size="sm" class="float-right">
 							<i class="fas fa-angle-double-right"></i>
 						</b-button>
-						<h5 class="mb-0"><i class="fas fa-poll"></i>&nbsp;{{poll.title}}</h5>
+						<h5 class="m-0"><i class="fas fa-poll"></i>&nbsp;{{poll.title}}</h5>
 					</template>
 
 					<b-list-group flush>
-						<b-list-group-item v-for="prop in poll.proposals" :key="prop.id">
-							<img :src="prop.createdBy.profile.picture" class="prop-img"/>
-							{{prop.title}}
+						<b-list-group-item v-for="prop in poll.proposals" :key="prop.id" class="prop-list-group-item">
+							<img :src="'https://picsum.photos/seed/'+prop.id+'/100'" class="prop-image"/>
+							<h4 class="prop-title">{{prop.title}}</h4>
 							<div class="author">
 								<i class="far fa-user"></i>&nbsp;{{ prop.createdBy.profile.name }}&nbsp;
 								<span :class="{ supported: prop.supportedByCurrentUser }">
@@ -79,6 +85,8 @@ export default {
 
 			},
 			de: {
+				ideas: "Ideen",
+				newIdeas: "Neue Ideen", 
 				proposals: 'Vorschläge',
 				polls: 'Wahlen',  // Abstimmungen, Umfragen ??
 				elaboration: 'Diskussion',
@@ -89,6 +97,35 @@ export default {
 	components: { lawPanel },
 	data() {
 		return {
+			ideas: [
+					{
+							id: 1001,
+							title: "This is a great idea with a long tittle",
+							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
+							status: "IDEA",
+							createdAt: new Date(),
+
+							updatedAt: new Date(),
+							area: {
+								id: 4001,
+								title: "Example Area"
+							},
+							supporters: [
+								
+							],
+							numSupporters: 15,
+							supportedByCurrentUser: true,
+							createdBy: {
+								id: 7001,
+								email: "user1@liqudo.vote",
+								profile: {
+									name: "User1 Mobile",
+									mobilephone: "#491234517",
+									picture: "/img/avatars/Avatar1.png",
+								}
+							}
+						},
+			],
 			polls: [
 				{
 					id: 101,
@@ -182,54 +219,30 @@ export default {
 </script>
 
 <style lang="scss">
-.nav-link {
-	padding: 0.25rem;
-}
+$avatar_size: 90px;
+
 .poll-panel {
-	position: relative;
-	 
-	.card-header {
-		padding: 0 0 0 0.5rem;
-		h5 {
-			padding-top: 2px;
-		}
-		.btn {
-			border-top-left-radius: 0;
-			border-bottom-right-radius: 0;
-			border-bottom-left-radius: 0;
-		}
+	.prop-list-group-item {
+		padding: 5px;
 	}
-	.list-group-item {
-		padding: 0.25rem 0.5rem;
-		font-size: 14px;
-		height: 48px;
+	.prop-title {
+		//line-height: 30px;
+		margin: 0;
+		font-size: 18px;
+		//white-space: nowrap;
+		//overflow: hidden;
+		//text-overflow: ellipsis;
 	}
-	.prop-img {
+	.prop-image {
 		float: left;
-		width: 32px;
-		height: 32px;
-		margin-top: 4px;
-		margin-right: 0.5rem;
+		margin-right: 5px;
 		border-radius: 5px;
+		min-width: $avatar_size;
+		max-width: $avatar_size;
+		width: $avatar_size;
+		min-height: $avatar_size;
+		max-height: $avatar_size;
+		height: $avatar_size;
 	}
 }
-
-.author {
-	font-size: 10px;
-	line-height: 15px;
-	color: grey;
-	background-color: #f3f3f3;
-	border-top-left-radius: 15px;
-	// border-bottom-left-radius: 15px;
-	border-left: 5px solid white;
-	box-shadow: inset 2px 2px 2px 0px rgba(100,100,100, 0.1);
-	padding: 3px 5px 0 10px; // need some more white pixels above to hide h2 behind
-	position: absolute;
-	right: 0;
-	bottom: 0;
-}
-.supported {
-	color: green;
-}
-
 </style>

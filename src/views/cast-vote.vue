@@ -14,7 +14,7 @@
 				>
 						<law-panel
 							v-for="law in laws"
-							class="mb-2"
+							class="mb-2 shadow-sm"
 							:law="law"
 							:read-only="false"
 							:key="law.id"
@@ -46,7 +46,7 @@ export default {
           id: 1,
           title:
             "Just some example very long title gasdkfljasdjf lkdjsa lkf flknwe rtmnwre,m nwm,e rwerfln werflkwe rln welrnlwlerk ",
-          description: "Law description which is very helpfull ...",
+          description: "Law description which is very helpfull In the example below, we remove the row grid gutters with the no-gutters prop on <b-row> and use md props on <b-col> to make the card horizontal at the md breakpoint. Class rounded-0 removes the rounding of the <b-card-img> corners while class overflow-hidden on <b-card> will appropriately ",
           createdAt: new Date(),
           createdBy: {
             email: "user@liquido.vote",
