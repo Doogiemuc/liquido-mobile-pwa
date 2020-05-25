@@ -1,6 +1,7 @@
 <template>
 	<nav class="navbar fixed-top bg-white container-lg">
-		<router-link to="/"><h1 class="navbar-brand mb-0"><i class="fa fa-university"></i>&nbsp;<span class="liquido" /></h1></router-link>
+		<i class="fa fa-university nav-icon"></i>
+		<router-link to="/"><h1 class="navbar-brand m-0"><span class="liquido" /></h1></router-link>
 		<button
 			class="navbar-toggler collapsed"
 			type="button"
@@ -96,6 +97,8 @@ export default {
 
 <style lang="scss">
 nav.navbar {
+	color: $primary;
+	font-size: 1.25rem;
 	border-bottom: 1px solid $primary;
 	padding: 0 0.5rem;
 }

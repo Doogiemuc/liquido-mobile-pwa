@@ -1,5 +1,5 @@
 <template>
-	<b-card no-body class="law-panel">
+	<b-card no-body class="law-panel" :id="law.id">
 		<div>
 			<h4 class="law-title"><i :class="iconForLaw" class="title-icon"></i>&nbsp;{{law.title}}</h4>
 		</div>
@@ -21,7 +21,7 @@
 			<div class="law-description">
 				{{law.description}}
 			</div>
-		</div>
+		</div> 
   </b-card>
 </template>
 
@@ -83,9 +83,9 @@ export default {
 $avatar_size: 90px;
 
 .law-panel {
-	height: 30px + 25px + $avatar_size + 5px;  // title + subtitle + avatar_img + padding-bottom
+	height: 30px + 25px + $avatar_size + 15px;  // title + subtitle + avatar_img + padding
 	overflow: hidden;
-	padding: 0 5px 5px 5px;
+	padding: 5px 10px 10px 10px;
 
 	.flex-fixed-width {
 		flex: 0 0 100px;
@@ -96,6 +96,7 @@ $avatar_size: 90px;
 		height: 30px;
 		line-height: 30px;
 		margin: 0;
+		padding-top: 0;
 		font-size: 18px;
 		white-space: nowrap;
 		overflow: hidden;
@@ -113,9 +114,9 @@ $avatar_size: 90px;
 		min-height: 18px;
 		color: #BBB;
 		margin-bottom: 5px;
-		//border-bottom: 1px solid #BBB;
-		//-webkit-box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-		//box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+		//border-bottom: 1px solid rgba(0, 0, 0, 0.1);;
+		//-webkit-box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
+		//box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
 	}
 
 	.law-image {
@@ -131,6 +132,9 @@ $avatar_size: 90px;
 
 	.law-description {
 		font-size: 12px;
+		height: $avatar_size;
+		max-height: $avatar_size;
+		overflow: hidden;
 	}
 }
 

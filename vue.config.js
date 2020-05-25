@@ -6,7 +6,8 @@ const path = require("path")
 module.exports = {
   lintOnSave: undefined,
   configureWebpack: {
-    // Merged into the final Webpack config
+		// Merged into the final Webpack config
+		devtool: 'source-map',
     plugins: [
       new PurgecssPlugin({
         paths: glob.sync([

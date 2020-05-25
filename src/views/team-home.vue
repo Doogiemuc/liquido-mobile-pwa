@@ -1,9 +1,9 @@
 <template>
-	<div id="" class="container-lg">
+	<div class="container-lg team-container">
 		<h3>Team Fabolous</h3>
 
-		<b-tabs content-class="mt-3" justified>
-			<b-tab>
+		<b-tabs content-class="tabs-content" justified>
+			<b-tab active>
 				<template v-slot:title>
 					<i class="far fa-lightbulb"></i>
 				</template>				
@@ -20,7 +20,7 @@
 					<i class="far fa-file-alt"></i>
 				</template>
 					<law-panel
-						v-for="prop in polls[0].proposals" :key="'prop-'+prop.id"
+						v-for="prop in proposals" :key="'prop-'+prop.id"
 						class="mb-3 shadow-sm"
 						:law="prop"
 						:read-only="false"
@@ -33,9 +33,9 @@
 				</template>
 			</b-tab>
 
-			<b-tab active>
+			<b-tab>
 				<template v-slot:title>
-					<i class="fas fa-vote-yea"></i>
+					<i class="fas fa-poll"></i>
 				</template>
 
 				<b-card 
@@ -103,6 +103,140 @@ export default {
 							title: "This is a great idea with a long tittle",
 							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
 							status: "IDEA",
+							createdAt: new Date(),
+
+							updatedAt: new Date(),
+							area: {
+								id: 4001,
+								title: "Example Area"
+							},
+							supporters: [
+								
+							],
+							numSupporters: 15,
+							supportedByCurrentUser: true,
+							createdBy: {
+								id: 7001,
+								email: "user1@liqudo.vote",
+								profile: {
+									name: "User1 Mobile",
+									mobilephone: "#491234517",
+									picture: "/img/avatars/Avatar1.png",
+								}
+							}
+						},
+							{
+							id: 1002,
+							title: "Just an example proposal Bei relativ positionierten Elementen (position: relative)",
+							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
+							status: "IDEA",
+							createdAt: new Date(),
+
+							updatedAt: new Date(),
+							area: {
+								id: 4001,
+								title: "Example Area"
+							},
+							supporters: [
+								
+							],
+							numSupporters: 15,
+							supportedByCurrentUser: true,
+							createdBy: {
+								id: 7001,
+								email: "user1@liqudo.vote",
+								profile: {
+									name: "User1 Mobile",
+									mobilephone: "#491234517",
+									picture: "/img/avatars/Avatar1.png",
+								}
+							}
+						},
+						{
+							id: 1003,
+							title: "asdfklfj ewml,rtn wvasdoi v weweklv  gfdsfasdf",
+							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
+							status: "IDEA",
+							createdAt: new Date(),
+
+							updatedAt: new Date(),
+							area: {
+								id: 4001,
+								title: "Example Area"
+							},
+							supporters: [
+								
+							],
+							numSupporters: 15,
+							supportedByCurrentUser: true,
+							createdBy: {
+								id: 7001,
+								email: "user1@liqudo.vote",
+								profile: {
+									name: "User1 Mobile",
+									mobilephone: "#491234517",
+									picture: "/img/avatars/Avatar1.png",
+								}
+							}
+						},
+						{
+							id: 1004,
+							title: "Fourht idea with a long title",
+							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
+							status: "IDEA",
+							createdAt: new Date(),
+
+							updatedAt: new Date(),
+							area: {
+								id: 4001,
+								title: "Example Area"
+							},
+							supporters: [
+								
+							],
+							numSupporters: 9,
+							supportedByCurrentUser: false,
+							createdBy: {
+								id: 7002,
+								email: "user2@liqudo.vote",
+								profile: {
+									name: "User2 Mobile",
+									mobilephone: "#491234512",
+									picture: "/img/avatars/Avatar2.png",
+								}
+							}
+						},
+						{
+							id: 1005,
+							title: "Fifth 555 idea with a vey long title",
+							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
+							status: "IDEA",
+							createdAt: new Date(),
+							updatedAt: new Date(),
+							area: {
+								id: 4001,
+								title: "Example Area"
+							},
+							supporters: [],
+							numSupporters: 0,
+							supportedByCurrentUser: false,
+							createdBy: {
+								id: 7004,
+								email: "user4@liqudo.vote",
+								profile: {
+									name: "User4 Mobile",
+									mobilephone: "#49123454",
+									picture: "/img/avatars/Avatar4.png",
+								}
+							}
+						},
+			],
+			proposals: [
+					{
+							id: 2001,
+							title: "Just a dummy proposal with a very long title",
+							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
+							status: "PROPOSAL",
 							createdAt: new Date(),
 
 							updatedAt: new Date(),
@@ -211,7 +345,6 @@ export default {
 			return result;
 		},
 
-
 	},
 
 }
@@ -220,6 +353,18 @@ export default {
 
 <style lang="scss">
 $avatar_size: 90px;
+
+ .tabs-content {
+	margin-left: -15px;
+	margin-right: -15px;
+	padding: 1rem 15px;
+	background-color: #f0f0f0;
+}
+
+.nav-tabs .nav-link.active {
+	background-color: #f0f0f0;
+	border-bottom-color: #f0f0f0;
+}
 
 .poll-panel {
 	.prop-list-group-item {

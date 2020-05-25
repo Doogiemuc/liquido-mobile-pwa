@@ -3,8 +3,13 @@ const routes = [
     path: "/",
     name: "index",
     component: () => lazyLoadView(import("@/views/index-page")),
-  },
+	},
   {
+    path: "/addIdea",
+    name: "addIdea",
+    component: () => lazyLoadView(import("@/views/add-idea")),
+	},
+	{
     path: "/about",
     name: "about",
     component: () => lazyLoadView(import("@/views/about-page")),

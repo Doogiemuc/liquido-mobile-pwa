@@ -5,10 +5,11 @@ Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.v
 
 ## Use Cases
 
-### Open www.liquido.me on mobile
+### Directly open www.liquido.me on mobile
 
- * IF user has a stored JWT, then log him in. Goto User Home
- * ELSE Welcome message. User can decide to create a new team or join an existing one (with invitation code).
+ * IF user has a stored JWT, then log him in. Goto User Home.
+ * ELSE IF liquido.me/join/{teamname}?invitationCode={abc} link, then join that team
+ * ELSE Welcome chat bot: User can decide to create a new team or join an existing one (with invitation code).
 
 ### Create a new team
 

@@ -20,7 +20,7 @@ export default {
 	mixins: [],
 	data() {
 		return {
-			showFooter: false
+			showFooter: true
 		}
 	},
 	created() {},

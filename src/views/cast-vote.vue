@@ -9,6 +9,7 @@
 				<draggable 
 					v-model="laws"
 					:swap-threshold="0.5"
+					:delay="83"
 					:animation="500"
 					:canScrollX="false"
 				>

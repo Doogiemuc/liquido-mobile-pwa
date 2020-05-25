@@ -1,5 +1,5 @@
 <template>
-	<div id="" class="container-lg">
+	<div class="container-lg">
 		<b-card class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 1 }">
 			<b-card-text v-html="$t('welcome')"></b-card-text>
 		</b-card>
@@ -170,6 +170,8 @@ export default {
 		 * 2) false: The fields value is invalid. Show error message.
 		 * 3) true:  The fields value is valid. May show success message.
 		 */
+
+			// These variables store if the field has been validated before. If false => do not show any error message yet.
 			usernameValidated: false,
 			inviteValidated:   false,
 			emailValidated:    false,
