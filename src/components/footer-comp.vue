@@ -2,7 +2,7 @@
   <footer class="container-lg">
 		<div class="row">
 			<div class="col text-center">
-				<router-link to="/proposals" class="navbar-item"><i class="far fa-file-alt"></i></router-link>
+				<router-link to="/proposals" class="navbar-item"><i class="fas fa-vote-yea"></i></router-link>
 			</div>
 			<div class="col text-center">
 				<div class="circle-1">
@@ -10,7 +10,7 @@
 				</div>
 			</div>
 			<div class="col text-center">
-				<router-link to="/polls" class="navbar-item"><i class="fas fa-poll"></i></router-link>
+				<router-link to="/polls" class="navbar-item"><i class="fas fa-person-booth"></i></router-link>
 			</div>
 		</div>
   </footer>

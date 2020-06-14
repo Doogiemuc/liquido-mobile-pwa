@@ -1,5 +1,5 @@
 <template>
-	<nav class="navbar fixed-top bg-white container-lg">
+	<nav class="navbar fixed-top bg-white container-lg shadow-sm">
 		<i class="fa fa-university nav-icon"></i>
 		<router-link to="/"><h1 class="navbar-brand m-0"><span class="liquido" /></h1></router-link>
 		<button
@@ -101,6 +101,9 @@ nav.navbar {
 	font-size: 1.25rem;
 	border-bottom: 1px solid $primary;
 	padding: 0 0.5rem;
+}
+.nav-icon {
+	font-size: 1.7rem;
 }
 .navbar-toggler {
 	padding: 0.25rem !important;

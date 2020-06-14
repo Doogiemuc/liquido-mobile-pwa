@@ -3,11 +3,13 @@
  		<label v-if="label" :for="id">{{label}}</label>
 		<input 
 			:id="id" 
+			:name="name"
 			v-model="inputValue" 
 			class="form-control" 
 			:class="validClass"
 			:type="type" 
 			:placeholder="placeholder"
+			:disabled="disabled"
 			:maxlength="maxlength"
 			v-on:input="$emit('input', $event.target.value)"
 			v-on:blur="$emit('blur', $event.target.value)"
@@ -34,13 +36,15 @@ export default {
 	name: "liquido-input",
 	props: {
 		id: String,
+		name: String,
 		value: String,
 		label: String,
 		placeholder: String,
 		type: { type: String, required: false, default: "Text" },
+		disabled: Boolean,
 		maxlength: Number,
 		invalidFeedback: String,
-		status: { type: Boolean, required: false, default: null },
+		state: { type: Boolean, required: false, default: null },
 	},
   data() {
     return {
@@ -50,7 +54,7 @@ export default {
   mounted() { },
   computed: {
 		validClass() {
-			return { 'is-valid' : this.status === true, 'is-invalid' : this.status === false }   // status === null will set no class at all
+			return { 'is-valid' : this.state === true, 'is-invalid' : this.state === false }   // status === null will set no class at all
 		}
 	},
   methods: {
