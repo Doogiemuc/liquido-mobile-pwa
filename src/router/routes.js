@@ -8,7 +8,12 @@ const routes = [
     path: "/addIdea",
     name: "addIdea",
     component: () => lazyLoadView(import("@/views/add-idea")),
-	},
+  },
+  {
+    path: "/polls",
+    name: "pollsSearch",
+    component: () => lazyLoadView(import("@/views/polls-search")),
+  },
 	{
     path: "/about",
     name: "about",

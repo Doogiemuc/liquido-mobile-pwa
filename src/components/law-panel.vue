@@ -22,7 +22,7 @@
 				{{law.description}}
 			</div>
 		</div> 
-  </b-card>
+	</b-card>
 </template>
 
 <script>

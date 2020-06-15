@@ -1,46 +1,46 @@
 <template>
-  <footer class="container-lg">
+	<footer class="container-lg">
 		<div class="row">
 			<div class="col text-center">
-				<router-link to="/proposals" class="navbar-item"><i class="fas fa-vote-yea"></i></router-link>
+				<router-link to="/proposals" class="navbar-item"><i class="fas fa-search"></i></router-link>
 			</div>
 			<div class="col text-center">
 				<div class="circle-1">
-					<router-link to="/addIdea" class="navbar-item"><i class="far fa-lightbulb"></i></router-link>
+					<router-link to="/addIdea" class="navbar-item"><i class="fas fa-lightbulb"></i></router-link>
 				</div>
 			</div>
 			<div class="col text-center">
 				<router-link to="/polls" class="navbar-item"><i class="fas fa-person-booth"></i></router-link>
 			</div>
 		</div>
-  </footer>
+	</footer>
 </template>
 
 <script>
 import { get } from "vuex-pathify"
 
 export default {
-  name: "GlobalFooter",
-  components: {},
-  mixins: [],
-  data() {
-    return {
-			year: new Date().getFullYear(),
-    }
-  },
-  beforeCreate() {},
-  created() {},
-  beforeMount() {},
-  mounted() {},
-  computed: {
-    showFooter: get("ui/showFooter"),
-  },
-  methods: {
+	name: "GlobalFooter",
+	components: {},
+	mixins: [],
+	data() {
+	return {
+		year: new Date().getFullYear(),
+	}
+	},
+	beforeCreate() {},
+	created() {},
+	beforeMount() {},
+	mounted() {},
+	computed: {
+	showFooter: get("ui/showFooter"),
+	},
+	methods: {
 
-},
-  beforeUpdate() {},
-  updated() {},
-  beforeDestroy() {},
+	},
+	beforeUpdate() {},
+	updated() {},
+	beforeDestroy() {},
 }
 </script>
 
@@ -58,15 +58,15 @@ footer {
 
 	font-size: 1.7rem;
 	border-top: 1px solid $primary;
-	background-color: rgba(220, 236, 255, 0.8);
+	background-color: rgba(220, 236, 255, 0.9);
 }
 
 .circle-1 {
 	background: white;
-  width: 50px;
-  height: 50px;
+	width: 50px;
+	height: 50px;
 	border: 1px solid $primary;
-  border-radius: 50%;
+	border-radius: 50%;
 	font-size: 2rem;
 	position: fixed;
 	bottom: 0;

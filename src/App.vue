@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <GlobalNavbar />
+    <!-- GlobalNavbar /-->
     <transition name="fadePage" mode="out-in">
       <router-view id="appContent" :key="$route.fullPath" />
     </transition>
@@ -38,14 +38,14 @@ export default {
 
 #app {
 	max-width: 1140px;   // bootstrap breakpoint of container-lg
-	//height: 100vh;
+	height: 100vh;
 	margin: 0 auto;
 	position: relative;
 }
 
 /** no horizintal scrolling */
 #appContent {
-	margin-top: 60px !important;  // for navbar
+	// margin-top: 60px !important;  // for navbar
 	margin-bottom: 50px;  // for footer
 	overflow-x: hidden;
 }
