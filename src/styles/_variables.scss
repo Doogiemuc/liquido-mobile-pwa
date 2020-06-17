@@ -1,4 +1,5 @@
 // Globally avialable SCSS
+
 $black : hsl(0, 0%, 4%);
 $black-bis : hsl(0, 0%, 7%);
 $black-ter : hsl(0, 0%, 14%);
@@ -19,6 +20,7 @@ $purple : hsl(271, 100%, 71%);
 $red : hsl(0, 100%, 42%);
 
 $primary : $blue;
+$secondary: #6c757d;
 $info : $blue;
 $success : $green;
 $warning : $yellow;
@@ -28,7 +30,7 @@ $dark : $grey-darker;
 
 $debug: false;
 
-// top navbar height & offset
-$stickyNavHeight: 50px;
+// navbar height & offset
+$stickyNavHeight: 130px;
 
 //@import './liquido.scss'

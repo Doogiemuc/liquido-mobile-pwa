@@ -1,23 +1,55 @@
 <template>
 	<div>
-		<div class="poll-header">
-			<h3>Polls</h3>
+		<div class="liquido-header shadow-sm">
+			<div class="liquido-brand"><i class="fas fa-university"></i>&nbsp;<span class="liquido"></span></div>
+
+			<ul id="navArrows" class="nav nav-arrows" >
+				<li><router-link active-class="active" to="/ideas" id="IdeasArrow">	<i class="far fa-comments"></i>&nbsp;Ideas</router-link></li>
+				<li><router-link active-class="active" to="/proposals" id="ProposalsArrow"><i class="far fa-comments"></i>&nbsp;Proposals</router-link></li>
+				<li class="active"><router-link active-class="active" to="/polls" id="PollsArrow"><i class="fas fa-poll"></i>&nbsp;Polls</router-link></li>
+			</ul>
 		</div>
-		<div class="poll-filter-wrapper container-fluid">
-			<div class="row text-center">
-				<div class="col">
-					Discuss <span class="badge badge-primary">4</span>
-				</div>
-				<div class="col">
-					<span class="active-filter">Vote</span>&nbsp;<span class="badge badge-primary">2</span>
-				</div>
-				<div class="col">
-					Finished <span class="badge badge-primary">0</span>
-				</div>
-			</div>
-		</div>
+
+		<div class="behind-header">&nbsp;</div>
+		
 		<div class="container mt-3">
-			<b-card no-body class="poll-panel" :id="poll.id">
+			 <b-button-group class="filter-buttons shadow-sm">
+				<b-button><i class="far fa-comments"></i><div class="icon-title">Discuss</div></b-button>
+				<b-button class="active"><i class="fas fa-poll"></i><div class="icon-title">Vote</div></b-button>
+				<b-button><i class="fas fa-check"></i><div class="icon-title">Finished</div></b-button>
+			</b-button-group>
+		</div>
+
+
+		<div class="container mt-3 mb-5">
+
+			<b-card no-body class="poll-panel shadow mb-3" :id="poll.id">
+				<template v-slot:header>
+					<i class="fas fa-poll"></i>&nbsp;{{poll.title}}
+					<i class="float-right fas fa-angle-double-right goto-poll-icon"></i>
+				</template>
+				<div class="poll-proposal" v-for="prop in poll.proposals" :key="prop.id">
+					<div class="d-flex">
+						<img :src="'https://picsum.photos/seed/'+prop.id+'/100'" alt="proposal image" class="law-image"/>
+						<div class="d-flex flex-column w-100 justify-content-between">
+							<div class="law-title">{{prop.title}}</div>
+							<div class="d-flex justify-content-between subtitle">
+								<div>
+									<i class="far fa-user"></i>&nbsp;{{ prop.createdBy.profile.name }}
+								</div>
+								<div>
+									<i class="far fa-clock"></i>&nbsp;today
+								</div>
+								<div :class="{ supported: prop.supportedByCurrentUser }">
+									<i :class="{'far': !prop.supportedByCurrentUser, 'fas': prop.supportedByCurrentUser}" class="fa-thumbs-up"></i>&nbsp;{{prop.numSupporters}}
+								</div>
+							</div>
+						</div>
+					</div>	
+				</div>
+			</b-card>
+
+			<b-card no-body class="poll-panel shadow mb-3" :id="poll.id">
 				<template v-slot:header>
 					<i class="fas fa-poll"></i>&nbsp;{{poll.title}}
 					<i class="float-right fas fa-angle-double-right goto-poll-icon"></i>
@@ -169,7 +201,9 @@ export default {
 		}
 	},
 	created() {},
-	mounted() {},
+	mounted() {
+		window.onscroll = () => this.transitionHeader();
+	},
 	computed: {},
 	methods: {
 		
@@ -179,6 +213,16 @@ export default {
 			return result;
 		},
 
+		transitionHeader() {
+			var navHeight = 130;  // pixel
+			if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+				$('.liquido-header').addClass('scrolled')
+				$('#navArrows').addClass('scrolled')
+			} else {
+				$('.liquido-header').removeClass('scrolled')
+				$('#navArrows').removeClass('scrolled')
+			}
+		}
 	},
 
 }
@@ -186,26 +230,158 @@ export default {
 </script>
 
 <style lang="scss">
-.poll-header {
+
+$navHeight: 130px;
+
+.liquido-header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	//height: $navHeight;
+	z-index: 100;
+	transition: 0.3s;  /* Add a transition effect when scrolling */
 	color: $primary;
 	background-color: rgb(220, 236, 255);
-	font-family: Georgia, 'Times New Roman', Times, serif;
-	padding: 2rem;
-	border-bottom: 1px solid $primary;
-}
-.poll-filter-wrapper {
-	padding-top: 5px;
-	padding-bottom: 5px;
-	border-bottom: 1px solid $primary;
-	.col:not(:last-child) {
-		border-right: 1px solid $primary;
-	}
-	.active-filter {
+	border-bottom: 1px solid rgba(0,0,255, 0.3);
+	text-align: center;
+
+	.liquido-brand {
+		font-size: 24px;
 		font-weight: bold;
-		text-decoration: underline;
-		//background-color: rgb(220, 236, 255);
+		margin: 1rem 0;
+		transition: 0.3s;  /* Add a transition effect when scrolling */
 	}
 }
+
+.liquido-header.scrolled {
+	.liquido-brand {
+		//height: 0;
+		font-size: 0;
+		margin: 5px 0 0 0;
+	}
+}
+
+.behind-header {
+	height: $navHeight;
+	min-height: $navHeight;
+}
+
+/* Arrows for nav links */
+
+$inactiveNavArrowBg: #fdfdff;
+
+#navArrows {
+	margin: 0 auto;
+	justify-content: center;
+	font-family: Georgia, 'Times New Roman', Times, serif;
+	margin-bottom: 1rem;
+	transition: 0.3s;
+}
+#navArrows > li {
+	margin: 0 12px;
+	position: relative;
+	transition: 0.3s;
+}
+#navArrows a {
+	display: block;
+	color: $primary;
+	height: 40px;
+	padding: 9px 3px 0 7px;
+	background-color: $inactiveNavArrowBg;
+	transition: 0.3s;
+}
+#navArrows a:before {
+	position: absolute;
+	content: "";
+	top: 0px;
+	left: -19px;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 20px 0 20px 20px;
+	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg transparent;
+	z-index: 150;
+	transition: 0.3s;
+}
+#navArrows a:after {
+	position: absolute;
+	content: "";
+	top: 0px;
+	right: -20px;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 20px 0 20px 20px;
+	border-color: transparent transparent transparent $inactiveNavArrowBg;
+	z-index: 150;
+	transition: 0.3s;
+}
+
+/* Navbar arrows become smaller when user scrolled upwards */
+#navArrows.scrolled {
+	margin-bottom: 5px;
+	a {
+		height: 30px;
+		padding: 4px 4px 0 7px;
+	}
+	li {
+		margin: 0 10px;
+	}
+	a:before {
+		left: -15px;
+		border-width: 15px 0 15px 15px;
+	}
+	a:after {
+		right: -15px;
+		border-width: 15px 0 15px 15px;
+	}
+}
+
+
+/* Navbar arrows when active */
+#navArrows li.active a  {
+	color: white;
+	background-color: $primary;
+}
+#navArrows li.active a:before {
+	border-color: $primary $primary $primary transparent;
+}
+#navArrows li.active a:after {
+	border-color: transparent transparent transparent $primary;
+}
+
+
+/* Navbar arrows when disabled */
+#navArrows li.disabled a  {
+	background-color: #ddd;
+}
+#navArrows li.disabled a:before {
+	border-color:  #ddd #ddd #ddd transparent;
+}
+#navArrows li.disabled a:after {
+	border-color: transparent transparent transparent #ddd;
+}
+
+.filter-buttons {
+	width: 100%;
+	button {
+		color: $primary;
+	  border: 1px solid rgba(0, 0, 0, 0.125);
+		background-color: rgb(220, 236, 255); //$grey-light;
+		font-size: 20px;
+	}
+	.icon-title {
+		font-size: 10px;
+		line-height: 1.0;
+	}
+	.btn-secondary:not(:disabled).active {
+		color: white;
+		background-color: $primary;
+		border: 1px solid $primary;
+	}
+}
+
+
 
 $avatar_size: 70px;
 
