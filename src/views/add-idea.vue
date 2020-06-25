@@ -1,33 +1,38 @@
-	<template>
-	<div class="container-lg">
+<template>
+	<div>
+		<liquido-header></liquido-header>
+		<div class="behind-header">&nbsp;</div>
+		<div class="container-lg mt-3">
 
-		<div class="alert alert-primary" v-html="$t('addIdea')"></div>
+			<div class="alert alert-primary" v-html="$t('addIdea')"></div>
 
-		<b-card class="chat-bubble shadow-sm">  
-			<i class="far fa-lightbulb lightbulb-bg"></i>
-			<form id="addIdeaForm">
-				<liquido-input v-model="idea.title" id="ideaTitleInput" :label="$t('ideaTitle')" :state="titleState" @blur="titleValidated = true" :invalid-feedback="$t('titleInvalid')"></liquido-input>
+			<b-card class="chat-bubble shadow-sm">  
+				<i class="far fa-lightbulb lightbulb-bg"></i>
+				<form id="addIdeaForm">
+					<liquido-input v-model="idea.title" id="ideaTitleInput" :label="$t('ideaTitle')" :state="titleState" @blur="titleValidated = true" :invalid-feedback="$t('titleInvalid')"></liquido-input>
 
-				<div class="form-group">
-					<b-form-textarea id="descriptionInput" v-model="idea.description" :placeholder="$t('describeYourIdea')" :state="ideaDescriptionState"  rows="3" max-rows="10" @blur="descriptionValidated = true"></b-form-textarea>
-					<div class="invalid-feedback">{{$t('descriptionInvalid')}}</div>
-				</div>
+					<div class="form-group">
+						<b-form-textarea id="descriptionInput" v-model="idea.description" :placeholder="$t('describeYourIdea')" :state="ideaDescriptionState"  rows="3" max-rows="10" @blur="descriptionValidated = true"></b-form-textarea>
+						<div class="invalid-feedback">{{$t('descriptionInvalid')}}</div>
+					</div>
 
-				<div class="form-group">
-					<b-form-file id="ideaImageInput" accept="image/jpeg, image/png, image/gif" :placeholder="$t('addImage')"></b-form-file>
-				</div>
-			</form>
-		</b-card>
+					<div class="form-group">
+						<b-form-file id="ideaImageInput" accept="image/jpeg, image/png, image/gif" :placeholder="$t('addImage')"></b-form-file>
+					</div>
+				</form>
+			</b-card>
 
-		<div class="text-right">
-			<b-button variant="primary" :disabled="addIdeaButtonDisabled" @click="saveIdea()">{{$t('save')}} <i class="fas fa-angle-double-right"></i></b-button>
+			<div class="text-right">
+				<b-button variant="primary" :disabled="addIdeaButtonDisabled" @click="saveIdea()">{{$t('save')}} <i class="fas fa-angle-double-right"></i></b-button>
+			</div>
+
 		</div>
-
 	</div>
 </template>
 
 <script>
 
+import liquidoHeader from '../components/liquido-header'
 import liquidoInput from '../components/liquido-input'
 
 export default {
@@ -54,7 +59,7 @@ export default {
 		}
 	},
 	name: "IndexComponent",
-	components: { liquidoInput },
+	components: { liquidoInput, liquidoHeader },
 	data() {
 		return {
 			idea: {

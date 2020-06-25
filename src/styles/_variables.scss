@@ -1,4 +1,8 @@
-// Globally avialable SCSS
+/* 
+  Globally avialable SCSS
+
+  When you change this file you must restart your dev server.
+ */
 
 $black : hsl(0, 0%, 4%);
 $black-bis : hsl(0, 0%, 7%);
@@ -30,7 +34,14 @@ $dark : $grey-darker;
 
 $debug: false;
 
-// navbar height & offset
+// sticky navbar height at the top
 $stickyNavHeight: 130px;
+
+// placaeholder for empty space behind sticky navbar
+.behind-header {
+	height: $stickyNavHeight;
+	min-height: $stickyNavHeight;
+}
+
 
 //@import './liquido.scss'

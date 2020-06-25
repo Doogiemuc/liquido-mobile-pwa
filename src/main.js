@@ -33,6 +33,18 @@ const globalTranslations = {
 		Yes: "Ja",
 		No: "Nein",
 		Cancel: "Abbrechen",
+		back: "Zurück",
+		idea: "Idee",
+		ideas: "Ideen",
+		newIdeas: "Neue Ideen", 
+		proposal: "Vorschlag",			// Wahlvorschlag
+		proposals: 'Vorschläge',
+		poll: "Wahl",
+		polls: 'Wahlen',  				// Abstimmungen, Umfragen ??
+		elaboration: 'Diskussion',
+		inVoting: 'Abstimmung',			// laufende Wahlen ??
+		finished: 'Abgeschlossen',
+
 	}
 }
 
@@ -41,12 +53,12 @@ const i18n = new VueI18n({
 	locale: 'de',
 	fallbackLocale: 'en',
 	silentFallbackWarn: true,
-  messages: globalTranslations,
+  	messages: globalTranslations,
 })
 
 new Vue({
 	i18n,
-  router,
-  store,
+	router,
+	store,
 	render: (h) => h(App),
 }).$mount("#app")

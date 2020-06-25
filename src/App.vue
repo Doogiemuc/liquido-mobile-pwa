@@ -1,20 +1,17 @@
 <template>
-  <div id="app">
-    <!-- GlobalNavbar /-->
-    <transition name="fadePage" mode="out-in">
-      <router-view id="appContent" :key="$route.fullPath" />
-    </transition>
-    <GlobalFooter v-if="showFooter"/>
-  </div>
+	<div id="app">
+		<transition name="fadePage" mode="out-in">
+			<router-view id="appContent" :key="$route.fullPath" />
+		</transition>
+		<GlobalFooter v-if="showFooter"/>
+	</div>
 </template>
 
 <script>
-import GlobalNavbar from "@/components/navbar-comp"
 
 export default {
 	name: "App",
 	components: {
-		GlobalNavbar,
 		GlobalFooter: () => import("@/components/footer-comp"),
 	},
 	mixins: [],
