@@ -73,7 +73,7 @@ export default {
 	z-index: 100;
 	transition: 0.3s;  /* Add a transition effect when scrolling */
 	color: $primary;
-	background-color: rgb(220, 236, 255);
+	background-color: $secondary-bg;
 	border-bottom: 1px solid rgba(0,0,255, 0.3);
 	text-align: center;
 

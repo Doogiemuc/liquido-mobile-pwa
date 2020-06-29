@@ -19,29 +19,29 @@
 				</div>
 			</b-card>
 
-			<div :class="{'d-none': flowState < 4}">
-
-			<b-card class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 4 }">
-				<b-card-text v-html="$t('niceToMeetYou', { nickname: user.name })"></b-card-text>
-			</b-card>
-
-			<b-card id="createOrJoinBubble" class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 5 }">
-				<b-card-text v-html="$t('createOrJoin' )"></b-card-text>
-			</b-card>
-
-			<div id="joinOrCreateButtons" class="mb-3 transition-all" :class="{ 'hide-left': flowState < 6 }">
-				<button id="joinTeamButton"  @click="clickJoinTeam()" class="btn" :class="{ 
-					'btn-primary': true, 
-					'moveToCenterFromLeft active': flowState === 7, 
-					'opacity0' : flowState == 8 
-				}" >{{$t('joinTeamButton')}}</button>
-				<button id="createNewTeamButton" @click="clickCreateNewTeam()" class="btn" :class="{ 
-					'btn-primary': true, 
-					'moveToCenterFromRight active': flowState === 8, 
-					'opacity0' : flowState == 7
-				}">{{$t('createNewTeamButton')}}</button>
+			<div class="transition-all" :class="{'collapse-max-height': flowState < 4}">
+				<b-card class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 4 }">
+					<b-card-text v-html="$t('niceToMeetYou', { nickname: user.name })"></b-card-text>
+				</b-card>
 			</div>
 
+			<div class="transition-all" :class="{'collapse-max-height': flowState < 5}">
+				<b-card id="createOrJoinBubble" class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 5 }">
+					<b-card-text v-html="$t('createOrJoin' )"></b-card-text>
+				</b-card>
+
+				<div id="joinOrCreateButtons" class="mb-3 transition-all" :class="{ 'hide-left': flowState < 6 }">
+					<button id="joinTeamButton"  @click="clickJoinTeam()" class="btn" :class="{ 
+						'btn-primary': true, 
+						'moveToCenterFromLeft active': flowState === 7, 
+						'opacity0' : flowState >= 8 
+					}" >{{$t('joinTeamButton')}}</button>
+					<button id="createNewTeamButton" @click="clickCreateNewTeam()" class="btn" :class="{ 
+						'btn-primary': true, 
+						'moveToCenterFromRight active': flowState >= 8, 
+						'opacity0' : flowState == 7
+					}">{{$t('createNewTeamButton')}}</button>
+				</div>
 			</div>
 
 			<!-- Join a team (flowState == 7) -->
@@ -50,50 +50,50 @@
 				<form id="joinTeamForm">
 					<div class="form-group" :state="inviteState">
 						<label for="inviteInput">{{$t('inviteCode')}}</label>
-						<b-form-input id="inviteInput" v-model="user.invite" type="text" :state="inviteState" maxlength="6" placeholder="A3BD5F" trim @blur="inviteTouched = true"></b-form-input>
+						<b-form-input id="inviteInput" v-model="user.invite" type="text" :state="inviteState" maxlength="6" placeholder="A3BD5F" trim @blur="inviteTouched = true" :disabled="flowState > 7"></b-form-input>
 						<div class="invalid-feedback">{{$t('inviteInvalid')}}</div>
 					</div>
 
 					<div class="form-group" :state="eMailState">
 						<label for="userEmailInput">{{$t('yourEMail')}}</label>
-						<b-form-input id="userEmailInput" v-model="user.email" type="email" :state="eMailState" :placeholder="$t('eMailPlaceholder')" trim @blur="emailTouched = true"></b-form-input>
+						<b-form-input id="userEmailInput" v-model="user.email" type="email" :state="eMailState" :placeholder="$t('eMailPlaceholder')" trim @blur="emailTouched = true" :disabled="flowState > 7"></b-form-input>
 						<div class="invalid-feedback">{{$t('emailInvalid')}}</div>
 					</div>
 
 					<div class="d-flex justify-content-between align-items-center">
-						<small class="ml-1"><a href="#" @click="cancelJoinTeam()">{{$t('Cancel')}}</a></small>
-						<b-button variant="primary" :disabled="joinTeamButtonDisabled" @click="joinTeam()">{{$t('Ok')}} <i class="fas fa-angle-double-right"></i></b-button>
+						<small class="ml-1" :class="{'invisible': flowState > 7 }" ><a href="#" @click="cancelJoinTeam()">{{$t('Cancel')}}</a></small>
+						<b-button variant="primary" :disabled="joinTeamOkButtonDisabled" @click="joinTeam()">{{$t('Ok')}} <i class="fas fa-angle-double-right"></i></b-button>
 					</div>
 				</form>
 			</b-card>
 			
 			<!-- Create a new team (flowState == 8) -->
 
-			<b-card class="chat-bubble chat-right" :class="{ 'collapse-max-height': flowState !== 8 }">
+			<b-card class="chat-bubble chat-right" :class="{ 'collapse-max-height': flowState < 8 }">
 				<form id="createNewTeamForm">
 					<div class="form-group">
 						<label for="teamNameInput">{{$t('teamName')}}</label>
-						<b-form-input id="teamNameInput" v-model="newTeam.name" type="text" :state="teamNameState" trim @blur="teamNameTouched = true"></b-form-input>
+						<b-form-input id="teamNameInput" v-model="newTeam.name" type="text" :state="teamNameState" trim @blur="teamNameTouched = true" :disabled="flowState > 8"></b-form-input>
 						<div class="invalid-feedback">{{$t('teamNameInvalid')}}</div>
 					</div>
 
 					<div class="form-group">
 						<label for="adminEMailInput">{{$t('adminEmail')}}</label>
-						<b-form-input id="adminEMailInput" v-model="user.email" type="email" :state="eMailState" :placeholder="$t('eMailPlaceholder')" trim></b-form-input>
+						<b-form-input id="adminEMailInput" v-model="user.email" type="email" :state="eMailState" :placeholder="$t('eMailPlaceholder')" trim :disabled="flowState > 8" @keyup.enter="createNewTeam()"></b-form-input>
 						<small class="ml-1">{{$t('youWillBecomeAdmin')}}</small>
 						<div class="invalid-feedback">{{$t('emailInvalid')}}</div>
 					</div>
 
-					<div class="d-flex justify-content-between align-items-center">
+					<div class="d-flex justify-content-between align-items-center" :class="{'collapse-max-height': flowState > 8 }">
 						<small class="ml-1"><a href="#" @click="cancelCreateNewTeam()">{{$t('Cancel')}}</a></small>
-						<b-button variant="primary" :disabled="createNewTeamButtonDisabled" @click="creatNewTeam()">{{$t('Ok')}} <i class="fas fa-angle-double-right"></i></b-button>
+						<b-button variant="primary" :disabled="createNewTeamOkButtonDisabled" @click="createNewTeam()">{{$t('Ok')}} <i class="fas fa-angle-double-right"></i></b-button>
 					</div>
 				</form>
 			</b-card>
 
 			<!-- New team created (flowState == 9) -->
 
-			<b-card class="chat-bubble shadow-sm" :class="{'collapse-max-height': flowState !== 9 } ">
+			<b-card id="newTeamCreatedBubble" class="chat-bubble shadow-sm" :class="{'collapse-max-height': flowState < 9 }">
 				<p>{{$t('teamCreated')}}</p>
 				<ul>
 					<li><a :href="newTeam.inviteLink" @click.prevent="shareLink()">{{$t('shareThisLink')}} <i class="fas fa-external-link-alt"></i></a></li>
@@ -143,7 +143,8 @@ export default {
 			},
 			de: {
 				welcome: '<p>Willkommen bei <span class="liquido"></span>, der freien, sicheren und liquiden e-voting App.</p>'+
-				 '<p>Mit Liquido kannst du private Abstimmung für dein Team erstellen. Jedes Teammitglied kann eine Idee vorschlagen, welche dann von allen diskutiert und geliked wird. Anschließend wählt jeder seine favorisierten Vorschläge und Liquido berechnet den Gesamtsieger der Wahl.</p>',
+				 '<p>Mit Liquido kannst du private Abstimmung für dein Team erstellen. Jedes Teammitglied kann eine Idee vorschlagen, welche dann diskutiert wird. Diejenigen Ideen mit genügend likes werden zu Vorschlägen.<p>'+
+				 'In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag (oder Kandidaten), sondern jeder sortiert die Wahlvorschläge nach seiner eigenen Prio und Liquido berechnet daraus dann den Gesamtsieger der Wahl.</p>',
 				whatsYourName: 'Darf ich fragen wie du heißt?',
 				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
@@ -165,9 +166,9 @@ export default {
 
 				teamCreated: 'Ok, dein Team ist angelegt. Lade jetzt deine Freunde in dein Team ein:',
 				shareThisLink: 'Teile diesen Link',
-				tellInvitationCode: 'oder sag ihnen deinen Einadungscode:',
+				tellInvitationCode: 'oder sage ihnen deinen Einadungscode:',
 				scanQrCode: 'oder lass sie diesen QR code scannen:',
-				teamInfo: 'Du findest diese Infos jederzeit wieder unter dem Team Icon <i class="fas fa-users"></i> ganz links unten im Footer.',
+				teamInfo: 'Du findest diese Infos später jederzeit wieder unter dem Team Icon <i class="fas fa-users"></i> ganz links unten im Footer.',
 
 
 				pollInfo: 'Jetzt kannst du deine erste Abstimung anlegen, zu der jedes Teammitglied dann seine Idee (<i class="fas fa-lightbulb"></i>) hinzufügen kann.',
@@ -202,9 +203,9 @@ export default {
 				 4 - Nice to meet you bubble
 				 5 - create or join Team bubble
 				 6 - create or join Team buttons
-				 7 - join team form
+				 7 - join a team form
 				 8 - create new team form
-				 9 - team created
+				 9 -new  team created
 			*/
 			flowState: 0,   								//TODO: store flow State in vuex, and re-use when user comes back
 				/** 
@@ -225,7 +226,7 @@ export default {
 		this.$root.store.setShowFooter(false)
 		window.setTimeout(() => { this.flowState = 1}, 500)
 		window.setTimeout(() => { this.flowState = 2}, 2500)
-		window.setTimeout(() => { this.flowState = 3}, 3000)
+		window.setTimeout(() => { this.flowState = 3; this.scrollToBottom() }, 3000)
 	},
 	mounted() {
 		$("html, body").animate({ scrollTop: 0 }, 1000);
@@ -247,16 +248,24 @@ export default {
 			if(this.newTeam.name && this.newTeam.name.replace(/\s/g, '').length >= 4) return this.teamNameValidated = true
 			return this.teamNameValidated ? false : null
 		},
-		joinTeamButtonDisabled()      { return !this.inviteState   || !this.eMailState },
-		createNewTeamButtonDisabled() { return !this.teamNameState || !this.eMailState },
+		joinTeamOkButtonDisabled()      { return !this.inviteState   || !this.eMailState || this.flowState > 7 },
+		createNewTeamOkButtonDisabled() { return !this.teamNameState || !this.eMailState || this.flowState > 8 },
+	},
+	watch: {
+		'flowState': function(newVal, oldVal) {
+			console.log("flowState", oldVal, "=>", newVal)
+		}
 	},
 	methods: {
 
 		userNameEnter() {
-			this.usernameValidated = true
-			if (this.userNameState)	{
+			console.log("userNameEnter")
+			//this.usernameValidated = true
+			if (this.userNameState && this.flowState < 4)	{
+				console.log("userNameEnter inner")
 				this.flowState = 4
 				$('#userNameInput').blur()
+				this.scrollToBottom()
 				setTimeout(() => { 
 					this.flowState = 6 
 					this.scrollToBottom()
@@ -265,8 +274,10 @@ export default {
 		},
 
 		clickJoinTeam() {
-			this.flowState = 7
-			this.scrollToBottom()
+			if (this.flowState === 6) {
+				this.flowState = 7
+				this.scrollToBottom()
+			}
 		},
 		cancelJoinTeam() {
 			this.flowState = 6
@@ -274,8 +285,10 @@ export default {
 		},
 
 		clickCreateNewTeam() {
-			this.flowState = 8
-			this.scrollToBottom()
+			if (this.flowState === 6) {
+				this.flowState = 8
+				this.scrollToBottom()
+			}
 		},
 		cancelCreateNewTeam() {
 			this.flowState = 6
@@ -289,9 +302,14 @@ export default {
 		},
 
 		/** Create a new team */
-		creatNewTeam() {
+		createNewTeam() {
+			if (this.createNewTeamOkButtonDisabled) return
 			console.log(this.user.name + "<" + this.user.email + "> creates new team: "+this.newTeam.name)
-
+			//TODO: backend call createNewTeam
+			this.flowState = 9
+			this.$nextTick(() => {
+				this.scrollElemToTop('#newTeamCreatedBubble', 10)
+			})
 		},
 
 		/** scroll to the very bottom of the content. Show last chat message */
@@ -305,8 +323,8 @@ export default {
 		 * scroll an HTML elemant right under the header
 		 * (as far up as possible, depending on content below the elem) 
 		 */
-		scrollElemToTop(elem) {
-			var scrollTop = $(elem).offset().top - this.$root.headerHeight
+		scrollElemToTop(elem, margin) {
+			var scrollTop = $(elem).offset().top - this.$root.headerHeight - margin
 			this.$nextTick(() => {
 				$("html, body").animate({ scrollTop: scrollTop }, 2000);
 			})
@@ -364,7 +382,7 @@ export default {
 }
 
 .chat-right {
-	background-color: #e9fce9;
+	background-color: $secondary-bg; // #e9fce9;
 	margin-left: 2rem;
 	margin-bottom: 1rem;
 }
