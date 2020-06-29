@@ -39,9 +39,6 @@ $stickyNavHeight: 130px;
 
 // placaeholder for empty space behind sticky navbar
 .behind-header {
-	height: $stickyNavHeight;
-	min-height: $stickyNavHeight;
+	height: $stickyNavHeight + 10px;
+	min-height: $stickyNavHeight + 10px;
 }
-
-
-//@import './liquido.scss'

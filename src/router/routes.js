@@ -4,15 +4,20 @@ const routes = [
     name: "index",
     component: () => lazyLoadView(import("@/views/index-page")),
 	},
+	{
+    path: "/ideas",
+    name: "ideas",
+    component: () => lazyLoadView(import("@/views/ideas")),
+  },
   {
     path: "/addIdea",
     name: "addIdea",
-    component: () => lazyLoadView(import("@/views/add-idea")),
+    component: () => lazyLoadView(import("@/views/idea-add")),
   },
   {
     path: "/polls",
-    name: "pollsSearch",
-    component: () => lazyLoadView(import("@/views/polls-search")),
+    name: "polls",
+    component: () => lazyLoadView(import("@/views/polls")),
   },
 	{
     path: "/about",

@@ -1,9 +1,10 @@
 import Vue from "vue"
 import App from "@/App.vue"
-import store from "@/store/index"
+//import store from "@/store/index"
+import liquidoStore from "@/store/liquido-store"
 import router from "@/router/index"
 import "@/registerServiceWorker"
-import modal from "@/components/modal-comp"
+//import modal from "@/components/modal-comp"
 import accountAPI from "@/plugins/accountAPI"
 import { BootstrapVue } from "bootstrap-vue"
 import "bootstrap/dist/css/bootstrap.css"
@@ -13,10 +14,10 @@ import VueI18n from 'vue-i18n'
 Vue.use(BootstrapVue)
 Vue.use(VueI18n)
 Vue.use(accountAPI)
-Vue.component("modal", modal)
+//Vue.component("modal", modal)
 
 Vue.config.productionTip = false
-Vue.config.debug = true
+Vue.config.debug = false
 
 /** Global translations that are available to all components */
 const globalTranslations = {
@@ -53,12 +54,18 @@ const i18n = new VueI18n({
 	locale: 'de',
 	fallbackLocale: 'en',
 	silentFallbackWarn: true,
-  	messages: globalTranslations,
+	messages: globalTranslations,
 })
 
-new Vue({
+// Vue Root App
+const rootApp = new Vue({
 	i18n,
 	router,
-	store,
-	render: (h) => h(App),
-}).$mount("#app")
+	data: {
+		store: liquidoStore				// this is available to all sub components as this.$root.store
+	},	
+	...App
+	//render: (h) => h(App),
+})
+
+rootApp.$mount("#app")

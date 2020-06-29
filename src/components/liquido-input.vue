@@ -4,7 +4,7 @@
 		<input 
 			:id="id" 
 			:name="name"
-			v-model="inputValue" 
+			:value="value" 
 			class="form-control" 
 			:class="validClass"
 			:type="type" 
@@ -14,6 +14,9 @@
 			v-on:input="$emit('input', $event.target.value)"
 			v-on:blur="$emit('blur', $event.target.value)"
 		>
+		<div class="iconRight">
+			<slot name="iconRight"></slot>
+		</div>
 		<div v-if="invalidFeedback" class="invalid-feedback">{{invalidFeedback}}</div>
 	</div>
 </template>
@@ -48,7 +51,6 @@ export default {
 	},
   data() {
     return {
-			inputValue: this.value
 		}
   },
   mounted() { },
@@ -75,6 +77,11 @@ export default {
 		padding: 0 3px;
 		background: white;
 		border-radius: 5px;
+	}
+	.iconRight {
+		position: absolute;
+		top: 18px;
+		right: 5px;
 	}
 }
 </style>

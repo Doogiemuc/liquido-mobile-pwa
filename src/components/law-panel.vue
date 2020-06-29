@@ -3,17 +3,17 @@
 		<div>
 			<h4 class="law-title"><i :class="iconForLaw" class="title-icon"></i>&nbsp;{{law.title}}</h4>
 		</div>
-		<div class="subtitle d-flex">
-			<div class="flex-fixed-width user">
-				<i class="far fa-user"></i>&nbsp;{{ law.createdBy.profile.name }}
+		<div class="law-subtitle d-flex">
+			<div class="createdAt flex-fixed-width">
+				<i class="far fa-clock"></i>&nbsp;{{ formatDate(law.createdAt) }}
 			</div>
-			<div class="createdAt">
-				<i class="far fa-clock"></i>&nbsp;{{ getFromNow(law.createdAt) }}
+			<div class="user">
+				<i class="far fa-user"></i>&nbsp;{{ law.createdBy.profile.name }}
 			</div>
 			<div class="like-button flex-grow-1 text-right" :class="{ supported: law.supportedByCurrentUser }">
 				<i :class="{'far': !law.supportedByCurrentUser, 'fas': law.supportedByCurrentUser}" class="fa-thumbs-up"></i>&nbsp;{{law.numSupporters}}
 			</div>
-		</div>
+		</div>		
 		<div class="d-flex">
 			<div class="flex-fixed-width">
 				<img :src="'https://picsum.photos/seed/'+law.id+'/100'" alt="Image" class="law-image"/>
@@ -68,8 +68,8 @@ export default {
 		},
 	},
 	methods: {
-		getFromNow: function(dateVal) {
-			return moment(dateVal).fromNow()
+		formatDate(dateVal) {
+			return moment(dateVal).format("L")
 		},
 	},
 	filters: {},
@@ -107,7 +107,7 @@ $avatar_size: 90px;
 		font-size: 80%;
 	}
 
-	.subtitle {
+	.law-subtitle {
 		font-size: 10px;
 		//line-height: 15px;
 		height: 18px;

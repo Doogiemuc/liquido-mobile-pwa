@@ -1,13 +1,15 @@
 <template>
-	<header class="liquido-header shadow-sm">
-		<div class="liquido-brand"><i class="fas fa-university"></i>&nbsp;<span class="liquido"></span></div>
+	<div id="behindHeader">
+		<header id="liquidoHeader" class="liquido-header shadow-sm">
+			<div class="liquido-brand"><i class="fas fa-university"></i>&nbsp;<span class="liquido"></span></div>
 
-		<ul id="navArrows" class="nav nav-arrows container-fluid" >
-			<li><router-link active-class="active" to="/ideas" id="IdeasArrow">	<i class="far fa-comments"></i>&nbsp;{{$t('ideas')}}</router-link></li>
-			<li><router-link active-class="active" to="/proposals" id="ProposalsArrow"><i class="far fa-comments"></i>&nbsp;{{$t('proposals')}}</router-link></li>
-			<li class="active"><router-link active-class="active" to="/polls" id="PollsArrow"><i class="fas fa-poll"></i>&nbsp;{{$t('polls')}}</router-link></li>
-		</ul>
-	</header>
+			<ul v-if="showNavArrows" id="navArrows" class="nav nav-arrows container-fluid" >
+				<li :class="{'active': isPathActive('/ideas')}"><router-link active-class="active" to="/ideas" id="IdeasArrow">	<i class="far fa-lightbulb"></i>&nbsp;{{$t('ideas')}}</router-link></li>
+				<li :class="{'active': isPathActive('/proposals')}"><router-link active-class="active" to="/proposals" id="ProposalsArrow"><i class="fas fa-vote-yea"></i>&nbsp;{{$t('proposals')}}</router-link></li>
+				<li :class="{'active': isPathActive('/polls')}"><router-link active-class="active" to="/polls" id="PollsArrow"><i class="fas fa-poll"></i>&nbsp;{{$t('polls')}}</router-link></li>
+			</ul>
+		</header>
+	</div>
 </template>
 
 <script>
@@ -17,16 +19,14 @@ export default {
 	i18n: {
 		messages: {
 			en: {
-				welcome: 'Welcome to <span class="liquido"></span> - the free, secure and liquid eVoting platform. With this mobile app you can create polls and then take votes with your team.',
 			},
 			de: {
-				ideas: "Ideen",
-				proposals: 'Vorschläge',
-				polls: 'Wahlen',  				// Abstimmungen, Umfragen ??
-				discussion: 'Diskussion',
-				inVoting: 'Abstimmung',
 			}
 		}
+	},
+	props: {
+		'showNavArrows': { type: Boolean, required: false, default: true },
+		'minimizeOnScroll': { type: Boolean, required: false, default: true },
 	},
 	data() {
 		return {}
@@ -40,10 +40,24 @@ export default {
 				$('.liquido-header').removeClass('scrolled')
 				$('#navArrows').removeClass('scrolled')
 			}
+		},
+
+		/** check if current $route.path starts with the given pathPrefix. so that we can add the .active class to the outer li element */
+		isPathActive(pathPrefix) {
+			return this.$route.path.indexOf(pathPrefix) === 0
 		}
 	},
+
+	/**
+	 * Make the spacer div behind the fixed header the same hight as the header itself.
+	 * Next sibling element should add its own top margin.
+	 */
 	mounted() {
-		window.onscroll = () => this.transitionHeader();
+		var headerHeight = $('#liquidoHeader').css('height')
+		$('#behindHeader').css('height', headerHeight)
+		if (this.minimizeOnScroll) {
+			window.onscroll = () => this.transitionHeader();
+		}	
 	}
 }
 </script>
@@ -53,6 +67,7 @@ export default {
 .liquido-header {
 	position: fixed;
 	top: 0;
+	left: 0;
 	width: 100%;
 	//height: $stickyNavHeight;
 	z-index: 100;
@@ -72,7 +87,6 @@ export default {
 
 .liquido-header.scrolled {
 	.liquido-brand {
-		//height: 0;
 		font-size: 0;
 		margin: 5px 0 0 0;
 	}

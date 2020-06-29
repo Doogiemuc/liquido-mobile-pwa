@@ -3,7 +3,7 @@
 		<transition name="fadePage" mode="out-in">
 			<router-view id="appContent" :key="$route.fullPath" />
 		</transition>
-		<GlobalFooter v-if="showFooter"/>
+		<GlobalFooter v-if="$root.store.showFooter"/>
 	</div>
 </template>
 
@@ -15,14 +15,14 @@ export default {
 		GlobalFooter: () => import("@/components/footer-comp"),
 	},
 	mixins: [],
-	data() {
-		return {
-			showFooter: true
-		}
-	},
+	//data is set in main.js
 	created() {},
 	mounted() {},
-	computed: {},
+	computed: {
+		headerHeight() {
+			return $('#behindHeader').height()
+		}
+	},
 	methods: {},
 	updated() {},
 	beforeDestroy() {},

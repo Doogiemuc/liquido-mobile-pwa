@@ -3,16 +3,21 @@
 		<liquido-header></liquido-header>
 		<div class="behind-header">&nbsp;</div>
 		
-		<div class="container mt-3">
-			 <b-button-group class="filter-buttons shadow-sm">
-				<b-button><i class="far fa-comments"></i><div class="icon-title">{{$t('elaboration')}}</div></b-button>
-				<b-button class="active"><i class="fas fa-poll"></i><div class="icon-title">{{$t('inVoting')}}</div></b-button>
-				<b-button><i class="fas fa-check"></i><div class="icon-title">{{$t('finished')}}</div></b-button>
-			</b-button-group>
+		<div v-if="ideas.length > 3" class="container mt-3 mb-3">
+			 <liquido-input v-model="searchTitle" id="searchInput" :label="$t('Search')" :status="null">
+				 <template v-slot:iconRight>
+					 <i class="fas fa-times mr-1" @click="clearSearch()"></i>
+				 </template>
+			 </liquido-input>
 		</div>
 
-		<div class="container mt-3 mb-5">
-			<poll-panel :poll="poll" class="shadow mb-3"></poll-panel>
+		<div class="container mb-3">
+			<law-panel v-for="idea in filteredIdeas" :law="idea" :key="idea.id" class="shadow mb-3"></law-panel>
+		</div>
+
+		<div class="container mb-3">
+			<div v-if="filteredIdeas.length === 0" class="alert alert-primary" v-html="$t('noIdeas')"></div>
+			<div v-else class="alert alert-primary" v-html="$t('addIdeaHint')"></div>
 		</div>
 	</div>
 </template>
@@ -21,28 +26,29 @@
 
 import moment from 'moment'
 import liquidoHeader from '../components/liquido-header'
-import pollPanel from "../components/poll-panel"
+import liquidoInput from '../components/liquido-input'
+import lawPanel from "../components/law-panel"
 
 export default {
 	i18n: {
 		messages: {
 			en: {
+				Search: "Search",
+				noIdeas: "There are no <b>ideas</b> yet. You can add your idea here with the lightbulb below. When your idea receives enough likes, then it will become a <b>proposal</b>. In a <p>poll</p> you can then vote on your and other proposals.",
+				addIdeaHint: "To add your idea here, just click the lightbulb below."
 			},
 			de: {
+				Search: "Suche",
+				noIdeas: "Momentan gibt es noch keine <b>Ideen</b>. Mit der Glühbirne unten kannst du deine Idee hier hinzufügen. When deine Idee genügend likes erhält, dann wird sie zu einem <b>Vorschlag</b>. In einer <b>Wahl</b> könnt ihr dann über deinen und andere Vorschläge abstimmen.",
+				addIdeaHint: "Um deine Idee hier hinzuzufügen, klicke einfach auf die Glühbirne unten."
 			}
 		}
 	},
-	components: { pollPanel, liquidoHeader },
+	components: { liquidoHeader, liquidoInput, lawPanel },
 	data() {
 		return {
-			poll: {
-				id: 101,
-				title: "Example poll in voting with a very long titela asddfasdf dd",
-				status: "VOTING",
-				votingStartAt: this.addDays(new Date(), -1),
-				votingEndAt:   this.addDays(new Date(), +9),
-
-				proposals: [
+				searchTitle: undefined,
+				ideas: [
 					{
 						id: 2001,
 						title: "Proposal One qurg ASD asdfcvvef fdadsf ddd fff ddccc c ewe e",
@@ -123,27 +129,21 @@ export default {
 						}
 					}
 				],
-				area: {
-					id: 4001,
-					title: "Example Area"
-				},
-				winner: undefined,
-				duelMatrix: undefined
-			}
-			
 		}
 	},
 	created() {},
 	mounted() {},
-	computed: {},
+	computed: {
+		filteredIdeas() {
+			if (this.searchTitle === undefined || this.searchTitle === "") return this.ideas
+			var regex = new RegExp(this.searchTitle, "i")
+			return this.ideas.filter(idea => regex.test(idea.title) || regex.test(idea.description))
+		}
+	},
 	methods: {
-		
-		addDays(date, days) {
-			var result = new Date(date);
-			result.setDate(result.getDate() + days);
-			return result;
-		},
-		
+		clearSearch() {
+			this.searchTitle = ""
+		}
 	},
 
 }
@@ -151,82 +151,5 @@ export default {
 </script>
 
 <style lang="scss">
-
-.filter-buttons {
-	width: 100%;
-	button {
-		color: $primary;
-	  border: 1px solid rgba(0, 0, 0, 0.125);
-		background-color: rgb(220, 236, 255); //$grey-light;
-		font-size: 20px;
-	}
-	.icon-title {
-		font-size: 10px;
-		line-height: 1.0;
-	}
-	.btn-secondary:not(:disabled).active {
-		color: white;
-		background-color: $primary;
-		border: 1px solid $primary;
-	}
-}
-
-
-
-/*
-.law-panel {
-	//height: 30px + 25px + $avatar_size + 15px;  // title + subtitle + avatar_img + padding
-	//overflow: hidden;
-	padding: 10px 10px 10px 10px;
-
-	.flex-fixed-width {
-		flex: 0 0 $avatar_size + 10px;
-		//border: 1px solid red;
-	}
-
-	.law-title {
-		margin-bottom: 3px;
-		padding: 0;
-		font-size: 18px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.title-icon {
-		font-size: 80%;
-	}
-
-	.law-subtitle {
-		font-size: 10px;
-		//line-height: 15px;
-		//height: 18px;
-		//min-height: 18px;
-		color: #BBB;
-		margin-bottom: 5px;
-		//border-bottom: 1px solid rgba(0, 0, 0, 0.1);;
-		//-webkit-box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
-		//box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
-	}
-
-	.law-image {
-		//margin: 5px;
-		border-radius: 5px;
-		min-width: $avatar_size;
-		max-width: $avatar_size;
-		width: $avatar_size;
-		min-height: $avatar_size;
-		max-height: $avatar_size;
-		height: $avatar_size;
-	}
-
-	.law-description {
-		font-size: 12px;
-		height: $avatar_size;
-		max-height: $avatar_size;
-		overflow: hidden;
-	}
-}
-*/
 
 </style>
