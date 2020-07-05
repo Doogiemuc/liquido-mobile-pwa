@@ -3,7 +3,7 @@
 Designed for small groups, e.g. social societeies, SMEs, pupils (suggest age >10), open source communities
 Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.vote
 
-## Use Cases
+# Use Cases
 
 ### Directly open www.liquido.me on mobile
 
@@ -36,15 +36,18 @@ Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.v
  6. Admin closes the voting phase
  7. Everyone can see the results.
 
-## Tennant
+# One tennant is one team
 
-One tennant / team contains
-
+One Team contains:
  * one admin user
- * a list of users (that are allowed to vote)
+ * a list of team members (that are allowed to vote)
  * a list of polls
- * proposals (new, elaboration, in voting)
- * agreed laws
+ * each poll with proposals (in elaboration, proposal, in voting, rule)
+
+
+# Devlepment Roadmap
+
+ * Local data store/cache for polls with proposals => liquido-store or VueApollo InMemoryStore
 
 ## Screenflow
 
@@ -73,6 +76,10 @@ https://github.com/christlee1989/vue-mobile-log
 //TODO: Use Visual Studio Code   Chrome Debugger  with Vue
 https://medium.com/@brockreece/how-i-stopped-using-console-log-when-debugging-vue-components-14e0f7aa280d
 
+### Logging on mobile
+
+TODO: Create a Vue Plugin that can show a loging component on mobile phone.
+
 # Test
 
 ## Simulate test on mobile phone
@@ -80,5 +87,4 @@ https://medium.com/@brockreece/how-i-stopped-using-console-log-when-debugging-vu
 Very nice mobile simulator: http://mobiletest.me/apple_iphone_6s/8028826 
 
 
-# Links & Resources
-
+# Furhter Links & Resources

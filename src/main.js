@@ -30,22 +30,26 @@ const globalTranslations = {
 	},
 	de: {
 		helloWorld: 'Hallo Welt!',
-		Ok: "Ok",
-		Yes: "Ja",
-		No: "Nein",
+		ok: "Ok",
+		yes: "Ja",
+		no: "Nein",
+		save: "Speichern",
 		Cancel: "Abbrechen",
 		back: "Zurück",
+
 		idea: "Idee",
 		ideas: "Ideen",
-		newIdeas: "Neue Ideen", 
-		proposal: "Vorschlag",			// Wahlvorschlag
-		proposals: 'Vorschläge',
-		poll: "Wahl",
-		polls: 'Wahlen',  				// Abstimmungen, Umfragen ??
-		elaboration: 'Diskussion',
-		inVoting: 'Abstimmung',			// laufende Wahlen ??
-		finished: 'Abgeschlossen',
+		proposal: "Vorschlag",
+		proposals: "Vorschläge",
+		poll: "Abstimmung",							// Entscheidung von Robert: nein nicht "Wahl(en)" !!  Deutsche Übersetzung von poll ist Abstimmung!
+		polls: "Abstimmungen",
+		pollsAbbr: "Abst.",							// Abkürzung für Nav Arrows im Header
+		law: "Regel",
+		laws: "Regeln",
 
+		elaboration: 'in Diskussion',		// oder auch "in Ausarbeitung"
+		inVoting: 'Wahl läuft',					// Abstimmung im Status "wahl läuft"
+		finished: 'Abgeschlossen',
 	}
 }
 

@@ -2,7 +2,9 @@
 	<div>
 		<liquido-header></liquido-header>
 		
-		<div v-if="showFilter" class="container mt-3 mb-3">
+		<div class="mt-1">&nbsp;</div>
+
+		<div v-if="showFilter" class="container mb-3">
 			<b-button-group class="filter-buttons shadow-sm">
 				<b-button :class="{'active' : pollStatusFilter === 'ELABORATION'}" @click="pollStatusFilter = 'ELABORATION'">
 					<i class="far fa-comments"></i><div class="icon-title">{{$t('elaboration')}}</div>
@@ -58,7 +60,7 @@ export default {
 				noPollsInVoting: "Es gibt gerade keine laufenden Abstimmungen.",
 				noFinishedPolls: "Es gibt bisher noch keine abgeschlossen Abstimmung.",
 				butProposalsInDiscussion: "Es gibt jedoch Wahlvorschläge die ihr diskutieren könnt.",
-				butPollInVoting: "Es gibt jedoch eine <b>Abstimmung</b> in der du deine Stimme abgeben kannst."
+				butPollInVoting: "Es gibt jedoch eine <b>laufende Abstimmung</b> in der du deine Stimme abgeben kannst."
 			}
 		}
 	},
@@ -66,108 +68,15 @@ export default {
 	data() {
 		return {
 			pollStatusFilter: "ELABORATION",
-			polls: [
-				{
-					id: 101,
-					title: "Example poll in voting with a very long titela asddfasdf dd",
-					status: "VOTING",
-					votingStartAt: this.addDays(new Date(), -1),
-					votingEndAt:   this.addDays(new Date(), +9),
-
-					proposals: [
-						{
-							id: 2001,
-							title: "Proposal One qurg ASD asdfcvvef fdadsf ddd fff ddccc c ewe e",
-							description: "Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-							status: "VOTING",
-							createdAt: new Date(),
-
-							updatedAt: new Date(),
-							area: {
-								id: 4001,
-								title: "Example Area"
-							},
-							supporters: [
-								
-							],
-							numSupporters: 15,
-							supportedByCurrentUser: true,
-							createdBy: {
-								id: 7001,
-								email: "user1@liqudo.vote",
-								profile: {
-									name: "User1longname Mobileasdf",
-									mobilephone: "#491234517",
-									picture: "/img/avatars/Avatar1.png",
-								}
-							}
-						},
-						{
-							id: 2002,
-							title: "Proposal Two",
-							description: "Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-							status: "VOTING",
-							createdAt: new Date(),
-							updatedAt: new Date(),
-							area: {
-								id: 4002,
-								title: "Example Area"
-							},
-							supporters: [
-								
-							],
-							numSupporters: 9,
-							supportedByCurrentUser: false,
-							createdBy: {
-								id: 7002,
-								email: "user2@liqudo.vote",
-								profile: {
-									name: "User2 Mobile",
-									mobilephone: "#491234518",
-									picture: "/img/avatars/Avatar2.png",
-								}
-							}
-						},
-						{
-							id: 2003,
-							title: "Proposal Three with a very long title that will break more than three lines just to besure we make it very long",
-							description: "Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-							status: "VOTING",
-							createdAt: new Date(),
-							updatedAt: new Date(),
-							area: {
-								id: 4002,
-								title: "Example Area"
-							},
-							supporters: [
-								
-							],
-							numSupporters: 92345,
-							supportedByCurrentUser: true,
-							createdBy: {
-								id: 7002,
-								email: "user4@liqudo.vote",
-								profile: {
-									name: "User4 Mobile",
-									mobilephone: "#491234514",
-									picture: "/img/avatars/Avatar4.png",
-								}
-							}
-						}
-					],
-					area: {
-						id: 4001,
-						title: "Example Area"
-					},
-					winner: undefined,
-					duelMatrix: undefined
-				}
-			]			
+			
 		}
 	},
 	created() {},
 	mounted() {},
 	computed: {
+		polls() {
+			return this.$root.store.polls
+		},
 		showFilter() {
 			return this.polls.length > 3
 		},
@@ -186,12 +95,6 @@ export default {
 		}
 	},
 	methods: {
-		// just a dummy to create test data
-		addDays(date, days) {
-			var result = new Date(date);
-			result.setDate(result.getDate() + days);
-			return result;
-		},
 		
 	},
 

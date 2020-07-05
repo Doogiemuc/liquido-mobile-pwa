@@ -4,9 +4,24 @@
 			<div class="liquido-brand"><i class="fas fa-university"></i>&nbsp;<span class="liquido"></span></div>
 
 			<ul v-if="showNavArrows" id="navArrows" class="nav nav-arrows container-fluid" >
-				<li :class="{'active': isPathActive('/ideas')}"><router-link active-class="active" to="/ideas" id="IdeasArrow">	<i class="far fa-lightbulb"></i>&nbsp;{{$t('ideas')}}</router-link></li>
-				<li :class="{'active': isPathActive('/proposals')}"><router-link active-class="active" to="/proposals" id="ProposalsArrow"><i class="fas fa-vote-yea"></i>&nbsp;{{$t('proposals')}}</router-link></li>
-				<li :class="{'active': isPathActive('/polls')}"><router-link active-class="active" to="/polls" id="PollsArrow"><i class="fas fa-poll"></i>&nbsp;{{$t('polls')}}</router-link></li>
+				<li :class="{'active': isPathActive('/ideas')}">
+					<router-link active-class="active" to="/ideas" id="IdeasArrow">
+						<i class="far fa-lightbulb"></i>
+						<div class="icon-title">{{$t('ideas')}}</div>
+					</router-link>
+				</li>
+				<li :class="{'active': isPathActive('/proposals')}">
+					<router-link active-class="active" to="/proposals" id="ProposalsArrow">
+						<i class="fas fa-vote-yea"></i>
+						<div class="icon-title">{{$t('proposals')}}</div>
+					</router-link>
+				</li>
+				<li :class="{'active': isPathActive('/polls')}">
+					<router-link active-class="active" to="/polls" id="PollsArrow">
+						<i class="fas fa-poll"></i>
+						<div class="icon-title">{{$t('polls')}}</div>
+					</router-link>
+				</li>
 			</ul>
 		</header>
 	</div>
@@ -102,25 +117,36 @@ $inactiveNavArrowBg: #fdfdff;
 	justify-content: center;
 	font-family: 'Libre Baskerville', serif;
 	//font-family: Georgia, 'Times New Roman', Times, serif;
+	font-size: 1.7rem;
 	margin-bottom: 1rem;
 	padding-left: 15px;  // same as contianer-fluid. Was overwritten by .nav
 	//min-width: 350px;	
 	transition: 0.3s;
+	.icon-title {
+		font-size: 10px;
+		line-height: 1.0;
+	}
+
 	@media (max-width: 350px) {
 		font-size: 12px;
 	}
 }
 
+$arrowSize: 28px;
+
 #navArrows > li {
-	margin: 0 12px;
+	margin: 0 $arrowSize*0.5;
 	position: relative;
 	flex-grow: 1;
 	transition: 0.3s;
 }
 #navArrows a {
 	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	//text-overflow: ellipsis;
 	color: $primary;
-	height: 40px;
+	height: 2 * $arrowSize;
 	line-height: 40px;   // vertically center text in arrows
 	background-color: $inactiveNavArrowBg;
 	transition: 0.3s;
@@ -129,11 +155,11 @@ $inactiveNavArrowBg: #fdfdff;
 	position: absolute;
 	content: "";
 	top: 0px;
-	left: -19px;
+	left: -$arrowSize*0.75;
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: 20px 0 20px 20px;
+	border-width: $arrowSize 0 $arrowSize $arrowSize*0.75;
 	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg transparent;
 	z-index: 150;
 	transition: 0.3s;
@@ -142,11 +168,11 @@ $inactiveNavArrowBg: #fdfdff;
 	position: absolute;
 	content: "";
 	top: 0px;
-	right: -20px;
+	right: -$arrowSize*0.75;
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: 20px 0 20px 20px;
+	border-width: $arrowSize 0 $arrowSize $arrowSize*0.75;
 	border-color: transparent transparent transparent $inactiveNavArrowBg;
 	z-index: 150;
 	transition: 0.3s;
@@ -160,15 +186,15 @@ $inactiveNavArrowBg: #fdfdff;
 		line-height: 30px;
 	}
 	li {
-		margin: 0 10px;
+		margin: 0 8px;
 	}
 	a:before {
-		left: -15px;
-		border-width: 15px 0 15px 15px;
+		left: -10px;
+		border-width: 15px 0 15px 10px;
 	}
 	a:after {
-		right: -15px;
-		border-width: 15px 0 15px 15px;
+		right: -10px;
+		border-width: 15px 0 15px 10px;
 	}
 }
 

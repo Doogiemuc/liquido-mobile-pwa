@@ -3,17 +3,17 @@
 		<transition name="fadePage" mode="out-in">
 			<router-view id="appContent" :key="$route.fullPath" />
 		</transition>
-		<GlobalFooter v-if="$root.store.showFooter"/>
+		<liquido-footer v-if="$root.store.showFooter"/>
 	</div>
 </template>
 
 <script>
 
+import liquidoFooter from '@/components/liquido-footer'
+
 export default {
 	name: "App",
-	components: {
-		GlobalFooter: () => import("@/components/footer-comp"),
-	},
+	components: { liquidoFooter },
 	mixins: [],
 	//data is set in main.js
 	created() {},

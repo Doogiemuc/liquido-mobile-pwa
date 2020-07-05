@@ -13,7 +13,12 @@ const routes = [
     path: "/addIdea",
     name: "addIdea",
     component: () => lazyLoadView(import("@/views/idea-add")),
-  },
+	},
+	{
+    path: "/createPoll",
+    name: "createPoll",
+    component: () => lazyLoadView(import("@/views/poll-create")),
+	},
   {
     path: "/polls",
     name: "polls",

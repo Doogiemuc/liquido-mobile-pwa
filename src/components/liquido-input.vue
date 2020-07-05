@@ -24,11 +24,21 @@
 <script>
 /**
  * HTML Form Input field with validation feedback
+ * ==============================================
  * 
  * This input field can have three states:
  *  - null:  Input has not been validated yet. Will not show any validation feedback
  *  - false: Value is currently invalid. Marked in red and show invalid-feedback message
  *  - true:  Input has been validated and is value is valid. Marked in green and may show valid-feedback message
+ *
+ * The one and only delicate logic for validating an input field
+ * =============================================================
+ * 
+ * When the field is new and untouched, then do not show any error message.
+ * While the user is typing, do not show any error message.
+ * When the field validates, because user has entered enough characters, then immidiately show the green checkmark.
+ * When the user presses enter or blurs the field or clicks on "done" on the iOS keyboard, then try to validate the value and show corresponding message.
+ * (Only show an error message, when the field was touched by the user before.)
  * 
  * Example Usage
  * =============

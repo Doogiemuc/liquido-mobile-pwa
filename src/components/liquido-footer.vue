@@ -2,45 +2,33 @@
 	<footer class="container-lg">
 		<div class="row">
 			<div class="col text-center">
-				<router-link to="/team" class="navbar-item"><i class="fas fa-users"></i></router-link>
+				<router-link to="/ideas" class="navbar-item"><i class="fas fa-lightbulb"></i></router-link>
 			</div>
 			<div class="col text-center">
 				<div class="circle-1">
-					<router-link to="/addIdea" class="navbar-item"><i class="fas fa-lightbulb"></i></router-link>
+					<router-link to="/polls" class="navbar-item"><i class="fas fa-person-booth"></i></router-link>
 				</div>
 			</div>
 			<div class="col text-center">
-				<router-link to="/polls?status=VOTING" class="navbar-item"><i class="fas fa-person-booth"></i></router-link>
+				<router-link to="/team" class="navbar-item"><i class="fas fa-users"></i></router-link>
 			</div>
 		</div>
 	</footer>
 </template>
 
 <script>
-import { get } from "vuex-pathify"
 
 export default {
-	name: "GlobalFooter",
+	name: "LiquidiFooter",
 	components: {},
 	mixins: [],
-	data() {
-	return {
-		year: new Date().getFullYear(),
-	}
+	data() { 
+		return {} 
 	},
-	beforeCreate() {},
 	created() {},
-	beforeMount() {},
 	mounted() {},
-	computed: {
-	showFooter: get("ui/showFooter"),
-	},
-	methods: {
-
-	},
-	beforeUpdate() {},
-	updated() {},
-	beforeDestroy() {},
+	computed: {},
+	methods: {},
 }
 </script>
 
@@ -67,7 +55,7 @@ footer {
 	height: 50px;
 	border: 1px solid $primary;
 	border-radius: 50%;
-	font-size: 2rem;
+	font-size: 1.9rem;
 	position: fixed;
 	bottom: 0;
 	left: 50%;

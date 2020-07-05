@@ -3,7 +3,7 @@
 		<liquido-header :showNavArrows="false" :minimizeOnScroll="false"></liquido-header>
 
 		<div class="container-lg mt-3">
-			<b-card class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 1 }">
+			<b-card id="welcomeBubble" class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 1 }">
 				<b-card-text v-html="$t('welcome')"></b-card-text>
 			</b-card>
 
@@ -103,7 +103,7 @@
 				<div class="text-center my-3">
 					<img :src="newTeam.qrCode" class="qr-code" />
 				</div>
-				<small v-html="$t('teamInfo')"></small>
+				<p v-html="$t('teamInfo')"></p>
 			</b-card>
 
 			<b-card class="chat-bubble shadow-sm" :class="{'collapse-max-height': flowState !== 9 } ">
@@ -168,10 +168,10 @@ export default {
 				shareThisLink: 'Teile diesen Link',
 				tellInvitationCode: 'oder sage ihnen deinen Einadungscode:',
 				scanQrCode: 'oder lass sie diesen QR code scannen:',
-				teamInfo: 'Du findest diese Infos später jederzeit wieder unter dem Team Icon <i class="fas fa-users"></i> ganz links unten im Footer.',
+				teamInfo: 'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) im Footer.',
 
 
-				pollInfo: 'Jetzt kannst du deine erste Abstimung anlegen, zu der jedes Teammitglied dann seine Idee (<i class="fas fa-lightbulb"></i>) hinzufügen kann.',
+				pollInfo: 'Jetzt kannst du deine erste Abstimung (<i class="fas fa-poll"></i>) anlegen, zu der jedes Teammitglied dann seine Idee (<i class="fas fa-lightbulb"></i>) hinzufügen kann.',
 				createPoll: 'Abstimmung anlegen',
 			}
 		}
@@ -195,7 +195,7 @@ export default {
 			},
 			
 			/*
-				user flow:   chat bubbles are consecutively blended in along this flowState value.
+				user flow:   chat bubbles are consecutively blended in along this flowState.
 				 0 - empty chat
 				 1 - first welcome message bubble
 				 2 - blend in: What's your name
@@ -207,31 +207,52 @@ export default {
 				 8 - create new team form
 				 9 -new  team created
 			*/
-			flowState: 0,   								//TODO: store flow State in vuex, and re-use when user comes back
-				/** 
-		 * Each form field may have one of three states:
-		 * 1) null:  The field has not yet been validated at all. Do not show any error or success message yet.
-		 * 2) false: The fields value is invalid. Show error message.
-		 * 3) true:  The fields value is valid. May show success message.
-		 */
+			flowState: 0,
 
 			// These variables store if the field has been validated before. If false => do not show any error message yet.
 			usernameValidated: false,
 			inviteValidated:   false,
 			emailValidated:    false,
 			teamNameValidated: false,
+
+			chatAnimationStarted: false,
 		}
 	},
+	/**
+	 * Do not show the Footer on the index page and
+	 * only start automatic scrolling if first bubble is completely visible (> iPhone5)
+	 */
 	created() {
 		this.$root.store.setShowFooter(false)
-		window.setTimeout(() => { this.flowState = 1}, 500)
-		window.setTimeout(() => { this.flowState = 2}, 2500)
-		window.setTimeout(() => { this.flowState = 3; this.scrollToBottom() }, 3000)
 	},
+
+	/**
+	 * By default scroll to the top of the page (e.g. when reloading the page)
+	 * When the bottom of the #welcomeBubble becomes visible (or already is visible on larger screens)
+	 * then start the chat animation ONCE
+	 */
 	mounted() {
-		$("html, body").animate({ scrollTop: 0 }, 1000);
+		//$("html, body").animate({ scrollTop: 0 }, 500);
+		$("html, body").scrollTop(0);
+		window.setTimeout(() => { this.flowState = 1}, 500)
+
+		if (this.isBottomInView("#welcomeBubble")) {
+			this.startChatAnimation()
+		} else {
+			$(window).scroll(() => {
+				if (!this.chatAnimationStarted && this.isBottomInView("#welcomeBubble")) {
+					this.startChatAnimation()
+				}
+			})
+		}
 	},
 	computed: {
+		/** 
+		 * Each form field may have one of three states:
+		 *  1) null:  The field has not yet been validated at all. Do not show any error or success message yet.
+		 *  2) false: The fields value is invalid. Show error message.
+		 *  3) true:  The fields value is valid. May show success message.
+		 */
 		userNameState()   { 
 			 if (this.user.name && this.user.name.replace(/\s/g, '').length >= 4) return this.usernameValidated = true
 			 return this.usernameValidated ? false : null
@@ -258,11 +279,17 @@ export default {
 	},
 	methods: {
 
+		/**
+		 * The one and only delicate logic for validating an input field:
+		 * When the field is new and untouched, then do not show any error message.
+		 * While the user is typing, do not show any error message.
+		 * When the field validates, because user has entered enough characters, then immidiately show the green checkmark.
+		 * When the user presses enter or blurs the field or clicks on "done" on the iOS keyboard, then try to validate the value and show corresponding message.
+		 * (Only show an error message, when the field was touched by the user before.)
+		 */
 		userNameEnter() {
-			console.log("userNameEnter")
-			//this.usernameValidated = true
+			this.usernameValidated = true    // When user did not enter enough characters but presses enter, then show error message. But not before while he is still typeing.
 			if (this.userNameState && this.flowState < 4)	{
-				console.log("userNameEnter inner")
 				this.flowState = 4
 				$('#userNameInput').blur()
 				this.scrollToBottom()
@@ -312,6 +339,8 @@ export default {
 			})
 		},
 
+		// Here comes some UX magic :-)
+
 		/** scroll to the very bottom of the content. Show last chat message */
 		scrollToBottom() {
 			this.$nextTick(() => {
@@ -328,6 +357,22 @@ export default {
 			this.$nextTick(() => {
 				$("html, body").animate({ scrollTop: scrollTop }, 2000);
 			})
+		},
+
+		/** Check if the bottom of elem is scrolled into view */
+		isBottomInView(elem) {
+			var docViewTop = $(window).scrollTop()
+			var docViewBottom = docViewTop + $(window).height()
+			var elemTop = $(elem).offset().top
+			var elemBottom = elemTop + $(elem).height()
+			return elemBottom <= docViewBottom
+		},
+
+		startChatAnimation() {
+			this.chatAnimationStarted = true
+			$(window).off("scroll")
+			window.setTimeout(() => { this.flowState = 2; this.scrollToBottom() }, 2500)
+			window.setTimeout(() => { this.flowState = 3; this.scrollToBottom() }, 3000)
 		},
 
 		shareLink() {
