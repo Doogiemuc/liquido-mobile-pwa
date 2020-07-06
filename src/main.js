@@ -34,7 +34,7 @@ const globalTranslations = {
 		yes: "Ja",
 		no: "Nein",
 		save: "Speichern",
-		Cancel: "Abbrechen",
+		cancel: "Abbrechen",
 		back: "Zurück",
 
 		idea: "Idee",

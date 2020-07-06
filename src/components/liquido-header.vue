@@ -1,9 +1,8 @@
 <template>
-	<div id="behindHeader">
+	<div>
 		<header id="liquidoHeader" class="liquido-header shadow-sm">
 			<div class="liquido-brand"><i class="fas fa-university"></i>&nbsp;<span class="liquido"></span></div>
-
-			<ul v-if="showNavArrows" id="navArrows" class="nav nav-arrows container-fluid" >
+			<ul v-if="showNavArrows" id="navArrows" class="nav nav-arrows" >
 				<li :class="{'active': isPathActive('/ideas')}">
 					<router-link active-class="active" to="/ideas" id="IdeasArrow">
 						<i class="far fa-lightbulb"></i>
@@ -24,6 +23,7 @@
 				</li>
 			</ul>
 		</header>
+		<div id="behindHeader"></div>
 	</div>
 </template>
 
@@ -103,7 +103,8 @@ export default {
 .liquido-header.scrolled {
 	.liquido-brand {
 		font-size: 0;
-		margin: 5px 0 0 0;
+		padding: 0;
+		margin: 0;
 	}
 }
 
@@ -113,22 +114,16 @@ $inactiveNavArrowBg: #fdfdff;
 
 #navArrows {
 	flex-wrap: nowrap;
-	margin: 0 auto;
+	padding: 0;
+	//min-width: 350px;	
 	justify-content: center;
 	font-family: 'Libre Baskerville', serif;
-	//font-family: Georgia, 'Times New Roman', Times, serif;
 	font-size: 1.7rem;
 	margin-bottom: 1rem;
-	padding-left: 15px;  // same as contianer-fluid. Was overwritten by .nav
-	//min-width: 350px;	
 	transition: 0.3s;
 	.icon-title {
 		font-size: 10px;
 		line-height: 1.0;
-	}
-
-	@media (max-width: 350px) {
-		font-size: 12px;
 	}
 }
 
@@ -137,7 +132,8 @@ $arrowSize: 28px;
 #navArrows > li {
 	margin: 0 $arrowSize*0.5;
 	position: relative;
-	flex-grow: 1;
+	flex-grow: 1;		
+	flex-basis: 0;  // make all li elemns the same width (independant of their content)
 	transition: 0.3s;
 }
 #navArrows a {
@@ -147,11 +143,12 @@ $arrowSize: 28px;
 	//text-overflow: ellipsis;
 	color: $primary;
 	height: 2 * $arrowSize;
-	line-height: 40px;   // vertically center text in arrows
+	line-height: 40px;   				// vertically center text in arrows
 	background-color: $inactiveNavArrowBg;
 	transition: 0.3s;
 }
-#navArrows a:before {
+/* Wings before each element */
+#navArrows li:not(:first-child) > a:before {
 	position: absolute;
 	content: "";
 	top: 0px;
@@ -164,7 +161,14 @@ $arrowSize: 28px;
 	z-index: 150;
 	transition: 0.3s;
 }
-#navArrows a:after {
+/* Rounded corners for first element at the left */
+#navArrows > li:first-child > a {
+	border-top-left-radius: $arrowSize*0.3;
+	border-bottom-left-radius: $arrowSize*0.3;
+}
+
+/* Arrows after each element */
+#navArrows > li:not(:last-child) > a:after {
 	position: absolute;
 	content: "";
 	top: 0px;
@@ -177,26 +181,40 @@ $arrowSize: 28px;
 	z-index: 150;
 	transition: 0.3s;
 }
+/* Rounded corners for last element at the right */
+#navArrows > li:last-child > a {
+	border-top-right-radius: $arrowSize*0.3;
+	border-bottom-right-radius: $arrowSize*0.3;
+}
 
 /* Navbar arrows become smaller when user scrolled upwards */
 #navArrows.scrolled {
-	margin-bottom: 5px;
-	a {
-		height: 30px;
-		line-height: 30px;
-	}
+	margin-top: 10px;
+	margin-bottom: 10px;
 	li {
 		margin: 0 8px;
 	}
-	a:before {
-		left: -10px;
-		border-width: 15px 0 15px 10px;
-	}
-	a:after {
-		right: -10px;
-		border-width: 15px 0 15px 10px;
+	a {
+		height: 30px;
+		line-height: 33px;
 	}
 }
+
+#navArrows.scrolled > li:not(:first-child) > a:before {
+	left: -10px;
+	border-width: 15px 0 15px 10px;
+}
+#navArrows.scrolled > li:not(:last-child) > a:after {
+	right: -10px;
+	border-width: 15px 0 15px 10px;
+}
+
+
+
+	//.icon-title {
+		//display: none;   //TODO: then width of arrows jumps :-(
+	//}
+
 
 
 /* Navbar arrows when active */

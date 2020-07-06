@@ -23,15 +23,15 @@
 		</div>
 
 		<div v-if="showFilter" class="container mb-3">
-			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'ELABORATION'" class="alert alert-primary">
+			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'ELABORATION'" class="alert alert-secondary">
 				<p v-html="$t('noPollsInElaboration')"></p>
 				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
 			</div>
-			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'VOTING'" class="alert alert-primary">
+			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'VOTING'" class="alert alert-secondary">
 				<p v-html="$t('noPollsInVoting')"></p>
 				<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')"></p>
 			</div>
-			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'FINISHED'" class="alert alert-primary">
+			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'FINISHED'" class="alert alert-secondary">
 				<p v-html="$t('noFinishedPolls')"></p>
 				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
 			</div>
@@ -58,9 +58,9 @@ export default {
 			de: {
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es gibt gerade keine laufenden Abstimmungen.",
-				noFinishedPolls: "Es gibt bisher noch keine abgeschlossen Abstimmung.",
+				noFinishedPolls: "Es gibt bisher noch keine abgeschlossenen Abstimmungen.",
 				butProposalsInDiscussion: "Es gibt jedoch Wahlvorschläge die ihr diskutieren könnt.",
-				butPollInVoting: "Es gibt jedoch eine <b>laufende Abstimmung</b> in der du deine Stimme abgeben kannst."
+				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst."
 			}
 		}
 	},

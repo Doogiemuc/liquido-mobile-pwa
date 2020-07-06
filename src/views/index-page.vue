@@ -339,6 +339,10 @@ export default {
 			})
 		},
 
+		createPoll() {
+			this.$router.push('/createPoll')
+		},
+
 		// Here comes some UX magic :-)
 
 		/** scroll to the very bottom of the content. Show last chat message */
