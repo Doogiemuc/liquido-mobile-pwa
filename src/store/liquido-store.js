@@ -6,6 +6,8 @@
  * (I don't need - and sorry yes, I also don't like - VUEX :) Its plain simply overengeneered.
  */
 
+import { uniqueId } from "lodash";
+
 // just a dummy to create test data
 var addDays = function(date, days) {
 	var result = new Date(date);
@@ -28,9 +30,6 @@ export default {
 		inviteCode: undefined,
 		qrCode: undefined
 	},
-
-
-
 
 	//
 	// DUMMY DATA FOR TESTING
@@ -422,6 +421,25 @@ export default {
 		}
 	],
 	
+	getPollById(pollId) {
+		return this.polls.find(poll => poll.id == pollId)
+	},
+
+	saveProposal(pollId, proposal) {
+		var poll = this.getPollById(pollId)
+		if (!poll) return Promise.reject("Cannot find poll.id="+pollId)
+		if (!poll.proposals) {
+			poll.proposals = []
+			proposal.id = uniqueId()
+			poll.proposals.push(proposal)
+		}
+		if (!proposal.id) {
+			proposal.id = uniqueId()
+		} else {
+			
+		}
+	},
+
 	// These methods change the content of the store ("mutations" in vuex)
 	setShowFooter(showFooter) {
 		this.showFooter = showFooter

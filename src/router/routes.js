@@ -24,6 +24,12 @@ const routes = [
     name: "polls",
     component: () => lazyLoadView(import("@/views/polls")),
   },
+  {
+    path: "/polls/:pollId/add",
+    name: "addProposal",
+    component: () => import("@/views/proposal-add"),
+    props: true
+  },
 	{
     path: "/about",
     name: "about",

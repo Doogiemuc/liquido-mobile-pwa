@@ -35,10 +35,10 @@
  * =============================================================
  * 
  * When the field is new and untouched, then do not show any error message.
- * While the user is typing, do not show any error message.
- * When the field validates, because user has entered enough characters, then immidiately show the green checkmark.
- * When the user presses enter or blurs the field or clicks on "done" on the iOS keyboard, then try to validate the value and show corresponding message.
- * (Only show an error message, when the field was touched by the user before.)
+ * When the field is focused for the first time and the content is still invalid, then do not show an error message yet.
+ * When the field validates, for example, because the user has entered enough characters, then immidiately show the field as valid with a gree border and a checkmark.
+ * When the user presses enter or blurs the field (or clicks on "done" on the iOS keyboard), then validate the current value and show corresponding valid/invalid message.
+ * (Goal: Only ever show an error message, when the field was touched by the user before.)
  * 
  * Example Usage
  * =============
