@@ -1,9 +1,15 @@
 /* 
   Globally avialable SCSS
 
-  When you change this file you must restart your dev server.
+  !!! When you change this file you must restart your dev server. !!!
  */
 
+$primary: blue;												// primary text foreground
+$secondary: #6c757d;									// secondary text foreground
+$header-bg: rgb(220, 236, 255);				// background of fixed header
+$input-bg: rgb(220, 236, 255); 			 	// background for chat bubbles where user has to enter something
+
+/*
 $black : hsl(0, 0%, 4%);
 $black-bis : hsl(0, 0%, 7%);
 $black-ter : hsl(0, 0%, 14%);
@@ -22,24 +28,4 @@ $turquoise : hsl(171, 100%, 41%);
 $blue : hsl(215, 100%, 47%);
 $purple : hsl(271, 100%, 71%);
 $red : hsl(0, 100%, 42%);
-
-$primary : $blue;
-$secondary: #6c757d;
-$secondary-bg: rgb(220, 236, 255);
-$info : $blue;
-$success : $green;
-$warning : $yellow;
-$danger : $red;
-$light : $white-ter;
-$dark : $grey-darker;
-
-$debug: false;
-
-// sticky navbar height at the top
-$stickyNavHeight: 130px;
-
-// placaeholder for empty space behind sticky navbar
-.behind-header {
-	height: $stickyNavHeight + 10px;
-	min-height: $stickyNavHeight + 10px;
-}
+*/

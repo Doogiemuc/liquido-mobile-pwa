@@ -1,24 +1,29 @@
 <template>
 	<div>
 		<header id="liquidoHeader" class="liquido-header shadow-sm">
-			<div class="liquido-brand"><i class="fas fa-university"></i>&nbsp;<span class="liquido"></span></div>
+			<div class="row no-gutters align-items-center">
+				<div class="col header-left"><i v-if="showBack" class="fas fa-angle-double-left" @click="goBack()"></i></div>
+				<div class="col-8 liquido-title"><i class="fas fa-university"></i>&nbsp;<span @click="clickLiquidoTitle()" class="liquido"></span></div>
+				<div class="col header-right"><i class="fas fa-users"></i></div>
+			</div>
+			
 			<ul v-if="showNavArrows" id="navArrows" class="nav nav-arrows" >
-				<li :class="{'active': isPathActive('/ideas')}">
-					<router-link active-class="active" to="/ideas" id="IdeasArrow">
-						<i class="far fa-lightbulb"></i>
-						<div class="icon-title">{{$t('ideas')}}</div>
+				<li :class="{'active': isPathActive('/elaboration')}">
+					<router-link active-class="active" to="/elaboration" id="IdeasArrow">
+						<i class="far fa-comments"></i>
+						<div class="icon-title">{{$t('elaboration')}}</div>
 					</router-link>
 				</li>
-				<li :class="{'active': isPathActive('/proposals')}">
-					<router-link active-class="active" to="/proposals" id="ProposalsArrow">
-						<i class="fas fa-vote-yea"></i>
-						<div class="icon-title">{{$t('proposals')}}</div>
+				<li :class="{'active': isPathActive('/voting')}">
+					<router-link active-class="active" to="/voting" id="ProposalsArrow">
+						<i class="fas fa-person-booth"></i>
+						<div class="icon-title">{{$t('inVoting')}}</div>
 					</router-link>
 				</li>
-				<li :class="{'active': isPathActive('/polls')}">
-					<router-link active-class="active" to="/polls" id="PollsArrow">
-						<i class="fas fa-poll"></i>
-						<div class="icon-title">{{$t('polls')}}</div>
+				<li :class="{'active': isPathActive('/finished')}">
+					<router-link active-class="active" to="/finished" id="PollsArrow">
+						<i class="fas fa-check"></i>
+						<div class="icon-title">{{$t('finished')}}</div>
 					</router-link>
 				</li>
 			</ul>
@@ -40,11 +45,14 @@ export default {
 		}
 	},
 	props: {
-		'showNavArrows': { type: Boolean, required: false, default: true },
 		'minimizeOnScroll': { type: Boolean, required: false, default: true },
+		'showBack': { type: Boolean, required: false, default: false },
 	},
 	data() {
-		return {}
+		return {
+			showNavArrows: false,
+			filterByStatus: "ELABORATION",
+		}
 	},
 	methods: {
 		transitionHeader() {
@@ -55,6 +63,14 @@ export default {
 				$('.liquido-header').removeClass('scrolled')
 				$('#navArrows').removeClass('scrolled')
 			}
+		},
+
+		goBack() {
+			this.$router.go(-1)
+		},
+
+		clickLiquidoTitle() {
+			if (this.$route.path !== "/" && this.$route.path !== "/polls") this.$router.push("/polls")
 		},
 
 		/** check if current $route.path starts with the given pathPrefix. so that we can add the .active class to the outer li element */
@@ -68,8 +84,8 @@ export default {
 	 * Next sibling element should add its own top margin.
 	 */
 	mounted() {
-		var headerHeight = $('#liquidoHeader').css('height')
-		$('#behindHeader').css('height', headerHeight)
+		this.$root.headerHeight = parseInt($('#liquidoHeader').css('height'),10)  // jQuery returns "125px". 
+		$('#behindHeader').css('height', this.$root.headerHeight)
 		if (this.minimizeOnScroll) {
 			window.onscroll = () => this.transitionHeader();
 		}	
@@ -88,24 +104,26 @@ export default {
 	z-index: 100;
 	transition: 0.3s;  /* Add a transition effect when scrolling */
 	color: $primary;
-	background-color: $secondary-bg;
+	background-color: $header-bg;
 	border-bottom: 1px solid rgba(0,0,255, 0.3);
-	text-align: center;
+	font-size: 1.5rem;
 
-	.liquido-brand {
-		font-size: 24px;
-		font-weight: bold;
-		margin: 1rem 0;
-		transition: 0.3s;  /* Add a transition effect when scrolling */
+	.liquido-title {
+		text-align: center;
+	}
+	.header-right {
+		font-size: 1rem;
+		text-align: right;
+		margin-right: 15px;
+	}
+	.header-left {
+		text-align: left;
+		margin-left: 15px;
 	}
 }
 
 .liquido-header.scrolled {
-	.liquido-brand {
-		font-size: 0;
-		padding: 0;
-		margin: 0;
-	}
+	font-size: 1rem;
 }
 
 /* Arrows for nav links */

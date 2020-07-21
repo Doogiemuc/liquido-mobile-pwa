@@ -2,16 +2,16 @@
 	<div>
 		<liquido-header></liquido-header>
 
-		<div class="container-lg mt-3">
+		<div class="container-lg">
 			
-			<h2 class="my-3"><i class="fas fa-poll"></i> {{$t('newPoll')}}</h2>
+			<h2 class="pageTitle"><i class="fas fa-poll"></i> {{$t('newPoll')}}</h2>
 
 			<b-card class="chat-bubble form-bubble">
 				<liquido-input v-model="poll.title" id="pollTitleInput" :label="$t('pollTitle')" :state="pollTitleState" :invalidFeedback="$t('pollTitleInvalid')" @blur="pollTitleValidated = true"></liquido-input>
 
 				<div class="d-flex justify-content-between align-items-center">
 					<small class="ml-1"><a href="#" @click="cancelCreatePoll()">{{$t('cancel')}}</a></small>
-					<b-button variant="primary" class="float-right" :disabled="pollTitleState !== true"  @click="clickSavePoll()">{{$t('save')}} <i class="fas fa-angle-double-right"></i></b-button>
+					<b-button variant="primary" class="float-right" :disabled="pollTitleState !== true"  @click="clickCreateNewPoll()">{{$t('create')}} <i class="fas fa-angle-double-right"></i></b-button>
 				</div>
 
 			</b-card>
@@ -20,7 +20,7 @@
 				<!-- a class="float-right px-1" data-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="true" aria-controls="collapseOne">
 					<i class="fa" aria-hidden="true"></i>
 				</a -->
-				<div id="collapseInfo" v-html="$t('createPollInfo')"></div>
+				<div v-html="$t('createPollInfo')"></div>
 			</b-card>
 		</div>
 	</div>
@@ -38,13 +38,13 @@ export default {
 			},
 			de: {
 				newPoll: 'Neue Abstimmung',
-				createPollInfo: '<p>Eine Abstimmung enthält mehrere Wahlvorschläge (<i class="fas fa-vote-yea"></i>). Jeder in deinem Team kann seine Idee zur Abstimmung hinzufügen.<p>'+
-					 '<p>Bevor eine Idee (<i class="fas fa-lightbulb"></i>) jedoch zu einem gültigen Wahlvorschlag werden kann, muss sie erst genügend Unterstützer finden.</p>'+
-					 '<p>Während der Elaborationsphase können Ideen und Vorschläge noch diskutiert (<i class="fas fa-comments"></i>) werden.</p>'+
-					 '<p>Sobald die Wahlphase der Abstimmung eröffnet ist, könnt ihr wählen. (<i class="fas fa-person-booth"></i>)</p>',
+				createPollInfo: '<p>Eine Abstimmung (<i class="fas fa-poll"></i>) enthält mehrere Wahlvorschläge (<i class="fas fa-vote-yea"></i>) und läuft über zwei Phasen:<p>'+
+					 '<p>Während der Elaborationsphase kann jeder in deinem Team seinen Vorschlag (bzw. Kandidaten) hinzufügen. Diese können dann diskutiert (<i class="fas fa-comments"></i>) werden.</p>'+
+					 '<p>Nachdem du als Admin die Wahlphase der Abstimmung gestartet hast, kann dann jeder im Team seine Stimme abgeben. (<i class="fas fa-person-booth"></i>)</p>',
 				pollTitle: 'Titel der Abstimmung',
 				pollTitleInvalid: 'Titel ist zu kurz. Bitte mind. 10 Zeichen.',
-
+				create: "Anlegen",
+				createdSuccessfully: ' erfolgreich angelegt',
 			}
 		}
 	},
@@ -71,9 +71,9 @@ export default {
 	},
 	methods: {
 
-		
-
-		clickSavePoll() {
+		clickCreateNewPoll() {
+			var createdPoll = this.$root.store.savePoll(this.poll)
+			this.$router.push("/polls/"+createdPoll.id)
 		},
 
 	},
@@ -111,23 +111,8 @@ export default {
 		transform: translateX(-20px);
 	}
 
-
 	.form-bubble {
-		background-color: $secondary-bg;
+		background-color: $input-bg;
 	}
 
-	[data-toggle="collapse"] .fa:before {  
-		content: "\f13a";
-	}
-
-	[data-toggle="collapse"].collapsed .fa:before {
-		content: "\f139";
-	}
-
-	label {
-		font-size: 14px;
-		font-weight: bold;
-		margin: 0;
-		//color: rgb(86, 9, 109);
-	}
 </style>

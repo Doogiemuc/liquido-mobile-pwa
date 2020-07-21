@@ -3,29 +3,22 @@
 		<transition name="fadePage" mode="out-in">
 			<router-view id="appContent" :key="$route.fullPath" />
 		</transition>
-		<liquido-footer v-if="$root.store.showFooter"/>
 	</div>
 </template>
 
 <script>
 
-import liquidoFooter from '@/components/liquido-footer'
-
+/** Liquido Root App */
 export default {
-	name: "App",
-	components: { liquidoFooter },
+	name: "LiquidoApp",
+	components: {},
 	mixins: [],
 	//data is set in main.js
 	created() {},
 	mounted() {},
-	computed: {
-		headerHeight() {
-			return $('#behindHeader').height()
-		}
-	},
+	computed: {},
 	methods: {},
 	updated() {},
-	beforeDestroy() {},
 }
 </script>
 
@@ -42,7 +35,6 @@ export default {
 
 /** no horizintal scrolling */
 #appContent {
-	// margin-top: 60px !important;  // for navbar
 	margin-bottom: 50px;  // for footer
 	overflow-x: hidden;
 }

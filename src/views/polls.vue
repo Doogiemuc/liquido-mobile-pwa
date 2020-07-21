@@ -2,40 +2,45 @@
 	<div>
 		<liquido-header></liquido-header>
 		
-		<div class="mt-1">&nbsp;</div>
-
-		<div v-if="showFilter" class="container mb-3">
-			<b-button-group class="filter-buttons shadow-sm">
-				<b-button :class="{'active' : pollStatusFilter === 'ELABORATION'}" @click="pollStatusFilter = 'ELABORATION'">
-					<i class="far fa-comments"></i><div class="icon-title">{{$t('elaboration')}}</div>
-				</b-button>
-				<b-button :class="{'active' : pollStatusFilter === 'VOTING'}" @click="pollStatusFilter = 'VOTING'">
-					<i class="fas fa-person-booth"></i><div class="icon-title">{{$t('inVoting')}}</div>
-				</b-button>
-				<b-button :class="{'active' : pollStatusFilter === 'FINISHED'}" @click="pollStatusFilter = 'FINISHED'">
-					<i class="fas fa-check"></i><div class="icon-title">{{$t('finished')}}</div>
-					</b-button>
-			</b-button-group>
-		</div>
-
 		<div class="container mb-3">
+			<h2 class="pageTitle">{{pageTitleLoc}}</h2>
+
+			<liquido-input v-if="polls.length > 3" v-model="searchQuery" id="searchInput" :label="$t('search')" :status="null" class="mb-4">
+				 <template v-slot:iconRight>
+					 <i class="fas fa-times mr-1" @click="searchQuery = undefined"></i>
+				 </template>
+			 </liquido-input>
+
 			<poll-panel v-for="poll in filteredPolls" :poll="poll" :key="poll.id" class="shadow mb-3"></poll-panel>
 		</div>
 
-		<div v-if="showFilter" class="container mb-3">
-			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'ELABORATION'" class="alert alert-secondary">
+		<div class="container mb-3">
+			<div v-if="polls.length === 0" class="alert alert-secondary">
+				<p v-html="$t('noPollsYet')"></p>
+				<p v-if="userIsAdmin" v-html="$t('noPollsYetAdmin')"></p>
+			</div>
+			<div v-if="filteredPolls.length === 0 && searchQuery && searchQuery.trim().length > 0" class="alert alert-secondary">
+				<p v-html="$t('noPollsMatchSearch')"></p>
+			</div>
+			<div v-if="filteredPolls.length === 0 && !searchQuery && filterByStatus === 'ELABORATION'" class="alert alert-secondary">
 				<p v-html="$t('noPollsInElaboration')"></p>
 				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
 			</div>
-			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'VOTING'" class="alert alert-secondary">
+			<div v-if="filteredPolls.length === 0 && !searchQuery && filterByStatus === 'VOTING'" class="alert alert-secondary">
 				<p v-html="$t('noPollsInVoting')"></p>
 				<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')"></p>
 			</div>
-			<div v-if="filteredPolls.length === 0 && pollStatusFilter === 'FINISHED'" class="alert alert-secondary">
+			<div v-if="filteredPolls.length === 0 && !searchQuery && filterByStatus === 'FINISHED'" class="alert alert-secondary">
 				<p v-html="$t('noFinishedPolls')"></p>
 				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
 			</div>
 		</div>
+
+		<div v-if="userIsAdmin" class="container my-5 text-right">
+			<b-button variant="primary" @click="createPoll()"><i class="fas fa-person-booth"></i> {{$t('createPoll')}} <i class="fas fa-angle-double-right"></i></b-button>
+		</div>
+
+		<pollsFooter :activeStatus="filterByStatus" @clickFooter="clickFooter"></pollsFooter>
 	</div>
 </template>
 
@@ -43,7 +48,9 @@
 
 import moment from 'moment'
 import liquidoHeader from '../components/liquido-header'
+import liquidoInput from '../components/liquido-input'
 import pollPanel from "../components/poll-panel"
+import pollsFooter from "../components/polls-footer"
 
 export default {
 	i18n: {
@@ -56,33 +63,60 @@ export default {
 				butPollInVoting: "However there is a poll in which you can vote."
 			},
 			de: {
+				noPollsYet: "Es wurde bisher noch keine Abstimmung erstellt.",
+				noPollsYetAdmin: 'Möchstest du eine <a href="/createPoll">Abstimmung erstellen</a>?' ,
+				noPollsMatchSearch: "Keine Treffer für diese Suche.",
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es gibt gerade keine laufenden Abstimmungen.",
 				noFinishedPolls: "Es gibt bisher noch keine abgeschlossenen Abstimmungen.",
 				butProposalsInDiscussion: "Es gibt jedoch Wahlvorschläge die ihr diskutieren könnt.",
-				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst."
+				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
+				createPoll: "Neue Abstimmung anlegen",
+				allPolls: "Alle Abstimmungen",
+				ELABORATION: "Neue Abstimmungen",
+				VOTING: "Laufende Wahlen",
+				FINISHED: "Abgeschlossene Abstimmungen"
 			}
 		}
 	},
-	components: { pollPanel, liquidoHeader },
+	components: { pollPanel, liquidoHeader, liquidoInput, pollsFooter },
+	props: {
+		status: { type: String, required: false }
+	},
 	data() {
+		console.log("data() polls.vue")
 		return {
-			pollStatusFilter: "ELABORATION",
-			
+			filterByStatus: undefined,
+			searchQuery: "",
 		}
 	},
-	created() {},
-	mounted() {},
+	created() {
+		console.log("Creating polls.vue")
+		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
+			console.log("Set status to", this.status)
+			this.filterByStatus = this.status
+		}		
+	},
+	mounted() {
+		console.log("mounted polls.vue")
+	},
 	computed: {
+		pageTitleLoc() {
+			switch(this.filterByStatus) {
+				case "ELABORATION": return this.$t('pollsInElaboration')
+				case "VOTING": return this.$t('pollsInVoting')
+				case "FINISHED": return this.$t('finishedPolls')
+				default: return this.$t("allPolls")
+			}
+		},
+		userIsAdmin() {
+			return this.$root.store.user.isAdmin
+		},
 		polls() {
 			return this.$root.store.polls
 		},
-		showFilter() {
-			return this.polls.length > 3
-		},
 		filteredPolls() {
-			if (!this.showFilter) return this.polls
-			return this.polls.filter(poll => poll.status === this.pollStatusFilter)
+			return this.polls.filter(poll => !this.filterByStatus || poll.status === this.filterByStatus).filter(poll => this.matchesSearch(poll))
 		},
 		pollsInElaboration() {
 			return this.polls.filter(poll => poll.status === "ELABORATION").length
@@ -95,7 +129,34 @@ export default {
 		}
 	},
 	methods: {
+		createPoll() {
+			this.$router.push("/createPoll")
+		},
 		
+		clickFooter(val) {  
+			if (this.filterByStatus === val) {
+				this.filterByStatus = undefined
+			} else {
+				this.filterByStatus = val
+			}
+			this.searchQuery = ""
+		},
+
+		/** Try to flexibly match as much as possible. Case insesitive */
+		matchesSearch(poll) {
+			if (!this.searchQuery || this.searchQuery.trim === "") return true
+			var Q = this.searchQuery.toUpperCase()
+			if (poll.title && poll.title.toUpperCase().includes(Q)) return true
+			if (poll.proposals) {
+				poll.proposals.forEach(prop => {
+					if (prop.title.toUpperCase().includes(Q)) return true
+					if (prop.description.toUpperCase().includes(Q)) return true
+					if (prop.createdBy.profile.name.toUpperCase().includes(Q)) return true
+					if (prop.createdBy.email.toUpperCase().includes(Q)) return true
+				})
+			}
+			return false
+		}
 	},
 
 }
@@ -103,6 +164,15 @@ export default {
 </script>
 
 <style lang="scss">
+
+#searchInput {
+	background-color: $input-bg;
+}
+.iconRight {
+	color: $primary;
+}
+
+
 
 .filter-buttons {
 	width: 100%;
@@ -124,61 +194,5 @@ export default {
 }
 
 
-
-/*
-.law-panel {
-	//height: 30px + 25px + $avatar_size + 15px;  // title + subtitle + avatar_img + padding
-	//overflow: hidden;
-	padding: 10px 10px 10px 10px;
-
-	.flex-fixed-width {
-		flex: 0 0 $avatar_size + 10px;
-		//border: 1px solid red;
-	}
-
-	.law-title {
-		margin-bottom: 3px;
-		padding: 0;
-		font-size: 18px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.title-icon {
-		font-size: 80%;
-	}
-
-	.law-subtitle {
-		font-size: 10px;
-		//line-height: 15px;
-		//height: 18px;
-		//min-height: 18px;
-		color: #BBB;
-		margin-bottom: 5px;
-		//border-bottom: 1px solid rgba(0, 0, 0, 0.1);;
-		//-webkit-box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
-		//box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
-	}
-
-	.law-image {
-		//margin: 5px;
-		border-radius: 5px;
-		min-width: $avatar_size;
-		max-width: $avatar_size;
-		width: $avatar_size;
-		min-height: $avatar_size;
-		max-height: $avatar_size;
-		height: $avatar_size;
-	}
-
-	.law-description {
-		font-size: 12px;
-		height: $avatar_size;
-		max-height: $avatar_size;
-		overflow: hidden;
-	}
-}
-*/
 
 </style>

@@ -91,7 +91,7 @@ export default {
 	.iconRight {
 		position: absolute;
 		top: 18px;
-		right: 5px;
+		right: 10px;
 	}
 }
 </style>
