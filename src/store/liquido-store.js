@@ -22,8 +22,9 @@ export default {
 	// These attributes are reactive.
 	showFooter: true,
 	user: {
-		name: undefined,
-		email: undefined
+		name: "Demo Admin",
+		email: "admin1@liquido.me",
+		isAdmin: true
 	},
 	team: {
 		name: undefined,
@@ -36,6 +37,13 @@ export default {
 	//
 
 	polls: [
+		{
+			id: 99,
+			title: "New poll",
+			status: "ELABORATION",
+			votingStartAt: addDays(new Date(), 10),
+			votingEndAt:   addDays(new Date(), 20),
+		},
 		{
 			id: 101,
 			title: "Example poll in voting with a very long titela asddfasdf dd",
@@ -445,7 +453,30 @@ export default {
 		this.showFooter = showFooter
 	},
 
+	getToken() {
+		return "dummy-JWT-token"
+	},
 
-	
+	/** Find a poll by its ID. May return undefined if ID is not found! */
+	getPollById(pollId) {
+		return this.polls.find(p => p.id == pollId)   // pollId might be a String or a Number!
+	},
+
+	savePoll(poll) {
+		if (!typeof poll === "object") throw new Error("Cannot savePoll. Need poll object")
+		if (!poll.title) throw new Error("Cannot savePoll. Need title")
+		//TODO: savePoll() call backend
+		if (!poll.id) {
+			console.log("Creating new poll: '"+poll.title+"'")
+			poll.id = uuidv4();
+			this.polls.push(poll)
+		} else {
+			var existingPoll = this.polls.find(p => p.id === poll.id)
+			if (existingPoll === undefined) throw Error("Cannot savePoll. Cannot find poll with id="+poll.id)
+			existingPoll = poll
+			console.log("poll(id="+poll.id+") saved.")
+		}
+		return poll
+	}
 
 }

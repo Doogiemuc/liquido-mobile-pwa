@@ -34,22 +34,31 @@ const globalTranslations = {
 		yes: "Ja",
 		no: "Nein",
 		save: "Speichern",
-		Cancel: "Abbrechen",
+		cancel: "Abbrechen",
 		back: "Zurück",
+		search: "Suche",
 
+		// Every noun in singular and plural form!
 		idea: "Idee",
 		ideas: "Ideen",
 		proposal: "Vorschlag",
 		proposals: "Vorschläge",
 		poll: "Abstimmung",							// Entscheidung von Robert: nein nicht "Wahl(en)" !!  Deutsche Übersetzung von poll ist Abstimmung!
 		polls: "Abstimmungen",
-		pollsAbbr: "Abst.",							// Abkürzung für Nav Arrows im Header
 		law: "Regel",
 		laws: "Regeln",
 
-		elaboration: 'in Diskussion',		// oder auch "in Ausarbeitung"
-		inVoting: 'Wahl läuft',					// Abstimmung im Status "wahl läuft"
-		finished: 'Abgeschlossen',
+		newPoll: "Neue Abstimmung",
+		pollInElaboration: "Abstimmung in Diskussion",
+		pollsInElaboration: "Abstimmungen in Diskussion",
+		pollInVoting: "Laufende Abstimmung",
+		pollsInVoting: "Laufende Abstimmungen",
+		finishedPoll: "Abgeschlossene Abstimmung",
+		finishedPolls: "Abgeschlossene Abstimmungen",
+
+		elaboration: "Diskussion",			// oder auch "in Ausarbeitung"
+		inVoting: "Wahl läuft",					// Abstimmung im Status "wahl läuft"
+		finished: "Abgeschlossen",
 	}
 }
 
@@ -66,7 +75,8 @@ const rootApp = new Vue({
 	i18n,
 	router,
 	data: {
-		store: liquidoStore				// this is available to all sub components as this.$root.store
+		store: liquidoStore,			// this is available to all sub components as this.$root.store
+		headerHeight: 0						// will be set to height of header in liquido-header.vue
 	},	
 	...App
 	//render: (h) => h(App),

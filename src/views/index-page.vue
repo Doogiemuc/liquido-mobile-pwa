@@ -7,7 +7,7 @@
 				<b-card-text v-html="$t('welcome')"></b-card-text>
 			</b-card>
 
-			<b-card class="chat-bubble shadow-sm"  :class="{ 'hide-left': flowState < 2 }">
+			<b-card class="chat-bubble shadow-sm" :class="{ 'hide-left': flowState < 2 }">
 				<b-card-text v-html="$t('whatsYourName')"></b-card-text>
 			</b-card>
 
@@ -108,9 +108,12 @@
 
 			<b-card class="chat-bubble shadow-sm" :class="{'collapse-max-height': flowState !== 9 } ">
 				<p v-html="$t('pollInfo')"></p>
+				<b-button variant="primary" class="float-right mb-3" :class="{'d-none': flowState !== 9 } " @click="createPoll()">
+					<i class="fas fa-user-shield"></i> {{$t('createPoll')}} <i class="fas fa-angle-double-right"></i>
+				</b-button>
 			</b-card>
 
-			<b-button variant="primary" class="float-right mb-3" :class="{'d-none': flowState !== 9 } " @click="createPoll()">{{$t('createPoll')}} <i class="fas fa-angle-double-right"></i></b-button>
+			
 
 		</div>
 	</div>
@@ -142,9 +145,8 @@ export default {
 				createPoll: 'Create a poll',
 			},
 			de: {
-				welcome: '<p>Willkommen bei <span class="liquido"></span>, der freien, sicheren und liquiden e-voting App.</p>'+
-				 '<p>Mit Liquido kannst du private Abstimmung für dein Team erstellen. Jedes Teammitglied kann eine Idee vorschlagen, welche dann diskutiert wird. Diejenigen Ideen mit genügend likes werden zu Vorschlägen.<p>'+
-				 'In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag (oder Kandidaten), sondern jeder sortiert die Wahlvorschläge nach seiner eigenen Prio und Liquido berechnet daraus dann den Gesamtsieger der Wahl.</p>',
+				welcome: '<p>Willkommen bei <span class="liquido"></span>, der freien, sicheren und liquiden e-voting App für euer Team.</p>'+
+				 'In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag (oder Kandidaten), sondern jeder im Team sortiert alle Wahlvorschläge nach seiner eigenen Prio und Liquido berechnet daraus dann den Gesamtsieger der Wahl.</p>',
 				whatsYourName: 'Darf ich fragen wie du heißt?',
 				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
@@ -171,7 +173,7 @@ export default {
 				teamInfo: 'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) im Footer.',
 
 
-				pollInfo: 'Jetzt kannst du deine erste Abstimung (<i class="fas fa-poll"></i>) anlegen, zu der jedes Teammitglied dann seine Idee (<i class="fas fa-lightbulb"></i>) hinzufügen kann.',
+				pollInfo: 'Jetzt kannst du deine erste Abstimung (<i class="fas fa-poll"></i>) erstellen, zu der jedes Teammitglied dann seinen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen kann.',
 				createPoll: 'Abstimmung anlegen',
 			}
 		}
@@ -223,7 +225,7 @@ export default {
 	 * only start automatic scrolling if first bubble is completely visible (> iPhone5)
 	 */
 	created() {
-		this.$root.store.setShowFooter(false)
+		//this.$root.store.setShowFooter(false)
 	},
 
 	/**
@@ -273,9 +275,11 @@ export default {
 		createNewTeamOkButtonDisabled() { return !this.teamNameState || !this.eMailState || this.flowState > 8 },
 	},
 	watch: {
+		/*
 		'flowState': function(newVal, oldVal) {
 			console.log("flowState", oldVal, "=>", newVal)
 		}
+		*/
 	},
 	methods: {
 
@@ -339,6 +343,10 @@ export default {
 			})
 		},
 
+		createPoll() {
+			this.$router.push('/createPoll')
+		},
+
 		// Here comes some UX magic :-)
 
 		/** scroll to the very bottom of the content. Show last chat message */
@@ -351,9 +359,13 @@ export default {
 		/** 
 		 * scroll an HTML elemant right under the header
 		 * (as far up as possible, depending on content below the elem) 
+		 * @param {String} elem JQuery selector for dom elem
+		 * @param {Number} margin margin below headerHeight in pixels (default 0)
 		 */
-		scrollElemToTop(elem, margin) {
-			var scrollTop = $(elem).offset().top - this.$root.headerHeight - margin
+		scrollElemToTop(elem, margin = 0) {
+
+var scrollTop = $(elem).offset().top - this.$root.headerHeight - margin
+			console.log(scrollTop)
 			this.$nextTick(() => {
 				$("html, body").animate({ scrollTop: scrollTop }, 2000);
 			})
@@ -403,7 +415,7 @@ export default {
 <style lang="scss">
 
 .chat-bubble {
-	background-color: #FBFBFB;
+	//background-color: $secondary-bg;
 	margin-bottom: 1rem;
 	opacity: 1;
 	transform: none;
@@ -427,7 +439,7 @@ export default {
 }
 
 .chat-right {
-	background-color: $secondary-bg; // #e9fce9;
+	background-color: $input-bg;
 	margin-left: 2rem;
 	margin-bottom: 1rem;
 }
@@ -492,7 +504,7 @@ label {
 }
 
 .qr-code {
-	width: 80%;
+	width: 60%;
 	max-width: 300px;
 }
 

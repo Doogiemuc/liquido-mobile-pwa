@@ -1,15 +1,16 @@
 import axios from "axios"
-import store from "@/store/index"
+import store from "@/store/liquido-store"
 
 const HTTP = () => {
   return axios.create({
     baseURL: "http://0.0.0.0:8000",
     headers: {
-      Authorization: `Bearer ${store.get("account/token")}`,
+      Authorization: `Bearer ${store.getToken()}`,
     },
   })
 }
 
+/*
 function updateStoreData(accInfo) {
   if (accInfo.jwt) {
     store.set("account/isAuthenticated", true)
@@ -173,11 +174,14 @@ const accFunctions = {
     return cleanedData
   },
 }
+*/
 
 export default {
   install: function(Vue) {
+		/*
     Object.defineProperty(Vue.prototype, "$accountAPI", {
       value: accFunctions,
-    })
+		})
+		*/
   },
 }

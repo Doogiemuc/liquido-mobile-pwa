@@ -1,4 +1,8 @@
-//These styles are imported in App.vue so they are a available to every component.
+/**
+ * These styles are imported in App.vue so they are a available to every component.
+ */
+
+//Remark: height of header is dynamically calculated and stored in this.$root.headerHeight variable
 
 /** No iOS native button and input styling */
 button, [type="button"], [type="reset"], [type="submit"], input {
@@ -16,6 +20,16 @@ button, [type="button"], [type="reset"], [type="submit"], input {
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Opera and Firefox */
+}
+
+.pageTitle {
+	font-family: 'Libre Baskerville', serif;
+	font-size: 1.6rem;
+	margin: 1rem 0;
+}
+
+div.alert p:last-child {
+	margin-bottom: 0;					// Why is this not the default in bootstrap???
 }
 
 /** LIQUIDO - beautifull brand mark */

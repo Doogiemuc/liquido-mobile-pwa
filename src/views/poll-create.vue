@@ -2,23 +2,26 @@
 	<div>
 		<liquido-header></liquido-header>
 
-		<div class="container-lg mt-3">
+		<div class="container-lg">
 			
-			<b-card class="chat-bubble shadow-sm">
-				<a class="float-right" data-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="true" aria-controls="collapseOne">
-					<i class="fa" aria-hidden="true"></i>
-				</a>
-				<div class="collapse show" id="collapseInfo" v-html="$t('createPollInfo')"></div>
-			</b-card>
-
-			<h2><i class="fas fa-poll"></i> {{$t('newPoll')}}</h2>
+			<h2 class="pageTitle"><i class="fas fa-poll"></i> {{$t('newPoll')}}</h2>
 
 			<b-card class="chat-bubble form-bubble">
-				<liquido-input v-model="poll.title" id="pollTitleInput" :label="$t('pollTitle')" :status="pollTitleStatus" @blur="pollTitleValidated = true"></liquido-input>
+				<liquido-input v-model="poll.title" id="pollTitleInput" :label="$t('pollTitle')" :state="pollTitleState" :invalidFeedback="$t('pollTitleInvalid')" @blur="pollTitleValidated = true"></liquido-input>
+
+				<div class="d-flex justify-content-between align-items-center">
+					<small class="ml-1"><a href="#" @click="cancelCreatePoll()">{{$t('cancel')}}</a></small>
+					<b-button variant="primary" class="float-right" :disabled="pollTitleState !== true"  @click="clickCreateNewPoll()">{{$t('create')}} <i class="fas fa-angle-double-right"></i></b-button>
+				</div>
+
 			</b-card>
 
-			<b-button variant="primary" class="float-right mb-3" @click="clickSavePoll()">{{$t('Save')}}</b-button>
-
+			<b-card class="chat-bubble shadow-sm my-5" :class="{ 'hide-left': flowState < 1 }">
+				<!-- a class="float-right px-1" data-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="true" aria-controls="collapseOne">
+					<i class="fa" aria-hidden="true"></i>
+				</a -->
+				<div v-html="$t('createPollInfo')"></div>
+			</b-card>
 		</div>
 	</div>
 </template>
@@ -35,12 +38,13 @@ export default {
 			},
 			de: {
 				newPoll: 'Neue Abstimmung',
-				createPollInfo: '<p>Eine Abstimmung hat einen Titel und besteht aus mehreren Wahlvorschlägen (<i class="fas fa-vote-yea"></i>). Jeder in deinem Team kann seine Idee zur Abstimmung hinzufügen.<p>'+
-					 '<p>Bevor eine Idee (<i class="fas fa-lightbulb"></i>) jedoch zum Wahlvorschlag werden kann, muss sie erst genügend Unterstützer finden.</p>'+
-					 'asfd',
+				createPollInfo: '<p>Eine Abstimmung (<i class="fas fa-poll"></i>) enthält mehrere Wahlvorschläge (<i class="fas fa-vote-yea"></i>) und läuft über zwei Phasen:<p>'+
+					 '<p>Während der Elaborationsphase kann jeder in deinem Team seinen Vorschlag (bzw. Kandidaten) hinzufügen. Diese können dann diskutiert (<i class="fas fa-comments"></i>) werden.</p>'+
+					 '<p>Nachdem du als Admin die Wahlphase der Abstimmung gestartet hast, kann dann jeder im Team seine Stimme abgeben. (<i class="fas fa-person-booth"></i>)</p>',
 				pollTitle: 'Titel der Abstimmung',
-				pollTitleInvalid: 'Titel ist zu kurz',
-
+				pollTitleInvalid: 'Titel ist zu kurz. Bitte mind. 10 Zeichen.',
+				create: "Anlegen",
+				createdSuccessfully: ' erfolgreich angelegt',
 			}
 		}
 	},
@@ -50,11 +54,15 @@ export default {
 		return {
 			poll: {},
 			pollTitleValidated: false,
-
+			flowState: 0,
 		}
 	},
-	created() {},
-	mounted() {},
+	created() {  
+		//this.$root.store.setShowFooter(false)
+	},
+	mounted() {
+		window.setTimeout(() => { this.flowState = 1}, 500)
+	},
 	computed: {
 		pollTitleState() {
 			 if (this.poll.title && this.poll.title.replace(/\s/g, '').length >= 10) return this.pollTitleValidated = true
@@ -63,9 +71,9 @@ export default {
 	},
 	methods: {
 
-		
-
-		clickSavePoll() {
+		clickCreateNewPoll() {
+			var createdPoll = this.$root.store.savePoll(this.poll)
+			this.$router.push("/polls/"+createdPoll.id)
 		},
 
 	},
@@ -80,6 +88,11 @@ export default {
 		position: relative;
 		margin-bottom: 1rem;
 		opacity: 1;
+		transform: none;
+		-webkit-transition: all 0.5s ease;
+		-moz-transition: all 0.5s ease;
+		-o-transition: all 0.5s ease;
+		transition: all 0.5s ease;
 		.card-body {
 			padding: 0.5rem;
 			ul {
@@ -93,23 +106,13 @@ export default {
 			}
 		}
 	}
+	.hide-left {
+		opacity: 0;
+		transform: translateX(-20px);
+	}
 
 	.form-bubble {
-		background-color: $secondary-bg;
+		background-color: $input-bg;
 	}
 
-	[data-toggle="collapse"] .fa:before {  
-		content: "\f13a";
-	}
-
-	[data-toggle="collapse"].collapsed .fa:before {
-		content: "\f139";
-	}
-
-	label {
-		font-size: 14px;
-		font-weight: bold;
-		margin: 0;
-		//color: rgb(86, 9, 109);
-	}
 </style>

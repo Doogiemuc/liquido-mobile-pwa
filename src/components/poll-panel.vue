@@ -1,10 +1,19 @@
 <template>
-	<b-card no-body class="poll-panel shadow mb-3" :id="poll.id">
+	<b-card no-body class="poll-panel shadow mb-3" :pollid="poll.id">
 		<template v-slot:header>
-			<i class="fas fa-angle-double-right goto-poll-icon"></i>
-			<i class="fas fa-poll"></i>&nbsp;{{poll.title}}			
+			<h3 v-if="readOnly" class="read-only"><i class="fas fa-poll"></i>&nbsp;{{poll.title}}</h3>
+			<h3 v-else @click="goToPoll(poll.id)">
+				<i class="fas fa-angle-double-right goto-poll-icon"></i>
+				<i class="fas fa-poll"></i>&nbsp;{{poll.title}}
+			</h3>
 		</template>
-		<div class="law-panel" v-for="law in poll.proposals" :key="law.id">
+		<div class="no-proposals" v-if="!poll.proposals || poll.proposals.length === 0">
+			<p>{{$t('noProposalsInPollYet')}}</p>
+			<div class="mb-1 text-right">
+				<b-button variant="primary" @click="goToAddProposal(poll.id)">{{$t('addProposal')}} <i class="fas fa-angle-double-right"></i></b-button>
+			</div>
+		</div>
+		<div class="law-panel" v-else v-for="law in poll.proposals" :key="law.id">
 			<div>
 				<h4 class="law-title"><i :class="getIconForLaw(law)" class="title-icon"></i>&nbsp;{{law.title}}</h4>
 			</div>
@@ -28,6 +37,9 @@
 				</div>
 			</div>
 		</div>
+		<a v-if="poll.proposals && poll.proposals.length > 0" class="text-right collapse-icon" href="#" @click="toggleCollapse()">
+			<i class="fa"></i>
+		</a>
 	</b-card>
 </template>
 
@@ -35,6 +47,17 @@
 import moment from "moment"
 
 export default {
+	i18n: {
+		messages: {
+			en: {
+
+			},
+			de:{
+				noProposalsInPollYet: 'Es gibt bisher noch keine Wahlvorschläge oder Kandidaten in dieser Abstimmung.',
+				addProposal: "Vorschlag hinzufügen",
+			}
+		}
+	},
 	name: "PollPanel",
 	components: {},
 	props: {
@@ -49,6 +72,10 @@ export default {
 		
 	},
 	methods: {
+		addProposal() {
+
+		},
+
 		formatDate(dateVal) {
 			return moment(dateVal).format("L")
 		},
@@ -76,6 +103,18 @@ export default {
 			}
 		},
 
+		toggleCollapse() {
+			$('.law-panel').toggleClass('collapse-law-panel')
+			$('.collapse-icon').toggleClass('collapsed')
+		},
+
+		goToPoll(pollId) {
+			if (!this.readOnly) this.$router.push("/polls/"+pollId)
+		},
+
+		goToAddProposal(pollId) {
+			this.$router.push("/polls/"+pollId+"/addProposal")
+		}
 	},
 }
 </script>
@@ -86,11 +125,20 @@ $avatar_size: 70px;
 
 .poll-panel {
 	.card-header {
-		padding: 5px 10px;
-		font-size: 18px;  // same as .law-title
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		margin: 0;
+		padding: 0;
+		h3 {
+			// same as .law-title
+			color: $primary;
+			margin: 5px 10px;
+			font-size: 18px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.read-only {
+			color: black;
+		}
 	}
 	.poll-proposal {
 		margin: 0 10px;
@@ -100,15 +148,26 @@ $avatar_size: 70px;
 		border-bottom: 1px dotted rgba(0, 0, 0, 0.125);	
 	}
 	.goto-poll-icon {
-		color: $primary;
-		line-height: 1.5;   // was overwritten  by  "fas"
+		line-height: 1.2;   // same as .card-header > h3
 		float: right;
 	}
+  .collapse-icon {
+		padding-right: 10px;
+	}
+
+	.no-proposals {
+		padding: 10px;
+	}
+
 	// law-panel inside poll panel - list of proposals in poll
 	.law-panel {
 		height: 30px + 25px + $avatar_size + 15px;  // title + subtitle + avatar_img + padding
 		overflow: hidden;
-		padding: 10px 10px 10px 10px;
+		padding: 10px;
+		transition: height 0.5s;
+		&.collapse-law-panel {
+			height: 55px;
+		}
 		.law-title {
 			margin-bottom: 5px;
 			padding: 0;
@@ -151,5 +210,12 @@ $avatar_size: 70px;
 	
 }
 
+.collapse-icon .fa:before {   
+  content: "\f139";
+}
+
+.collapse-icon.collapsed .fa:before {
+  content: "\f13a";
+}
 
 </style>

@@ -43,7 +43,7 @@
  * Example Usage
  * =============
  * 
- *   <liquido-input v-model="idea.title" id="ideaTitleInput" :label="$t('ideaTitle')" :status="titleStatus" @blur="titleValidated = true"></liquido-input>
+ *   <liquido-input v-model="idea.title" id="ideaTitleInput" :label="$t('ideaTitle')" :state="titleStatus" @blur="titleValidated = true"></liquido-input>
  */
 export default {
 	name: "liquido-input",
@@ -91,7 +91,7 @@ export default {
 	.iconRight {
 		position: absolute;
 		top: 18px;
-		right: 5px;
+		right: 10px;
 	}
 }
 </style>

@@ -38,14 +38,14 @@ module.exports = {
         ],
       }),
     ],
-  },
+	},
   css: {
     loaderOptions: {
       sass: {
         prependData: fs.readFileSync("./src/styles/_variables.scss", "utf-8"),
       },
     },
-  },
+	},
   pwa: {
     name: "LIQUIDO",
     themeColor: "#4DBA87",

@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<liquido-header></liquido-header>
-		<div class="behind-header">&nbsp;</div>
-		
-		<div v-if="ideas.length > 3" class="container mt-3 mb-3">
+		<div class="mb-1">&nbsp;</div>
+
+		<div v-if="ideas.length > 3" class="container mb-3">
 			 <liquido-input v-model="searchTitle" id="searchInput" :label="$t('Search')" :status="null">
 				 <template v-slot:iconRight>
 					 <i class="fas fa-times mr-1" @click="clearSearch()"></i>
@@ -12,7 +12,7 @@
 		</div>
 
 		<div class="container mb-3">
-			<law-panel v-for="idea in filteredIdeas" :law="idea" :key="idea.id" class="shadow mb-3"></law-panel>
+			<law-panel v-for="idea in filteredIdeas" :law="idea" :key="idea.id" class="shadow-sm mb-3"></law-panel>
 		</div>
 
 		<div class="container mb-3">

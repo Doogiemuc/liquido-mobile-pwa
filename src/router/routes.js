@@ -2,22 +2,12 @@ const routes = [
   {
     path: "/",
     name: "index",
-    component: () => lazyLoadView(import("@/views/index-page")),
-	},
-	{
-    path: "/ideas",
-    name: "ideas",
-    component: () => lazyLoadView(import("@/views/ideas")),
-  },
-  {
-    path: "/addIdea",
-    name: "addIdea",
-    component: () => lazyLoadView(import("@/views/idea-add")),
+    component: () => import("@/views/index-page"),
 	},
 	{
     path: "/createPoll",
     name: "createPoll",
-    component: () => lazyLoadView(import("@/views/poll-create")),
+    component: () => import("@/views/poll-create"),
 	},
   {
     path: "/polls",
@@ -40,11 +30,6 @@ const routes = [
 		name: "teamHome",
 		component: () => lazyLoadView(import("@/views/team-home")),
 	},
-  {
-    path: "/contact",
-    name: "contact",
-    component: () => lazyLoadView(import("@/views/contact-page")),
-	},
 	{
     path: "/castVote",
     name: "castVote",
@@ -58,54 +43,7 @@ const routes = [
       requiresAuth: true,
     },
   },
-  {
-    path: "/signup",
-    name: "signup",
-    component: () => lazyLoadView(import("@/views/signup-page")),
-    meta: {
-      redirectIfAuthenticated: true,
-    },
-  },
-  {
-    path: "/login",
-    name: "login",
-    component: () => lazyLoadView(import("@/views/login-page")),
-    meta: {
-      redirectIfAuthenticated: true,
-    },
-  },
-  {
-    path: "/accounts",
-    name: "accounts",
-    component: () => lazyLoadView(import("@/views/accounts-page")),
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
-    path: "/confirm-account/:token",
-    name: "confirm",
-    component: () => lazyLoadView(import("@/views/confirm-page")),
-    props: true,
-  },
-  {
-    path: "/reset",
-    name: "reset",
-    component: () => lazyLoadView(import("@/views/init-reset-page")),
-    props: true,
-    meta: {
-      redirectIfAuthenticated: true,
-    },
-  },
-  {
-    path: "/reset/:token",
-    name: "resetToken",
-    component: () => lazyLoadView(import("@/views/reset-page")),
-    meta: {
-      redirectIfAuthenticated: true,
-    },
-  },
-  {
+	{
     path: "/404",
     name: "pageNotFound",
     component: () => lazyLoadView(import("@/views/not-found-page")),
