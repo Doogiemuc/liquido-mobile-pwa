@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<liquido-header :showBack="true"></liquido-header>
+		<liquido-header backLink="/polls"></liquido-header>
 		
 		<div class="container mb-3">
 
@@ -8,7 +8,7 @@
 
 			<poll-panel :poll="poll" :key="poll.id" class="shadow mb-3" :read-only="true"></poll-panel>
 
-			<div v-if="poll.status === 'ELABORATION'" class="alert alert-secondary mb-3">
+			<div v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert alert-secondary mb-3">
 				<p v-html="$t('pollInElaborationInfo')"></p>
 			</div>
 
@@ -18,7 +18,7 @@
 			</div>
 			<div class="clearfix mb-3"></div>
 
-			<div v-if="userIsAdmin && poll.status === 'ELABORATION'" class="alert alert-secondary mb-3">
+			<div v-if="userIsAdmin && poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert alert-secondary mb-3">
 				<p v-html="$t('startVotingPhaseInfo')"></p>
 				<b-button variant="primary" class="float-right"><i class="fas fa-user-shield"></i> {{$t('startVotingPhase')}}</b-button>
 			</div>
@@ -51,7 +51,7 @@ export default {
 				pollInElaborationInfo: "<p>Dieser Abstimmung ist in der <em>Diskussionphase</em>.</p><p>Wende dich an die Ersteller der einzelnen Wahlvorschläge und gib ihnen direkt Feedback. Wahlvorschläge können noch so lange angepasst und verbessert werden, bis euer Admin dann die <em>Wahlphase</em> für diese Abstimmung startet.</p>",
 				addProposalInfo: "Du kannst deinen eigenen Wahlvorschlag zu dieser Abstimmung hinzufügen.",
 				addProposal: "Vorschlag hinzufügen",
-				startVotingPhaseInfo: 'Hallo Admin! Möchstest du die Wahlphase für diese Abstimmung starten? Dann kann kein weiterer Vorschlag mehr hinzugefügt werden und dein Team kann abstimmen.',
+				startVotingPhaseInfo: 'Hallo Admin! Möchstest du die Wahlphase für diese Abstimmung starten? Dann sind die Wahlvorschläge fixiert und dein Team kann abstimmen.',
 				startVotingPhase: "Wahl starten",
 				castVote: "Stimme abgeben",
 			}
@@ -81,34 +81,23 @@ export default {
 		userIsAdmin() {
 			return this.$root.store.user.isAdmin
 		},
-		/** User can add his own proposal if the poll is in status proposal and he did not add a proposal to this poll yet. */
+		/** User can add his own proposal if the poll is in status ELABORATION and he did not add a proposal to this poll yet. */
 		showAddProposal() {
 			if (this.poll.status !== "ELABORATION") return false
-			if (!this.poll.proposals) return true			
+			if (!this.poll.proposals) return true
 			var currentUserEmail = this.$root.store.user.email
 			return this.poll.proposals.filter(prop => prop.createdBy.email === currentUserEmail).length === 0
 		}
 	},
 	methods: {
 		addProposal() {
-			this.$router.push("/add-proposal?poll="+this.poll.id)
+			this.$router.push("/polls/"+this.poll.id+"/add")
 		},
-		clickFooter(val) {
-			this.$router.push("/polls?status="+val)
-		}
 	},
-
 }
 
 </script>
 
 <style lang="scss">
-.alert {
-	padding-left: 10px;
-	padding-right: 10px;
-	p:last-child {
-		margin-bottom: 0;			// Why is this not set by default in bootstrap??
-	}
-}
 
 </style>

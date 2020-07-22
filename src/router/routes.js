@@ -12,7 +12,13 @@ const routes = [
   {
     path: "/polls",
     name: "polls",
-    component: () => lazyLoadView(import("@/views/polls")),
+    component: () => import("@/views/polls"),
+	},
+	{
+    path: "/polls/:pollId",
+    name: "showPoll",
+		component: () => import("@/views/poll-show"),
+		props: true
   },
   {
     path: "/polls/:pollId/add",
@@ -21,11 +27,6 @@ const routes = [
     props: true
   },
 	{
-    path: "/about",
-    name: "about",
-    component: () => lazyLoadView(import("@/views/about-page")),
-	},
-	{
 		path: "/team",
 		name: "teamHome",
 		component: () => lazyLoadView(import("@/views/team-home")),
@@ -33,13 +34,8 @@ const routes = [
 	{
     path: "/castVote",
     name: "castVote",
-    component: () => lazyLoadView(import("@/views/cast-vote")),
-  },
-  {
-    path: "/account",
-    name: "account",
-    component: () => lazyLoadView(import("@/views/account-page")),
-    meta: {
+		component: () => lazyLoadView(import("@/views/cast-vote")),
+		meta: {
       requiresAuth: true,
     },
   },

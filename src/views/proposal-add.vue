@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<liquido-header></liquido-header>
+		<liquido-header :showBack="true"></liquido-header>
 		
 		<div class="container">
 			<h2 class="pageTitle">{{$t('addProposal')}}</h2>
@@ -10,7 +10,15 @@
 					{{$t('yourProposal')}}
 				</div>
 				<div class="card-body">
-					<liquido-input id="propTitle" name="propTitle" :label="$t('title')" v-model="proposal.title" :state="titleState" :maxlength="500"></liquido-input>
+					<liquido-input 
+						id="propTitle"
+						name="propTitle"
+						:label="$t('title')"
+						v-model="proposal.title"
+						:state="titleState"
+						:invalidFeedback="$t('titleInvalid')"
+						:maxlength="500"
+						@blur="titleValidated = true"></liquido-input>
 					<textarea 
 						id="descriptionId" 
 						name="description" 
@@ -20,14 +28,20 @@
 						:placeholder="$t('describeYourProposal')" 
 						@blur="descriptionValidated = true"
 						rows="3"></textarea>
+					<div v-if="descriptionState === null" class="text-small">{{$t('descriptionInfo', { minChars: descriptionMinLength } )}}</div>	
 					<div v-if="descriptionState === false" class="invalid-feedback">{{$t('descriptionTooShort')}}</div>
-					<button type="button" class="btn btn-primary mt-3 float-right" :disabled="saveButtonDisabled" @click="saveProposal()">{{$t('save')}}</button>
+					<button type="button" class="btn btn-primary mt-3 float-right" :disabled="saveButtonDisabled" @click="saveProposal()">{{$t('save')}} <i class="fas fa-angle-double-right"></i></button>
+				</div>
+			</div>
+
+			<div v-if="isOnlyProposal" class="card">
+				<div class="card-body">
+					<p>{{$t('yoursIsOnlyProposal')}}</p>
 				</div>
 			</div>
 
 			<h2 class="pageTitle mt-5">{{$t('thePoll')}}</h2>
-
-			<poll-panel :poll="poll" class="shadow mb-3"></poll-panel>
+			<poll-panel :poll="poll" :expanded="false" :read-only="true" class="shadow mb-3"></poll-panel>
 
 		</div>
 	</div>
@@ -49,8 +63,12 @@ export default {
 				yourProposal: "Dein Vorschlag",
 				thePoll: "Die Abstimmung",
 				title: "Titel",
+				titleInvalid: "Titel zu kurz",
 				describeYourProposal: "Beschreibe deinen Wahlvorschlag ...",
-				descriptionTooShort: "Bitte beschreibe deinen Vorschlag ausführlicher.",
+				descriptionInfo: "(Mindestes {minChars} Zeichen)",
+				descriptionTooShort: "Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
+				firstProposal: "Das wird der erste Wahlvorschlag in dieser Abstimmung.",
+				yoursIsOnlyProposal: "Dein Vorschlag ist bisher der einzige Wahlvorschlag in dieser Abstimmung.",
 			}
 		}
 	},
@@ -64,21 +82,21 @@ export default {
 			proposal: {},
 			titleValidated: false,
 			descriptionValidated: false,
+			descriptionMinLength: 20,
 		}
 	},
 	created() {
 		var p = this.$root.store.getPollById(this.pollId)
 		this.poll = p;
 	},
-	mounted() {},
+	mounted() { },
 	computed: {
 		titleState() {
-			console.log("titleState", this.proposal.title)
-			if (this.proposal.title && this.proposal.title.replace(/\s/g, '').length >= 10) return this.titleValidated = true
+			if (this.proposal.title && this.proposal.title.replace(/\s/g, '').length >= 5) return this.titleValidated = true
 			return this.titleValidated ? false : null
 		},
 		descriptionState() {
-			 if (this.proposal.description && this.proposal.description.replace(/\s/g, '').length >= 50) return this.descriptionValidated = true
+			 if (this.proposal.description && this.proposal.description.replace(/\s/g, '').length >= this.descriptionMinLength) return this.descriptionValidated = true
 			 return this.descriptionValidated ? false : null
 		},
 		descriptionValidClass() {
@@ -86,11 +104,18 @@ export default {
 		},
 		saveButtonDisabled() {
 			return !this.titleState || !this.descriptionState
+		},
+		/** Is the user's proposal the only proposal in the poll. (This can only be true when editing an existing proposal.) */
+		isOnlyProposal() {
+			return this.poll.proposals && this.poll.proposals.length == 1 &&
+						 this.poll.proposals[0].createdBy.email === this.$root.store.user.email
 		}
 	},
 	methods: {
 		saveProposal() {
-			this.$root.store.saveProposal(poll.id, proposal)
+			this.$root.store.saveProposal(this.poll, this.proposal).then(() => {
+				this.$router.push("/polls/"+this.poll.id)
+			})
 		}
 	},
 
@@ -106,7 +131,7 @@ export default {
 }
 
 .input-bubble {
-	background-color: $secondary-bg;
+	background-color: $input-bg;
 	.card-header {
 		padding: 10px;
 	}
@@ -116,5 +141,10 @@ export default {
 	.description-textarea {
 		width: 100%;
 	}
+}
+
+.text-small {
+	font-size: 80%;
+	color: $secondary;
 }
 </style>

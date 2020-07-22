@@ -2,7 +2,7 @@
 	<div>
 		<header id="liquidoHeader" class="liquido-header shadow-sm">
 			<div class="row no-gutters align-items-center">
-				<div class="col header-left"><i v-if="showBack" class="fas fa-angle-double-left" @click="goBack()"></i></div>
+				<div class="col header-left"><i v-if="backLink" class="fas fa-angle-double-left" @click="goBack()"></i></div>
 				<div class="col-8 liquido-title"><i class="fas fa-university"></i>&nbsp;<span @click="clickLiquidoTitle()" class="liquido"></span></div>
 				<div class="col header-right"><i class="fas fa-users"></i></div>
 			</div>
@@ -46,7 +46,8 @@ export default {
 	},
 	props: {
 		'minimizeOnScroll': { type: Boolean, required: false, default: true },
-		'showBack': { type: Boolean, required: false, default: false },
+		// show a "backlink". You can pass an URL or the keyworkd "BACK" to use browsers back
+		'backLink': { type: String, required: false, default: undefined },
 	},
 	data() {
 		return {
@@ -66,7 +67,8 @@ export default {
 		},
 
 		goBack() {
-			this.$router.go(-1)
+			if (this.backLink === "BACK")	this.$router.go(-1)
+			else if (this.backLink) this.$router.push(this.backLink)
 		},
 
 		clickLiquidoTitle() {

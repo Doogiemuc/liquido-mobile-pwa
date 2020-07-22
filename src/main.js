@@ -17,7 +17,7 @@ Vue.use(accountAPI)
 //Vue.component("modal", modal)
 
 Vue.config.productionTip = false
-Vue.config.debug = false
+Vue.config.debug = true
 
 /** Global translations that are available to all components */
 const globalTranslations = {

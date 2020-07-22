@@ -22,15 +22,15 @@
 			<div v-if="filteredPolls.length === 0 && searchQuery && searchQuery.trim().length > 0" class="alert alert-secondary">
 				<p v-html="$t('noPollsMatchSearch')"></p>
 			</div>
-			<div v-if="filteredPolls.length === 0 && !searchQuery && filterByStatus === 'ELABORATION'" class="alert alert-secondary">
+			<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'ELABORATION'" class="alert alert-secondary">
 				<p v-html="$t('noPollsInElaboration')"></p>
 				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
 			</div>
-			<div v-if="filteredPolls.length === 0 && !searchQuery && filterByStatus === 'VOTING'" class="alert alert-secondary">
+			<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'VOTING'" class="alert alert-secondary">
 				<p v-html="$t('noPollsInVoting')"></p>
 				<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')"></p>
 			</div>
-			<div v-if="filteredPolls.length === 0 && !searchQuery && filterByStatus === 'FINISHED'" class="alert alert-secondary">
+			<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'FINISHED'" class="alert alert-secondary">
 				<p v-html="$t('noFinishedPolls')"></p>
 				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
 			</div>
@@ -40,7 +40,7 @@
 			<b-button variant="primary" @click="createPoll()"><i class="fas fa-person-booth"></i> {{$t('createPoll')}} <i class="fas fa-angle-double-right"></i></b-button>
 		</div>
 
-		<pollsFooter :activeStatus="filterByStatus" @clickFooter="clickFooter"></pollsFooter>
+		<pollsFooter :activeStatus="pollStatusFilter" @clickFooter="clickFooter"></pollsFooter>
 	</div>
 </template>
 
@@ -84,25 +84,21 @@ export default {
 		status: { type: String, required: false }
 	},
 	data() {
-		console.log("data() polls.vue")
 		return {
-			filterByStatus: undefined,
 			searchQuery: "",
 		}
 	},
 	created() {
-		console.log("Creating polls.vue")
 		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
-			console.log("Set status to", this.status)
-			this.filterByStatus = this.status
-		}		
+				this.$root.store.setPollStatusFilter(this.status)
+		}
 	},
 	mounted() {
-		console.log("mounted polls.vue")
+		
 	},
 	computed: {
 		pageTitleLoc() {
-			switch(this.filterByStatus) {
+			switch(this.pollStatusFilter) {
 				case "ELABORATION": return this.$t('pollsInElaboration')
 				case "VOTING": return this.$t('pollsInVoting')
 				case "FINISHED": return this.$t('finishedPolls')
@@ -116,7 +112,9 @@ export default {
 			return this.$root.store.polls
 		},
 		filteredPolls() {
-			return this.polls.filter(poll => !this.filterByStatus || poll.status === this.filterByStatus).filter(poll => this.matchesSearch(poll))
+			return this.polls.filter(poll => {
+				return !this.pollStatusFilter || poll.status === this.pollStatusFilter
+			}).filter(poll => this.matchesSearch(poll))
 		},
 		pollsInElaboration() {
 			return this.polls.filter(poll => poll.status === "ELABORATION").length
@@ -126,6 +124,10 @@ export default {
 		},
 		pollsFinished() {
 			return this.polls.filter(poll => poll.status === "FINISHED").length
+		},
+		/** current filter for poll status, undefined|ELABORATION|VOTING|FINISHED */
+		pollStatusFilter() {
+			return this.$root.store.pollStatusFilter
 		}
 	},
 	methods: {
@@ -133,11 +135,15 @@ export default {
 			this.$router.push("/createPoll")
 		},
 		
+		/**
+		 * When user clicks on a (currently unselected) status in the footer, then filter for that status.
+		 * When user clicks again on the currently selected status (blue), then clear filter.
+		 */
 		clickFooter(val) {  
-			if (this.filterByStatus === val) {
-				this.filterByStatus = undefined
+			if (this.$root.store.getPollStatusFilter() === val) {
+				this.$root.store.setPollStatusFilter(undefined)
 			} else {
-				this.filterByStatus = val
+				this.$root.store.setPollStatusFilter(val)
 			}
 			this.searchQuery = ""
 		},

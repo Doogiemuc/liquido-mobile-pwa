@@ -17,29 +17,35 @@ var addDays = function(date, days) {
 
 
 export default {
-	debug: true,
+	// All these attributes are even reactive.
 
-	// These attributes are reactive.
-	showFooter: true,
+	/** Currently logged in User */
 	user: {
-		name: "Demo Admin",
+		profile: {
+			name: "Demo Admin",
+		},
 		email: "admin1@liquido.me",
 		isAdmin: true
 	},
+
+	/** Users team */
 	team: {
 		name: undefined,
 		inviteCode: undefined,
 		qrCode: undefined
 	},
 
+	//** Current status filter on the /polls page */
+	pollStatusFilter: undefined,
+
 	//
-	// DUMMY DATA FOR TESTING
+	// ==========DUMMY DATA FOR TESTING ==========
 	//
 
 	polls: [
 		{
 			id: 99,
-			title: "New poll",
+			title: "Ich bin eine neue erstellte Abstimmung",
 			status: "ELABORATION",
 			votingStartAt: addDays(new Date(), 10),
 			votingEndAt:   addDays(new Date(), 20),
@@ -429,28 +435,29 @@ export default {
 		}
 	],
 	
+	//
+	// ========== These methods change the content of the store ("mutations" in vuex) ==========
+	//
+
+	setPollStatusFilter(newVal) {
+		this.pollStatusFilter = newVal
+	},
+
+	getPollStatusFilter(newVal) {
+		return this.pollStatusFilter
+	},
+
+
 	getPollById(pollId) {
 		return this.polls.find(poll => poll.id == pollId)
 	},
 
-	saveProposal(pollId, proposal) {
-		var poll = this.getPollById(pollId)
-		if (!poll) return Promise.reject("Cannot find poll.id="+pollId)
-		if (!poll.proposals) {
-			poll.proposals = []
-			proposal.id = uniqueId()
-			poll.proposals.push(proposal)
-		}
-		if (!proposal.id) {
-			proposal.id = uniqueId()
-		} else {
-			
-		}
-	},
-
-	// These methods change the content of the store ("mutations" in vuex)
 	setShowFooter(showFooter) {
 		this.showFooter = showFooter
+	},
+
+	getCurrentUser() {
+		return this.user
 	},
 
 	getToken() {
@@ -462,13 +469,17 @@ export default {
 		return this.polls.find(p => p.id == pollId)   // pollId might be a String or a Number!
 	},
 
+	getProposalById(poll, proposalId) {
+		return poll.proposals.find(prop => prop.id == proposalId)
+	},
+
 	savePoll(poll) {
-		if (!typeof poll === "object") throw new Error("Cannot savePoll. Need poll object")
-		if (!poll.title) throw new Error("Cannot savePoll. Need title")
+		if (!typeof poll === "object") return Promise.reject("Cannot savePoll. Need poll object")
+		if (!poll.title) return Promise.reject("Cannot savePoll. Need title")
 		//TODO: savePoll() call backend
 		if (!poll.id) {
 			console.log("Creating new poll: '"+poll.title+"'")
-			poll.id = uuidv4();
+			poll.id = uniqueId()
 			this.polls.push(poll)
 		} else {
 			var existingPoll = this.polls.find(p => p.id === poll.id)
@@ -476,7 +487,32 @@ export default {
 			existingPoll = poll
 			console.log("poll(id="+poll.id+") saved.")
 		}
-		return poll
+		return Promise.resolve(poll)
+	},
+
+	/**
+	 * Add or update a proposal in a poll.
+	 * @param {Object} poll An existing poll
+	 * @param {Object} proposal a new proposal to add (without an ID) or an existing proposal that shall be updated (with ID)
+	 */
+	saveProposal(poll, proposal) {
+		if (!poll || !poll.id) return Promise.reject("Need poll to saveProposal()")
+		if (!proposal) return Promise.reject("Need proposal to saveProposal()")
+		// more sanity checks in the backend ...
+		if (!poll.proposals) poll.proposals = []
+		proposal.createdBy = this.getCurrentUser()
+		if (proposal.id) {
+			// update existing proposal
+			var prop = this.getProposalById(poll, proposal.id)
+			prop = proposal
+			console.log("Updated proposal in poll(id="+poll.id+"): '"+prop.title+"'")
+		} else {
+			proposal.id = uniqueId()
+			poll.proposals.push(proposal)
+			console.log("Added new proposal to poll(id="+poll.id+"): '"+proposal.title+"'")
+		}
+		
+		return Promise.resolve(poll)
 	}
 
 }

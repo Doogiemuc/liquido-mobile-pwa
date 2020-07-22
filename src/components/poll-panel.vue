@@ -7,9 +7,9 @@
 				<i class="fas fa-poll"></i>&nbsp;{{poll.title}}
 			</h3>
 		</template>
-		<div class="no-proposals" v-if="!poll.proposals || poll.proposals.length === 0">
-			<p>{{$t('noProposalsInPollYet')}}</p>
-			<div class="mb-1 text-right">
+		<div class="card-body" v-if="!poll.proposals || poll.proposals.length === 0">
+			<p class="text-secondary">{{$t('noProposalsInPollYet')}}</p>
+			<div v-if="showAddProposalButton" class="mb-1 text-right">
 				<b-button variant="primary" @click="goToAddProposal(poll.id)">{{$t('addProposal')}} <i class="fas fa-angle-double-right"></i></b-button>
 			</div>
 		</div>
@@ -53,7 +53,7 @@ export default {
 
 			},
 			de:{
-				noProposalsInPollYet: 'Es gibt bisher noch keine Wahlvorschläge oder Kandidaten in dieser Abstimmung.',
+				noProposalsInPollYet: 'Es gibt bisher noch keine Wahlvorschläge oder Kandidat*innen in dieser Abstimmung.',
 				addProposal: "Vorschlag hinzufügen",
 			}
 		}
@@ -63,11 +63,15 @@ export default {
 	props: {
 		poll: { type: Object, required: true },
 		readOnly: { type: Boolean, required: false, default: false },
+		showAddProposalButton: { type: Boolean, required: false, default: false },
+		expanded: { type: Boolean, required: false, default: true },
 	},
 	data() {
 		return {}
 	},
-	mounted() {},
+	mounted() {
+		if (!this.expanded) this.toggleCollapse()   // collapse the proposal descriptions when initially not expanded. This is animated!
+	},
 	computed: {
 		
 	},
@@ -113,7 +117,7 @@ export default {
 		},
 
 		goToAddProposal(pollId) {
-			this.$router.push("/polls/"+pollId+"/addProposal")
+			this.$router.push("/polls/"+pollId+"/add")
 		}
 	},
 }
@@ -155,7 +159,7 @@ $avatar_size: 70px;
 		padding-right: 10px;
 	}
 
-	.no-proposals {
+	.card-body {
 		padding: 10px;
 	}
 

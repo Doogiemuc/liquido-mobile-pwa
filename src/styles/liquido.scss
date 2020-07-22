@@ -28,8 +28,10 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 	margin: 1rem 0;
 }
 
-div.alert p:last-child {
-	margin-bottom: 0;					// Why is this not the default in bootstrap???
+.alert, .card-body {
+	p:last-child {
+		margin-bottom: 0;					// Why is this not the default in bootstrap???
+	}
 }
 
 /** LIQUIDO - beautifull brand mark */

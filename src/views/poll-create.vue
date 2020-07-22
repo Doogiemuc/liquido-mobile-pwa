@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<liquido-header></liquido-header>
+		<liquido-header backLink="BACK"></liquido-header>
 
 		<div class="container-lg">
 			

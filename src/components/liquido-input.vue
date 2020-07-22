@@ -65,6 +65,10 @@ export default {
   },
   mounted() { },
   computed: {
+		/** 
+		 * Compute wether to add the is-valid or is-invalid pseudo class depending on the input's "state" 
+		 * If state == null, e.g. when the field was not validated at all yet, then no pseudo class is added.
+		 */
 		validClass() {
 			return { 'is-valid' : this.state === true, 'is-invalid' : this.state === false }   // status === null will set no class at all
 		}
