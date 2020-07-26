@@ -1,3 +1,9 @@
+import Vue from "vue"
+import Router from "vue-router"
+import store from "@/services/liquido-store"
+
+Vue.use(Router)
+
 const routes = [
   {
     path: "/",
@@ -51,6 +57,20 @@ const routes = [
   },
 ]
 
+const router = new Router({
+  mode: "history",
+  base: process.env.BASE_URL,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+			console.log("Returning to saved scroll position", savedPosition)
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  },
+  routes,
+})
+
 // Lazy-loads view components, but with better UX. A loading view
 // will be used if the component takes a while to load, falling
 // back to a timeout view in case the page fails to load. You can
@@ -89,4 +109,27 @@ function lazyLoadView(AsyncView) {
   })
 }
 
-export default routes
+// route checks for authentication and redirects
+router.beforeEach((routeTo, routeFrom, next) => {
+  const requiresAuth = routeTo.matched.some((route) => route.meta.requiresAuth)
+  const redirectIfAuthenticated = routeTo.matched.some(
+    (route) => route.meta.redirectIfAuthenticated
+  )
+  // If auth isn't required for the route, just continue.
+  if (!requiresAuth && !redirectIfAuthenticated) return next()
+
+  let isAuthenticated = store.isAuthenticated()
+
+  if (requiresAuth && !isAuthenticated) return next("/login")
+
+  if (isAuthenticated && redirectIfAuthenticated) {
+    return next("/")
+  }
+
+  return next()
+})
+
+
+
+
+export default router

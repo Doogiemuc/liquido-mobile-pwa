@@ -1,20 +1,18 @@
 import Vue from "vue"
 import App from "@/App.vue"
-//import store from "@/store/index"
-import liquidoStore from "@/store/liquido-store"
-import router from "@/router/index"
+import liquidoStore from "@/services/liquido-store"
+import liquidoApi from "@/services/liquido-api"
+import router from "@/services/router"
 import "@/registerServiceWorker"
-//import modal from "@/components/modal-comp"
-import accountAPI from "@/plugins/accountAPI"
 import { BootstrapVue } from "bootstrap-vue"
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
 import VueI18n from 'vue-i18n'
 
+
 Vue.use(BootstrapVue)
 Vue.use(VueI18n)
-Vue.use(accountAPI)
-//Vue.component("modal", modal)
+Vue.use(liquidoApi)
 
 Vue.config.productionTip = false
 Vue.config.debug = true

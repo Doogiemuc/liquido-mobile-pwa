@@ -439,6 +439,10 @@ export default {
 	// ========== These methods change the content of the store ("mutations" in vuex) ==========
 	//
 
+	isAdmin() {
+		return this.user.isAdmin
+	},
+
 	setPollStatusFilter(newVal) {
 		this.pollStatusFilter = newVal
 	},
@@ -480,11 +484,13 @@ export default {
 		if (!poll.id) {
 			console.log("Creating new poll: '"+poll.title+"'")
 			poll.id = uniqueId()
+			poll.status = "ELABORATION"
 			this.polls.push(poll)
 		} else {
 			var existingPoll = this.polls.find(p => p.id === poll.id)
-			if (existingPoll === undefined) throw Error("Cannot savePoll. Cannot find poll with id="+poll.id)
+			if (existingPoll === undefined) return Promise.reject("Cannot savePoll. Cannot find poll with id="+poll.id)
 			existingPoll = poll
+			poll.id = existingPoll.id
 			console.log("poll(id="+poll.id+") saved.")
 		}
 		return Promise.resolve(poll)

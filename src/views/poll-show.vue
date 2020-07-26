@@ -14,13 +14,13 @@
 
 			<div v-if="showAddProposal" class="alert alert-secondary mb-3">
 				<p v-html="$t('addProposalInfo')"></p>
-				<b-button variant="primary" class="float-right" @click="addProposal()">{{$t('addProposal')}} <i class="fas fa-angle-double-right"></i></b-button>
+				<b-button variant="primary" class="float-right" @click="clickAddProposal()">{{$t('addProposal')}} <i class="fas fa-angle-double-right"></i></b-button>
 			</div>
 			<div class="clearfix mb-3"></div>
 
-			<div v-if="userIsAdmin && poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert alert-secondary mb-3">
+			<div v-if="showStartVotingPhase" class="alert alert-secondary mb-3">
 				<p v-html="$t('startVotingPhaseInfo')"></p>
-				<b-button variant="primary" class="float-right"><i class="fas fa-user-shield"></i> {{$t('startVotingPhase')}}</b-button>
+				<b-button variant="primary" class="float-right" @click="clickStartVote()"><i class="fas fa-user-shield"></i> {{$t('startVotingPhase')}}</b-button>
 			</div>
 			<div class="clearfix mb-3"></div>
 
@@ -67,7 +67,7 @@ export default {
 		}
 	},
 	created() {
-		this.poll = this.$root.store.getPollById(this.pollId) || {}
+		this.poll = this.$root.store.getPollById(this.pollId)
 	},
 	mounted() {},
 	computed: {
@@ -84,15 +84,28 @@ export default {
 		/** User can add his own proposal if the poll is in status ELABORATION and he did not add a proposal to this poll yet. */
 		showAddProposal() {
 			if (this.poll.status !== "ELABORATION") return false
-			if (!this.poll.proposals) return true
+			if (!this.poll.proposals || this.poll.proposals.length === 0) {
+				this.poll.proposals = []
+				return true
+			}
 			var currentUserEmail = this.$root.store.user.email
 			return this.poll.proposals.filter(prop => prop.createdBy.email === currentUserEmail).length === 0
+		},
+		showStartVotingPhase() {
+			return this.userIsAdmin && this.poll.status === 'ELABORATION' && this.poll.proposals && this.poll.proposals.length > 0
 		}
 	},
 	methods: {
-		addProposal() {
+		clickAddProposal() {
 			this.$router.push("/polls/"+this.poll.id+"/add")
 		},
+		clickStartVote() {
+			this.$api.startVotingPhase(this.poll.id).then(poll => {
+				//TODO: Show success to user (need some kind of nice animation)
+				$("html, body").animate({ scrollTop: 0 }, 500);
+			})
+			
+		}
 	},
 }
 

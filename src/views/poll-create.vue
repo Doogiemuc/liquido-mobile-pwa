@@ -72,8 +72,9 @@ export default {
 	methods: {
 
 		clickCreateNewPoll() {
-			var createdPoll = this.$root.store.savePoll(this.poll)
-			this.$router.push("/polls/"+createdPoll.id)
+			this.$root.store.savePoll(this.poll).then(createdPoll => 
+				this.$router.push("/polls/"+createdPoll.id)
+			)
 		},
 
 	},
