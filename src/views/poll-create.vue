@@ -4,7 +4,7 @@
 
 		<div class="container-lg">
 			
-			<h2 class="pageTitle"><i class="fas fa-poll"></i> {{$t('newPoll')}}</h2>
+			<h2 class="page-title"><i class="fas fa-poll"></i> {{$t('newPoll')}}</h2>
 
 			<b-card class="chat-bubble form-bubble">
 				<liquido-input v-model="poll.title" id="pollTitleInput" :label="$t('pollTitle')" :state="pollTitleState" :invalidFeedback="$t('pollTitleInvalid')" @blur="pollTitleValidated = true"></liquido-input>

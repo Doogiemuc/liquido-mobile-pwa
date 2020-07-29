@@ -4,7 +4,7 @@
 		
 		<div class="container mb-3">
 
-			<h2 class="pageTitle">{{pageTitleLoc}}</h2>
+			<h2 class="page-title">{{pageTitleLoc}}</h2>
 
 			<poll-panel :poll="poll" :key="poll.id" class="shadow mb-3" :read-only="true"></poll-panel>
 
@@ -26,7 +26,7 @@
 
 
 			<div v-if="poll.status === 'VOTING'" class="text-right">
-				<b-button variant="primary" size="lg"><i class="fas fa-person-booth"></i> {{$t('castVote')}} <i class="fas fa-angle-double-right"></i></b-button>
+				<b-button variant="primary" size="lg" @click="clickCastVote()"><i class="fas fa-person-booth"></i> {{$t('castVote')}} <i class="fas fa-angle-double-right"></i></b-button>
 			</div>
 
 		</div>
@@ -53,7 +53,7 @@ export default {
 				addProposal: "Vorschlag hinzufügen",
 				startVotingPhaseInfo: 'Hallo Admin! Möchstest du die Wahlphase für diese Abstimmung starten? Dann sind die Wahlvorschläge fixiert und dein Team kann abstimmen.',
 				startVotingPhase: "Wahl starten",
-				castVote: "Stimme abgeben",
+				castVote: "Abstimmen",
 			}
 		}
 	},
@@ -68,6 +68,7 @@ export default {
 	},
 	created() {
 		this.poll = this.$root.store.getPollById(this.pollId)
+		//TODO: show error if this.poll === undefined
 	},
 	mounted() {},
 	computed: {
@@ -98,6 +99,9 @@ export default {
 	methods: {
 		clickAddProposal() {
 			this.$router.push("/polls/"+this.poll.id+"/add")
+		},
+		clickCastVote() {
+			this.$router.push("/polls/"+this.poll.id+"/castVote")
 		},
 		clickStartVote() {
 			this.$api.startVotingPhase(this.poll.id).then(poll => {

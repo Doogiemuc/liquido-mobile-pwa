@@ -36,15 +36,16 @@ const routes = [
 		path: "/team",
 		name: "teamHome",
 		component: () => lazyLoadView(import("@/views/team-home")),
-	},
-	{
-    path: "/castVote",
-    name: "castVote",
-		component: () => lazyLoadView(import("@/views/cast-vote")),
 		meta: {
       requiresAuth: true,
     },
-  },
+	},
+	{
+    path: "/polls/:pollId/castVote",
+    name: "castVote",
+		component: () => lazyLoadView(import("@/views/cast-vote")),
+		props: true
+	},
 	{
     path: "/404",
     name: "pageNotFound",

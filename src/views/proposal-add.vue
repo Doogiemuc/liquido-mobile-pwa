@@ -3,7 +3,7 @@
 		<liquido-header :showBack="true"></liquido-header>
 		
 		<div class="container">
-			<h2 class="pageTitle">{{$t('addProposal')}}</h2>
+			<h2 class="page-title">{{$t('addProposal')}}</h2>
 			
 			<div class="card input-bubble mb-3">
 				<div class="card-header">
@@ -40,7 +40,7 @@
 				</div>
 			</div>
 
-			<h2 class="pageTitle mt-5">{{$t('thePoll')}}</h2>
+			<h2 class="page-title mt-5">{{$t('thePoll')}}</h2>
 			<poll-panel :poll="poll" :expanded="false" :read-only="true" class="shadow mb-3"></poll-panel>
 
 		</div>
@@ -124,11 +124,6 @@ export default {
 </script>
 
 <style lang="scss">
-.pageTitle {
-	font-size: 1.5rem;
-	margin: 1rem 0;
-	font-family: 'Libre Baskerville', serif;
-}
 
 .input-bubble {
 	background-color: $input-bg;

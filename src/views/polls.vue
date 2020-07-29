@@ -3,7 +3,7 @@
 		<liquido-header></liquido-header>
 		
 		<div class="container mb-3">
-			<h2 class="pageTitle">{{pageTitleLoc}}</h2>
+			<h2 class="page-title">{{pageTitleLoc}}</h2>
 
 			<liquido-input v-if="polls.length > 3" v-model="searchQuery" id="searchInput" :label="$t('search')" :status="null" class="mb-4">
 				 <template v-slot:iconRight>

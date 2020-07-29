@@ -363,8 +363,7 @@ export default {
 		 * @param {Number} margin margin below headerHeight in pixels (default 0)
 		 */
 		scrollElemToTop(elem, margin = 0) {
-
-var scrollTop = $(elem).offset().top - this.$root.headerHeight - margin
+			var scrollTop = $(elem).offset().top - this.$root.headerHeight - margin
 			console.log(scrollTop)
 			this.$nextTick(() => {
 				$("html, body").animate({ scrollTop: scrollTop }, 2000);
