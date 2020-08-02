@@ -1,27 +1,44 @@
 <template>
-	<b-card no-body class="law-panel" :id="law.id">
+	<b-card :id="law.id" no-body class="law-panel">
 		<div>
-			<h4 class="law-title"><i :class="iconForLaw" class="title-icon"></i>&nbsp;{{law.title}}</h4>
+			<h4 class="law-title">
+				<i :class="iconForLaw" class="title-icon"></i>
+				&nbsp;{{ law.title }}
+			</h4>
 		</div>
 		<div class="law-subtitle d-flex">
 			<div class="createdAt flex-fixed-width">
-				<i class="far fa-clock"></i>&nbsp;{{ formatDate(law.createdAt) }}
+				<i class="far fa-clock"></i>
+				&nbsp;{{ formatDate(law.createdAt) }}
 			</div>
 			<div class="user">
-				<i class="far fa-user"></i>&nbsp;{{ law.createdBy.profile.name }}
+				<i class="far fa-user"></i>
+				&nbsp;{{ law.createdBy.profile.name }}
 			</div>
-			<div class="like-button flex-grow-1 text-right" :class="{ supported: law.supportedByCurrentUser }">
-				<i :class="{'far': !law.supportedByCurrentUser, 'fas': law.supportedByCurrentUser}" class="fa-thumbs-up"></i>&nbsp;{{law.numSupporters}}
+			<div
+				:class="{ supported: law.supportedByCurrentUser }"
+				class="like-button flex-grow-1 text-right"
+			>
+				<i
+					:class="{
+						far: !law.supportedByCurrentUser,
+						fas: law.supportedByCurrentUser,
+					}"
+					class="fa-thumbs-up"
+				></i>
+				&nbsp;{{ law.numSupporters }}
 			</div>
-		</div>		
+		</div>
 		<div class="d-flex">
 			<div class="flex-fixed-width">
-				<img :src="'https://picsum.photos/seed/'+law.id+'/100'" alt="Image" class="law-image"/>
+				<img
+					:src="'https://picsum.photos/seed/' + law.id + '/100'"
+					alt="Image"
+					class="law-image"
+				/>
 			</div>
-			<div class="law-description">
-				{{law.description}}
-			</div>
-		</div> 
+			<div class="law-description">{{ law.description }}</div>
+		</div>
 	</b-card>
 </template>
 
@@ -83,7 +100,7 @@ export default {
 $avatar_size: 90px;
 
 .law-panel {
-	height: 30px + 25px + $avatar_size + 15px;  // title + subtitle + avatar_img + padding
+	height: 30px + 25px + $avatar_size + 15px; // title + subtitle + avatar_img + padding
 	overflow: hidden;
 	padding: 5px 10px 10px 10px;
 
@@ -112,7 +129,7 @@ $avatar_size: 90px;
 		//line-height: 15px;
 		height: 18px;
 		min-height: 18px;
-		color: #BBB;
+		color: #bbb;
 		margin-bottom: 5px;
 		//border-bottom: 1px solid rgba(0, 0, 0, 0.1);;
 		//-webkit-box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
@@ -141,5 +158,4 @@ $avatar_size: 90px;
 .supported {
 	color: green;
 }
-
 </style>

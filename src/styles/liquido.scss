@@ -2,7 +2,6 @@
  * These styles are imported in App.vue so they are a available to every component.
  */
 
-//Remark: height of header is dynamically calculated and stored in this.$root.headerHeight variable
 
 /** No iOS native button and input styling */
 button, [type="button"], [type="reset"], [type="submit"], input {
@@ -13,13 +12,13 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 }
 
 .noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Opera and Firefox */
+	-webkit-touch-callout: none; /* iOS Safari */
+		-webkit-user-select: none; /* Safari */
+			-khtml-user-select: none; /* Konqueror HTML */
+				-moz-user-select: none; /* Old versions of Firefox */
+				-ms-user-select: none; /* Internet Explorer/Edge */
+						user-select: none; /* Non-prefixed version, currently
+																	supported by Chrome, Opera and Firefox */
 }
 
 .page-title {

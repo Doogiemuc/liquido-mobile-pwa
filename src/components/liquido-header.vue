@@ -2,9 +2,20 @@
 	<div>
 		<header id="liquidoHeader" class="liquido-header shadow-sm">
 			<div class="row no-gutters align-items-center">
-				<div class="col header-left"><i v-if="backLink" class="fas fa-angle-double-left" @click="goBack()"></i></div>
-				<div class="col-8 liquido-title"><i class="fas fa-university"></i>&nbsp;<span @click="clickLiquidoTitle()" class="liquido"></span></div>
-				<div class="col header-right"><i class="fas fa-users"></i></div>
+				<div class="col header-left">
+					<i
+						v-if="backLink"
+						class="fas fa-angle-double-left"
+						@click="goBack()"
+					></i>
+				</div>
+				<div class="col-8 liquido-title">
+					<i class="fas fa-university"></i>&nbsp;
+					<span class="liquido" @click="clickLiquidoTitle()"></span>
+				</div>
+				<div class="col header-right">
+					<i class="fas fa-users"></i>
+				</div>
 			</div>
 		</header>
 		<div id="behindHeader"></div>
@@ -12,21 +23,18 @@
 </template>
 
 <script>
-
 export default {
 	name: "LiquidoHeader",
 	i18n: {
 		messages: {
-			en: {
-			},
-			de: {
-			}
-		}
+			en: {},
+			de: {},
+		},
 	},
 	props: {
-		'minimizeOnScroll': { type: Boolean, required: false, default: true },
+		minimizeOnScroll: { type: Boolean, required: false, default: true },
 		// show a "backlink". You can pass an URL or the keyworkd "BACK" to use browsers back
-		'backLink': { type: String, required: false, default: undefined },
+		backLink: { type: String, required: false, default: undefined },
 	},
 	data() {
 		return {
@@ -35,28 +43,32 @@ export default {
 	},
 	methods: {
 		transitionHeader() {
-			if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
-				$('.liquido-header').addClass('scrolled')
-				$('#navArrows').addClass('scrolled')
+			if (
+				document.body.scrollTop > 50 ||
+				document.documentElement.scrollTop > 50
+			) {
+				$(".liquido-header").addClass("scrolled")
+				$("#navArrows").addClass("scrolled")
 			} else {
-				$('.liquido-header').removeClass('scrolled')
-				$('#navArrows').removeClass('scrolled')
+				$(".liquido-header").removeClass("scrolled")
+				$("#navArrows").removeClass("scrolled")
 			}
 		},
 
 		goBack() {
-			if (this.backLink === "BACK")	this.$router.go(-1)
+			if (this.backLink === "BACK") this.$router.go(-1)
 			else if (this.backLink) this.$router.push(this.backLink)
 		},
 
 		clickLiquidoTitle() {
-			if (this.$route.path !== "/" && this.$route.path !== "/polls") this.$router.push("/polls")
+			if (this.$route.path !== "/" && this.$route.path !== "/polls")
+				this.$router.push("/polls")
 		},
 
 		/** check if current $route.path starts with the given pathPrefix. so that we can add the .active class to the outer li element */
 		isPathActive(pathPrefix) {
 			return this.$route.path.indexOf(pathPrefix) === 0
-		}
+		},
 	},
 
 	/**
@@ -64,18 +76,17 @@ export default {
 	 * Next sibling element should add its own top margin.
 	 */
 	mounted() {
-		this.$root.headerHeight = parseInt($('#liquidoHeader').css('height'),10)  // jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
-		$('#behindHeader').css('height', this.$root.headerHeight)
+		this.$root.headerHeight = parseInt($("#liquidoHeader").css("height"), 10) // jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
+		$("#behindHeader").css("height", this.$root.headerHeight)
 		//$('#appContent').css('height', this.$root.headerHeight)
 		if (this.minimizeOnScroll) {
-			window.onscroll = () => this.transitionHeader();
-		}	
-	}
+			window.onscroll = () => this.transitionHeader()
+		}
+	},
 }
 </script>
 
 <style lang="scss" scoped>
-
 .liquido-header {
 	position: fixed;
 	top: 0;
@@ -83,10 +94,10 @@ export default {
 	width: 100%;
 	//height: $stickyNavHeight;
 	z-index: 100;
-	transition: 0.3s;  /* Add a transition effect when scrolling */
+	transition: 0.3s; /* Add a transition effect when scrolling */
 	color: $primary;
 	background-color: $header-bg;
-	border-bottom: 1px solid rgba(0,0,255, 0.3);
+	border-bottom: 1px solid rgba(0, 0, 255, 0.3);
 	font-size: 1.5rem;
 
 	.liquido-title {
@@ -114,25 +125,25 @@ $inactiveNavArrowBg: #fdfdff;
 #navArrows {
 	flex-wrap: nowrap;
 	padding: 0;
-	//min-width: 350px;	
+	//min-width: 350px;
 	justify-content: center;
-	font-family: 'Libre Baskerville', serif;
+	font-family: "Libre Baskerville", serif;
 	font-size: 1.7rem;
 	margin-bottom: 1rem;
 	transition: 0.3s;
 	.icon-title {
 		font-size: 10px;
-		line-height: 1.0;
+		line-height: 1;
 	}
 }
 
 $arrowSize: 28px;
 
 #navArrows > li {
-	margin: 0 $arrowSize*0.5;
+	margin: 0 $arrowSize * 0.5;
 	position: relative;
-	flex-grow: 1;		
-	flex-basis: 0;  // make all li elemns the same width (independant of their content)
+	flex-grow: 1;
+	flex-basis: 0; // make all li elemns the same width (independant of their content)
 	transition: 0.3s;
 }
 #navArrows a {
@@ -142,7 +153,7 @@ $arrowSize: 28px;
 	//text-overflow: ellipsis;
 	color: $primary;
 	height: 2 * $arrowSize;
-	line-height: 40px;   				// vertically center text in arrows
+	line-height: 40px; // vertically center text in arrows
 	background-color: $inactiveNavArrowBg;
 	transition: 0.3s;
 }
@@ -151,19 +162,20 @@ $arrowSize: 28px;
 	position: absolute;
 	content: "";
 	top: 0px;
-	left: -$arrowSize*0.75;
+	left: -$arrowSize * 0.75;
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: $arrowSize 0 $arrowSize $arrowSize*0.75;
-	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg transparent;
+	border-width: $arrowSize 0 $arrowSize $arrowSize * 0.75;
+	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg
+		transparent;
 	z-index: 150;
 	transition: 0.3s;
 }
 /* Rounded corners for first element at the left */
 #navArrows > li:first-child > a {
-	border-top-left-radius: $arrowSize*0.3;
-	border-bottom-left-radius: $arrowSize*0.3;
+	border-top-left-radius: $arrowSize * 0.3;
+	border-bottom-left-radius: $arrowSize * 0.3;
 }
 
 /* Arrows after each element */
@@ -171,19 +183,19 @@ $arrowSize: 28px;
 	position: absolute;
 	content: "";
 	top: 0px;
-	right: -$arrowSize*0.75;
+	right: -$arrowSize * 0.75;
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: $arrowSize 0 $arrowSize $arrowSize*0.75;
+	border-width: $arrowSize 0 $arrowSize $arrowSize * 0.75;
 	border-color: transparent transparent transparent $inactiveNavArrowBg;
 	z-index: 150;
 	transition: 0.3s;
 }
 /* Rounded corners for last element at the right */
 #navArrows > li:last-child > a {
-	border-top-right-radius: $arrowSize*0.3;
-	border-bottom-right-radius: $arrowSize*0.3;
+	border-top-right-radius: $arrowSize * 0.3;
+	border-bottom-right-radius: $arrowSize * 0.3;
 }
 
 /* Navbar arrows become smaller when user scrolled upwards */
@@ -208,16 +220,12 @@ $arrowSize: 28px;
 	border-width: 15px 0 15px 10px;
 }
 
-
-
-	//.icon-title {
-		//display: none;   //TODO: then width of arrows jumps :-(
-	//}
-
-
+//.icon-title {
+//display: none;   //TODO: then width of arrows jumps :-(
+//}
 
 /* Navbar arrows when active */
-#navArrows li.active a  {
+#navArrows li.active a {
 	color: white;
 	background-color: $primary;
 }
@@ -228,13 +236,12 @@ $arrowSize: 28px;
 	border-color: transparent transparent transparent $primary;
 }
 
-
 /* Navbar arrows when disabled */
-#navArrows li.disabled a  {
+#navArrows li.disabled a {
 	background-color: #ddd;
 }
 #navArrows li.disabled a:before {
-	border-color:  #ddd #ddd #ddd transparent;
+	border-color: #ddd #ddd #ddd transparent;
 }
 #navArrows li.disabled a:after {
 	border-color: transparent transparent transparent #ddd;

@@ -1,22 +1,37 @@
 <template>
 	<footer>
-		<ul id="navArrows" class="nav nav-arrows" >
-			<li :class="{'active': activeStatus === 'ELABORATION', 'none-selected': activeStatus === undefined }">
-				<a href="#" @click="clickFooter('ELABORATION')" id="elaborationArrow">
+		<ul id="navArrows" class="nav nav-arrows">
+			<li
+				:class="{
+					active: activeStatus === 'ELABORATION',
+					'none-selected': activeStatus === undefined,
+				}"
+			>
+				<a id="elaborationArrow" href="#" @click="clickFooter('ELABORATION')">
 					<i class="far fa-comments"></i>
-					<div class="icon-title">{{$t('elaboration')}}</div>
+					<div class="icon-title">{{ $t("elaboration") }}</div>
 				</a>
 			</li>
-			<li :class="{'active': activeStatus === 'VOTING', 'none-selected': activeStatus === undefined }">
-				<a href="#" @click="clickFooter('VOTING')" id="votingArrow">
+			<li
+				:class="{
+					active: activeStatus === 'VOTING',
+					'none-selected': activeStatus === undefined,
+				}"
+			>
+				<a id="votingArrow" href="#" @click="clickFooter('VOTING')">
 					<i class="fas fa-person-booth"></i>
-					<div class="icon-title">{{$t('inVoting')}}</div>
+					<div class="icon-title">{{ $t("inVoting") }}</div>
 				</a>
 			</li>
-			<li :class="{'active': activeStatus === 'FINISHED', 'none-selected': activeStatus === undefined }">
-				<a href="#" @click="clickFooter('FINISHED')" id="finishedArrow">
+			<li
+				:class="{
+					active: activeStatus === 'FINISHED',
+					'none-selected': activeStatus === undefined,
+				}"
+			>
+				<a id="finishedArrow" href="#" @click="clickFooter('FINISHED')">
 					<i class="fas fa-check"></i>
-					<div class="icon-title">{{$t('finished')}}</div>
+					<div class="icon-title">{{ $t("finished") }}</div>
 				</a>
 			</li>
 		</ul>
@@ -24,17 +39,16 @@
 </template>
 
 <script>
-
 export default {
 	name: "LiquidoFooter",
 	computed: {
-		activeStatus() { 
+		activeStatus() {
 			return this.$root.store.pollStatusFilter
-		}
+		},
 	},
 	methods: {
-		/** 
-		 * When user clicks on a status, then this becomes the current activeStatus that we filte for. 
+		/**
+		 * When user clicks on a status, then this becomes the current activeStatus that we filte for.
 		 * When user clicks on the active Status again, then the filter is cleared.
 		 */
 		clickFooter(newFilterValue) {
@@ -43,13 +57,12 @@ export default {
 			} else {
 				this.$root.store.setPollStatusFilter(newFilterValue)
 			}
-		}
+		},
 	},
 }
 </script>
 
 <style lang="scss" scoped>
-
 // mobile navbar at the bottom
 footer {
 	position: fixed;
@@ -62,10 +75,9 @@ footer {
 	//transition: all .3s ease;
 
 	font-size: 1.7rem;
-	border-top: 1px solid rgba(0,0,255, 0.3);
-	background-color: rgba(220, 236, 255, 1.0);
+	border-top: 1px solid rgba(0, 0, 255, 0.3);
+	background-color: rgba(220, 236, 255, 1);
 }
-
 
 $inactiveNavArrowBg: #fdfdff;
 $arrowSize: 28px;
@@ -73,26 +85,24 @@ $arrowSize: 28px;
 #navArrows {
 	flex-wrap: nowrap;
 	padding: 0;
-	//min-width: 350px;	
+	//min-width: 350px;
 	text-align: center;
 	//justify-content: center;
-	font-family: 'Libre Baskerville', serif;
+	font-family: "Libre Baskerville", serif;
 	font-size: 1.7rem;
 	margin: 5px 0;
 	transition: 0.3s;
 	.icon-title {
 		font-size: 10px;
-		line-height: 1.0;
+		line-height: 1;
 	}
 }
 
-
-
 #navArrows > li {
-	margin: 0 $arrowSize*0.5;
+	margin: 0 $arrowSize * 0.5;
 	position: relative;
-	flex-grow: 1;		
-	flex-basis: 0;  // make all li elemns the same width (independant of their content)
+	flex-grow: 1;
+	flex-basis: 0; // make all li elemns the same width (independant of their content)
 	transition: 0.5s;
 }
 #navArrows a {
@@ -102,7 +112,7 @@ $arrowSize: 28px;
 	//text-overflow: ellipsis;
 	color: lightgrey;
 	height: 2 * $arrowSize;
-	line-height: 40px;   				// vertically center text in arrows
+	line-height: 40px; // vertically center text in arrows
 	background-color: $inactiveNavArrowBg;
 	transition: 0.5s;
 }
@@ -111,19 +121,20 @@ $arrowSize: 28px;
 	position: absolute;
 	content: "";
 	top: 0px;
-	left: -$arrowSize*0.75;
+	left: -$arrowSize * 0.75;
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: $arrowSize 0 $arrowSize $arrowSize*0.75;
-	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg transparent;
+	border-width: $arrowSize 0 $arrowSize $arrowSize * 0.75;
+	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg
+		transparent;
 	z-index: 150;
 	transition: 0.3s;
 }
 /* Rounded corners for first element at the left */
 #navArrows > li:first-child > a {
-	border-top-left-radius: $arrowSize*0.3;
-	border-bottom-left-radius: $arrowSize*0.3;
+	border-top-left-radius: $arrowSize * 0.3;
+	border-bottom-left-radius: $arrowSize * 0.3;
 }
 
 /* Arrowhead after each element */
@@ -131,23 +142,23 @@ $arrowSize: 28px;
 	position: absolute;
 	content: "";
 	top: 0px;
-	right: -$arrowSize*0.75;
+	right: -$arrowSize * 0.75;
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: $arrowSize 0 $arrowSize $arrowSize*0.75;
+	border-width: $arrowSize 0 $arrowSize $arrowSize * 0.75;
 	border-color: transparent transparent transparent $inactiveNavArrowBg;
 	z-index: 150;
 	transition: 0.5s;
 }
 /* Rounded corners for last element at the right */
 #navArrows > li:last-child > a {
-	border-top-right-radius: $arrowSize*0.3;
-	border-bottom-right-radius: $arrowSize*0.3;
+	border-top-right-radius: $arrowSize * 0.3;
+	border-bottom-right-radius: $arrowSize * 0.3;
 }
 
 /* Navbar arrows when active */
-#navArrows li.active a  {
+#navArrows li.active a {
 	color: white;
 	background-color: $primary;
 	transition: 0.5s;
@@ -180,5 +191,4 @@ $arrowSize: 28px;
 	transform: translateX(-50%);
 }
 */
-
 </style>

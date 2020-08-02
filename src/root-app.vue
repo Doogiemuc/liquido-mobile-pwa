@@ -1,15 +1,14 @@
 <template>
 	<div id="app">
-		<liquido-header :backLink="backLink"></liquido-header>
+		<liquido-header :back-link="backLink"></liquido-header>
 		<transition :name="transitionName">
-			<router-view id="appContent" class="router-view" :key="$route.fullPath" />
+			<router-view id="appContent" :key="$route.fullPath" class="router-view" />
 		</transition>
 		<pollsFooter v-if="showPollsFooter"></pollsFooter>
 	</div>
 </template>
 
 <script>
-
 import liquidoHeader from "@/components/liquido-header"
 import pollsFooter from "@/components/polls-footer"
 
@@ -21,15 +20,15 @@ export default {
 	// all data properties are set in main.js !
 	created() {},
 	mounted() {},
-	// watch the `$route` to determine the transition to use 
+	// watch the `$route` to determine the transition to use
 	// https://router.vuejs.org/guide/advanced/transitions.html#per-route-transition
 	watch: {
-		'$route' (to, from) {
-			const fromDepth = from.path.split('/').length
-			const toDepth = to.path.split('/').length
-			if (fromDepth < toDepth) this.transitionName = 'slide-left'
-			if (fromDepth > toDepth) this.transitionName = 'slide-right'
-		}
+		$route(to, from) {
+			const fromDepth = from.path.split("/").length
+			const toDepth = to.path.split("/").length
+			if (fromDepth < toDepth) this.transitionName = "slide-left"
+			if (fromDepth > toDepth) this.transitionName = "slide-right"
+		},
 	},
 	computed: {
 		/** If we show one poll, then show a backlink */
@@ -41,7 +40,6 @@ export default {
 		showPollsFooter() {
 			return this.$route.path === "/polls"
 		},
-		
 	},
 	methods: {},
 }
@@ -52,7 +50,7 @@ export default {
 @import "styles/liquido.scss";
 
 #app {
-	max-width: 1140px;   // bootstrap breakpoint of container-lg
+	max-width: 1140px; // bootstrap breakpoint of container-lg
 	height: 100vh;
 	margin: 0 auto;
 	position: relative;
@@ -61,24 +59,26 @@ export default {
 
 /** no horizintal scrolling */
 #appContent {
-	margin-bottom: 50px;  // for footer
+	margin-bottom: 50px; // for footer
 	overflow-x: hidden;
 }
 // Slide animation between pages
 .router-view {
 	transition: transform 0.5s ease-in-out;
 }
-.slide-left-enter, .slide-right-leave-to {
+.slide-left-enter,
+.slide-right-leave-to {
 	-webkit-transform: translate(100%, 0);
 	transform: translate(100%, 0);
 }
-.slide-left-leave-active, .slide-right-leave-active {
+.slide-left-leave-active,
+.slide-right-leave-active {
 	position: absolute;
 	width: 100%;
 }
-.slide-left-leave-to, .slide-right-enter {
+.slide-left-leave-to,
+.slide-right-enter {
 	-webkit-transform: translate(-100%, 0);
 	transform: translate(-100%, 0);
 }
-
 </style>

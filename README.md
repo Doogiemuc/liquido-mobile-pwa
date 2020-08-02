@@ -23,8 +23,8 @@ This is a mobile client for [LIQUIDO](http://www.liquido.vote). Based on the awe
 
 ## Running
 ```bash
-# Run in development
-yarn run serve
+# Run development server locally
+npm start
 
 # Building and running with Docker
 docker build -t peridot .
