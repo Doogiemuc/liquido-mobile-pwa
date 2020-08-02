@@ -3,7 +3,7 @@
  * 
  * See https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
  * 
- * (I don't need - and sorry yes, I also don't like - VUEX :) Its plain simply overengeneered.
+ * I don't need - and I also don't like - VUEX. Its plain simply over engineered.
  */
 
 import { uniqueId } from "lodash";
@@ -35,7 +35,7 @@ export default {
 		qrCode: undefined
 	},
 
-	//** Current status filter on the /polls page */
+	/** Current filter on the /polls page: undefined|ELABORATION|VOTING|FINISHED */
 	pollStatusFilter: undefined,
 
 	//
@@ -434,30 +434,15 @@ export default {
 			duelMatrix: undefined
 		}
 	],
+
+	
 	
 	//
-	// ========== These methods change the content of the store ("mutations" in vuex) ==========
+	// read only getters for state values
 	//
 
 	isAdmin() {
 		return this.user.isAdmin
-	},
-
-	setPollStatusFilter(newVal) {
-		this.pollStatusFilter = newVal
-	},
-
-	getPollStatusFilter(newVal) {
-		return this.pollStatusFilter
-	},
-
-
-	getPollById(pollId) {
-		return this.polls.find(poll => poll.id == pollId)
-	},
-
-	setShowFooter(showFooter) {
-		this.showFooter = showFooter
 	},
 
 	getCurrentUser() {
@@ -475,6 +460,24 @@ export default {
 
 	getProposalById(poll, proposalId) {
 		return poll.proposals.find(prop => prop.id == proposalId)
+	},
+
+	getPollStatusFilter(newVal) {
+		return this.pollStatusFilter
+	},
+
+
+	getPollById(pollId) {
+		return this.polls.find(poll => poll.id == pollId)
+	},
+
+
+	//
+	// ========== These methods change the content of the store ("mutations" in vuex) ==========
+	//
+
+	setPollStatusFilter(newVal) {
+		this.pollStatusFilter = newVal
 	},
 
 	savePoll(poll) {

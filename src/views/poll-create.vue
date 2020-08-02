@@ -1,7 +1,5 @@
 <template>
 	<div>
-		<liquido-header backLink="BACK"></liquido-header>
-
 		<div class="container-lg">
 			
 			<h2 class="page-title"><i class="fas fa-poll"></i> {{$t('newPoll')}}</h2>

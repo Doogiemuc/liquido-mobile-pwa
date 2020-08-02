@@ -1,7 +1,5 @@
 <template>
 	<div>
-		<liquido-header :showBack="true"></liquido-header>
-		
 		<div class="container">
 			<h2 class="page-title">{{$t('addProposal')}}</h2>
 			

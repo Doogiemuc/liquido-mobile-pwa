@@ -6,27 +6,6 @@
 				<div class="col-8 liquido-title"><i class="fas fa-university"></i>&nbsp;<span @click="clickLiquidoTitle()" class="liquido"></span></div>
 				<div class="col header-right"><i class="fas fa-users"></i></div>
 			</div>
-			
-			<ul v-if="showNavArrows" id="navArrows" class="nav nav-arrows" >
-				<li :class="{'active': isPathActive('/elaboration')}">
-					<router-link active-class="active" to="/elaboration" id="IdeasArrow">
-						<i class="far fa-comments"></i>
-						<div class="icon-title">{{$t('elaboration')}}</div>
-					</router-link>
-				</li>
-				<li :class="{'active': isPathActive('/voting')}">
-					<router-link active-class="active" to="/voting" id="ProposalsArrow">
-						<i class="fas fa-person-booth"></i>
-						<div class="icon-title">{{$t('inVoting')}}</div>
-					</router-link>
-				</li>
-				<li :class="{'active': isPathActive('/finished')}">
-					<router-link active-class="active" to="/finished" id="PollsArrow">
-						<i class="fas fa-check"></i>
-						<div class="icon-title">{{$t('finished')}}</div>
-					</router-link>
-				</li>
-			</ul>
 		</header>
 		<div id="behindHeader"></div>
 	</div>
@@ -51,7 +30,6 @@ export default {
 	},
 	data() {
 		return {
-			showNavArrows: false,
 			filterByStatus: "ELABORATION",
 		}
 	},
@@ -86,8 +64,9 @@ export default {
 	 * Next sibling element should add its own top margin.
 	 */
 	mounted() {
-		this.$root.headerHeight = parseInt($('#liquidoHeader').css('height'),10)  // jQuery returns "125px". 
+		this.$root.headerHeight = parseInt($('#liquidoHeader').css('height'),10)  // jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
 		$('#behindHeader').css('height', this.$root.headerHeight)
+		//$('#appContent').css('height', this.$root.headerHeight)
 		if (this.minimizeOnScroll) {
 			window.onscroll = () => this.transitionHeader();
 		}	

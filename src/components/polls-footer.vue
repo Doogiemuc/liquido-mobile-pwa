@@ -27,18 +27,22 @@
 
 export default {
 	name: "LiquidoFooter",
-	props: {
-		'activeStatus': { type: String, required: false }
+	computed: {
+		activeStatus() { 
+			return this.$root.store.pollStatusFilter
+		}
 	},
-	data() { 
-		return {} 
-	},
-	created() {},
-	mounted() {},
-	computed: {},
 	methods: {
-		clickFooter(filterValue) {
-			this.$emit('clickFooter', filterValue)
+		/** 
+		 * When user clicks on a status, then this becomes the current activeStatus that we filte for. 
+		 * When user clicks on the active Status again, then the filter is cleared.
+		 */
+		clickFooter(newFilterValue) {
+			if (this.activeStatus === newFilterValue) {
+				this.$root.store.setPollStatusFilter(undefined)
+			} else {
+				this.$root.store.setPollStatusFilter(newFilterValue)
+			}
 		}
 	},
 }

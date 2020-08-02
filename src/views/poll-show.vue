@@ -1,7 +1,5 @@
 <template>
 	<div>
-		<liquido-header backLink="/polls"></liquido-header>
-		
 		<div class="container mb-3">
 
 			<h2 class="page-title">{{pageTitleLoc}}</h2>

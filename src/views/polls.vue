@@ -1,7 +1,5 @@
 <template>
 	<div>
-		<liquido-header></liquido-header>
-		
 		<div class="container mb-3">
 			<h2 class="page-title">{{pageTitleLoc}}</h2>
 
@@ -9,9 +7,9 @@
 				 <template v-slot:iconRight>
 					 <i class="fas fa-times mr-1" @click="searchQuery = undefined"></i>
 				 </template>
-			 </liquido-input>
+			</liquido-input>
 
-			<poll-panel v-for="poll in filteredPolls" :poll="poll" :key="poll.id" class="shadow mb-3"></poll-panel>
+			<poll-panel v-for="poll in filteredPolls.slice(0,1)" :poll="poll" :key="poll.id" class="shadow mb-3"></poll-panel>
 		</div>
 
 		<div class="container mb-3">
@@ -40,7 +38,7 @@
 			<b-button variant="primary" @click="createPoll()"><i class="fas fa-person-booth"></i> {{$t('createPoll')}} <i class="fas fa-angle-double-right"></i></b-button>
 		</div>
 
-		<pollsFooter :activeStatus="pollStatusFilter" @clickFooter="clickFooter"></pollsFooter>
+		
 	</div>
 </template>
 
@@ -93,9 +91,7 @@ export default {
 				this.$root.store.setPollStatusFilter(this.status)
 		}
 	},
-	mounted() {
-		
-	},
+	mounted() { },
 	computed: {
 		pageTitleLoc() {
 			switch(this.pollStatusFilter) {
@@ -139,7 +135,7 @@ export default {
 		 * When user clicks on a (currently unselected) status in the footer, then filter for that status.
 		 * When user clicks again on the currently selected status (blue), then clear filter.
 		 */
-		clickFooter(val) {  
+		onClickFooter(val) {  
 			if (this.$root.store.getPollStatusFilter() === val) {
 				this.$root.store.setPollStatusFilter(undefined)
 			} else {
