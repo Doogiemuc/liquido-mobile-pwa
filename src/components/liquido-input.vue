@@ -1,6 +1,8 @@
 <template>
 	<div class="liquido-input">
-		<label v-if="label" :for="id" :class="{'disabled': disabled}">{{ label }}</label>
+		<label v-if="label" :for="id" :class="{ disabled: disabled }">{{
+			label
+		}}</label>
 		<input
 			:id="id"
 			:name="name"
@@ -11,14 +13,16 @@
 			:disabled="disabled"
 			:maxlength="maxlength"
 			class="form-control"
-			@keyup="$emit('keyup', $event)"
+			@keyup="keyup"
 			@input="$emit('input', $event.target.value)"
-			@blur="$emit('blur', $event.target.value)"
+			@blur="blur"
 		/>
 		<div class="iconRight">
 			<slot name="iconRight"></slot>
 		</div>
-		<div v-if="invalidFeedback" class="invalid-feedback">{{ invalidFeedback }}</div>
+		<div v-if="invalidFeedback" class="invalid-feedback">
+			{{ invalidFeedback }}
+		</div>
 	</div>
 </template>
 
@@ -66,6 +70,7 @@ export default {
 		invalidFeedback: String,
 		validFunc: { type: Function, required: false, default: () => true },
 		validateOn: { type: String, required: false, default: "keyup" },
+		forceValidateOn: { type: String, required: false, default: "blur" },
 	},
 	data() {
 		return {
@@ -93,14 +98,28 @@ export default {
 		},
 	},
 	methods: {
+		keyup(evt) {
+			if (this.validateOn === "keyup") {
+				this.validateField()
+			}
+			this.$emit('keyup', evt)  // let event bubble up
+		},
+
+		blur(evt) {
+			if (this.forceValidateOn === "blur") {
+				this.validateField(true)
+			}
+			this.$emit('blur', evt)
+		},
+
 		/**
-		 * Validate the current value of the field.
+		 * Validate the current value of the field with <pre>validFunc</pre>
 		 * If valid, then this.state will be set to true and field will be marked in green.
-		 * If invalid and then mark the field as invalid if it was validated before or parameter force is given as true.
+		 * If invalid and then mark the field as invalid but only if it was validated successfully before or parameter force is given as true.
+		 * @param force enable error message when fields value is invalid
 		 */
 		validateField(force = false) {
 			let valid = this.validFunc(this.value)
-			console.log("validateField", valid, this.state)
 			if (valid) {
 				this.state = true
 			} else {

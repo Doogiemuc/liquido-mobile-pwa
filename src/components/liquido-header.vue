@@ -1,20 +1,22 @@
 <template>
 	<div>
 		<header id="liquidoHeader" class="liquido-header shadow-sm">
-			<div class="row no-gutters align-items-center">
-				<div class="col header-left">
-					<i
-						v-if="backLink"
-						class="fas fa-angle-double-left"
-						@click="goBack()"
-					></i>
-				</div>
-				<div class="col-8 liquido-title">
-					<i class="fas fa-university"></i>&nbsp;
-					<span class="liquido" @click="clickLiquidoTitle()"></span>
-				</div>
-				<div class="col header-right">
-					<i class="fas fa-users"></i>
+			<div class="container">
+				<div class="row no-gutters align-items-center">
+					<div class="col header-left">
+						<i
+							v-if="backLink"
+							class="fas fa-angle-double-left"
+							@click="goBack()"
+						></i>
+					</div>
+					<div class="col-8 liquido-title">
+						<i class="fas fa-university"></i>&nbsp;
+						<span class="liquido" @click="clickLiquidoTitle()"></span>
+					</div>
+					<div class="col header-right">
+						<i class="fas fa-users"></i>
+					</div>
 				</div>
 			</div>
 		</header>
@@ -32,7 +34,6 @@ export default {
 		},
 	},
 	props: {
-		minimizeOnScroll: { type: Boolean, required: false, default: true },
 		// show a "backlink". You can pass an URL or the keyworkd "BACK" to use browsers back
 		backLink: { type: String, required: false, default: undefined },
 	},
@@ -43,10 +44,7 @@ export default {
 	},
 	methods: {
 		transitionHeader() {
-			if (
-				document.body.scrollTop > 50 ||
-				document.documentElement.scrollTop > 50
-			) {
+			if (document.getElementById('app').scrollTop > 50) {
 				$(".liquido-header").addClass("scrolled")
 				$("#navArrows").addClass("scrolled")
 			} else {
@@ -62,7 +60,7 @@ export default {
 
 		clickLiquidoTitle() {
 			if (this.$route.path !== "/" && this.$route.path !== "/polls")
-				this.$router.push("/polls")
+				this.$router.push("/")
 		},
 
 		/** check if current $route.path starts with the given pathPrefix. so that we can add the .active class to the outer li element */
@@ -78,10 +76,7 @@ export default {
 	mounted() {
 		this.$root.headerHeight = parseInt($("#liquidoHeader").css("height"), 10) // jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
 		$("#behindHeader").css("height", this.$root.headerHeight)
-		//$('#appContent').css('height', this.$root.headerHeight)
-		if (this.minimizeOnScroll) {
-			window.onscroll = () => this.transitionHeader()
-		}
+		$('#app').scroll(this.transitionHeader)
 	},
 }
 </script>
@@ -92,7 +87,6 @@ export default {
 	top: 0;
 	left: 0;
 	width: 100%;
-	//height: $stickyNavHeight;
 	z-index: 100;
 	transition: 0.3s; /* Add a transition effect when scrolling */
 	color: $primary;

@@ -1,40 +1,42 @@
 <template>
 	<footer>
-		<ul id="navArrows" class="nav nav-arrows">
-			<li
-				:class="{
-					active: activeStatus === 'ELABORATION',
-					'none-selected': activeStatus === undefined,
-				}"
-			>
-				<a id="elaborationArrow" href="#" @click="clickFooter('ELABORATION')">
-					<i class="far fa-comments"></i>
-					<div class="icon-title">{{ $t("elaboration") }}</div>
-				</a>
-			</li>
-			<li
-				:class="{
-					active: activeStatus === 'VOTING',
-					'none-selected': activeStatus === undefined,
-				}"
-			>
-				<a id="votingArrow" href="#" @click="clickFooter('VOTING')">
-					<i class="fas fa-person-booth"></i>
-					<div class="icon-title">{{ $t("inVoting") }}</div>
-				</a>
-			</li>
-			<li
-				:class="{
-					active: activeStatus === 'FINISHED',
-					'none-selected': activeStatus === undefined,
-				}"
-			>
-				<a id="finishedArrow" href="#" @click="clickFooter('FINISHED')">
-					<i class="fas fa-check"></i>
-					<div class="icon-title">{{ $t("finished") }}</div>
-				</a>
-			</li>
-		</ul>
+		<div class="container">
+			<ul id="navArrows" class="nav nav-arrows">
+				<li
+					:class="{
+						active: activeStatus === 'ELABORATION',
+						'none-selected': activeStatus === undefined,
+					}"
+				>
+					<a id="elaborationArrow" href="#" @click="clickFooter('ELABORATION')">
+						<i class="far fa-comments"></i>
+						<div class="icon-title">{{ $t("elaboration") }}</div>
+					</a>
+				</li>
+				<li
+					:class="{
+						active: activeStatus === 'VOTING',
+						'none-selected': activeStatus === undefined,
+					}"
+				>
+					<a id="votingArrow" href="#" @click="clickFooter('VOTING')">
+						<i class="fas fa-person-booth"></i>
+						<div class="icon-title">{{ $t("inVoting") }}</div>
+					</a>
+				</li>
+				<li
+					:class="{
+						active: activeStatus === 'FINISHED',
+						'none-selected': activeStatus === undefined,
+					}"
+				>
+					<a id="finishedArrow" href="#" @click="clickFooter('FINISHED')">
+						<i class="fas fa-check"></i>
+						<div class="icon-title">{{ $t("finished") }}</div>
+					</a>
+				</li>
+			</ul>
+		</div>
 	</footer>
 </template>
 
@@ -73,7 +75,6 @@ footer {
 	z-index: 999;
 	//transform: translateY(calc(100% - 40px));
 	//transition: all .3s ease;
-
 	font-size: 1.7rem;
 	border-top: 1px solid rgba(0, 0, 255, 0.3);
 	background-color: rgba(220, 236, 255, 1);
@@ -104,6 +105,12 @@ $arrowSize: 28px;
 	flex-grow: 1;
 	flex-basis: 0; // make all li elemns the same width (independant of their content)
 	transition: 0.5s;
+	&:first-child {
+		margin-left: 0;
+	}
+	&:last-child {
+		margin-right: 0;
+	}
 }
 #navArrows a {
 	display: block;

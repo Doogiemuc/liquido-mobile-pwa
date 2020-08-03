@@ -1,36 +1,53 @@
 <template>
 	<div>
 		<div class="container-lg mt-3">
-			<b-card id="welcomeBubble" :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm">
+			<b-card
+				id="welcomeBubble"
+				:class="{ 'hide-left': flowState < 1 }"
+				class="chat-bubble shadow-sm"
+			>
 				<b-card-text v-html="$t('welcome')"></b-card-text>
 			</b-card>
 
-			<b-card :class="{ 'hide-left': flowState < 2 }" class="chat-bubble shadow-sm">
+			<b-card
+				:class="{ 'hide-left': flowState < 2 }"
+				class="chat-bubble shadow-sm"
+			>
 				<b-card-text v-html="$t('whatsYourName')"></b-card-text>
 			</b-card>
 
-			<b-card :class="{ 'hide-right': flowState < 3 }" class="chat-bubble chat-right">
+			<b-card	:class="{ 'hide-right': flowState < 3 }" class="chat-bubble chat-right">
 				<liquido-input
 					v-model="user.name"
 					ref="userNameInput"
 					:label="$t('yourNickname')"
-					:validFunc="isUsernameValid"
+					:valid-func="isUsernameValid"
 					:maxlength="100"
-					:invalidFeedback="$t('userNameInvalid')"
+					:invalid-feedback="$t('userNameInvalid')"
 					:disabled="flowState >= 4"
-					@keyup="userNameKeyUp"
 					@keyup.enter="userNameSubmit"
 					@blur="userNameSubmit"
 				></liquido-input>
 			</b-card>
 
-			<div :class="{ 'collapse-max-height': flowState < 4 }" class="transition-all">
-				<b-card :class="{ 'hide-left': flowState < 4 }" class="chat-bubble shadow-sm">
-					<b-card-text v-html="$t('niceToMeetYou', { nickname: user.name })"></b-card-text>
+			<div
+				:class="{ 'collapse-max-height': flowState < 4 }"
+				class="transition-all"
+			>
+				<b-card
+					:class="{ 'hide-left': flowState < 4 }"
+					class="chat-bubble shadow-sm"
+				>
+					<b-card-text
+						v-html="$t('niceToMeetYou', { nickname: user.name })"
+					></b-card-text>
 				</b-card>
 			</div>
 
-			<div :class="{ 'collapse-max-height': flowState < 5 }" class="transition-all">
+			<div
+				:class="{ 'collapse-max-height': flowState < 5 }"
+				class="transition-all"
+			>
 				<b-card
 					id="createOrJoinBubble"
 					:class="{ 'hide-left': flowState < 5 }"
@@ -53,7 +70,9 @@
 						}"
 						class="btn"
 						@click="clickJoinTeam()"
-					>{{ $t("joinTeamButton") }}</button>
+					>
+						{{ $t("joinTeamButton") }}
+					</button>
 					<button
 						id="createNewTeamButton"
 						:class="{
@@ -63,50 +82,48 @@
 						}"
 						class="btn"
 						@click="clickCreateNewTeam()"
-					>{{ $t("createNewTeamButton") }}</button>
+					>
+						{{ $t("createNewTeamButton") }}
+					</button>
 				</div>
 			</div>
 
 			<!-- Join a team (flowState == 7) -->
 
-			<b-card :class="{ 'collapse-max-height': flowState !== 7 }" class="chat-bubble chat-right">
+			<b-card
+				:class="{ 'collapse-max-height': flowState !== 7 }"
+				class="chat-bubble chat-right"
+			>
 				<form id="joinTeamForm">
-					<div :state="inviteState" class="form-group">
-						<label for="inviteInput">{{ $t("inviteCode") }}</label>
-						<b-form-input
-							id="inviteInput"
-							v-model="user.invite"
-							:state="inviteState"
-							:disabled="flowState > 7"
-							type="text"
-							maxlength="6"
-							placeholder="A3BD5F"
-							trim
-							@blur="inviteTouched = true"
-						></b-form-input>
-						<div class="invalid-feedback">{{ $t("inviteInvalid") }}</div>
-					</div>
+					<liquido-input
+						v-model="inviteCode"
+						ref="inviteCodeInput"
+						:label="$t('inviteCode')"
+						:valid-func="isInviteCodeValid"
+						:maxlength="100"
+						:invalid-feedback="$t('inviteCodeInvalid')"
+						:disabled="flowState > 7"
+					></liquido-input>
 
-					<div :state="eMailState" class="form-group">
-						<label for="userEmailInput">{{ $t("yourEMail") }}</label>
-						<b-form-input
-							id="userEmailInput"
-							v-model="user.email"
-							:state="eMailState"
-							:placeholder="$t('eMailPlaceholder')"
-							:disabled="flowState > 7"
-							type="email"
-							trim
-							@blur="emailTouched = true"
-						></b-form-input>
-						<div class="invalid-feedback">{{ $t("emailInvalid") }}</div>
-					</div>
+					<liquido-input
+						v-model="user.email"
+						ref="emailInput"
+						:label="$t('yourEMail')"
+						:valid-func="isEmailValid"
+						:maxlength="200"
+						:invalid-feedback="$t('emailInvalid')"
+						:disabled="flowState > 7"
+					></liquido-input>
 
 					<div class="d-flex justify-content-between align-items-center">
 						<small :class="{ invisible: flowState > 7 }" class="ml-1">
 							<a href="#" @click="cancelJoinTeam()">{{ $t("Cancel") }}</a>
 						</small>
-						<b-button :disabled="joinTeamOkButtonDisabled" variant="primary" @click="joinTeam()">
+						<b-button
+							:disabled="joinTeamOkButtonDisabled"
+							variant="primary"
+							@click="joinTeam()"
+						>
 							{{ $t("Ok") }}
 							<i class="fas fa-angle-double-right"></i>
 						</b-button>
@@ -116,37 +133,33 @@
 
 			<!-- Create a new team (flowState == 8) -->
 
-			<b-card :class="{ 'collapse-max-height': flowState < 8 }" class="chat-bubble chat-right">
+			<b-card
+				:class="{ 'collapse-max-height': flowState < 8 }"
+				class="chat-bubble chat-right"
+			>
 				<form id="createNewTeamForm">
-					<div class="form-group">
-						<label for="teamNameInput">{{ $t("teamName") }}</label>
-						<b-form-input
-							id="teamNameInput"
-							v-model="newTeam.name"
-							:state="teamNameState"
-							:disabled="flowState > 8"
-							type="text"
-							trim
-							@blur="teamNameTouched = true"
-						></b-form-input>
-						<div class="invalid-feedback">{{ $t("teamNameInvalid") }}</div>
-					</div>
+					<liquido-input
+						v-model="newTeam.name"
+						ref="teamNameInput"
+						:label="$t('teamName')"
+						:valid-func="isTeamNameValid"
+						:maxlength="100"
+						:invalid-feedback="$t('teamNameInvalid')"
+						:disabled="flowState > 8"
+					></liquido-input>
 
-					<div class="form-group">
-						<label for="adminEMailInput">{{ $t("adminEmail") }}</label>
-						<b-form-input
-							id="adminEMailInput"
-							v-model="user.email"
-							:state="eMailState"
-							:placeholder="$t('eMailPlaceholder')"
-							:disabled="flowState > 8"
-							type="email"
-							trim
-							@keyup.enter="createNewTeam()"
-						></b-form-input>
-						<small class="ml-1">{{ $t("youWillBecomeAdmin") }}</small>
-						<div class="invalid-feedback">{{ $t("emailInvalid") }}</div>
-					</div>
+					<liquido-input
+						class="mb-0"
+						v-model="user.email"
+						ref="adminEmailInput"
+						:label="$t('adminEmail')"
+						:valid-func="isAdminEmailValid"
+						:maxlength="200"
+						:invalid-feedback="$t('emailInvalid')"
+						:disabled="flowState > 8"
+					></liquido-input>
+
+					<small class="ml-1 mb-1">{{ $t("youWillBecomeAdmin") }}</small>
 
 					<div
 						:class="{ 'collapse-max-height': flowState > 8 }"
@@ -194,7 +207,10 @@
 				<p v-html="$t('teamInfo')"></p>
 			</b-card>
 
-			<b-card :class="{ 'collapse-max-height': flowState !== 9 }" class="chat-bubble shadow-sm">
+			<b-card
+				:class="{ 'collapse-max-height': flowState !== 9 }"
+				class="chat-bubble shadow-sm"
+			>
 				<p v-html="$t('pollInfo')"></p>
 				<b-button
 					:class="{ 'd-none': flowState !== 9 }"
@@ -248,14 +264,14 @@ export default {
 
 				joinTeamButton: "Team beitreten",
 				inviteCode: "Einladungscode",
-				inviteInvalid: "Code muss genau 6 Zeichen lang sein.",
+				inviteCodeInvalid: "Code muss genau 6 Zeichen lang sein.",
 				yourEMail: "Deine E-Mail",
 				eMailPlaceholder: "info@domain.de",
 				emailInvalid: "E-Mail ungültig",
 
 				createNewTeamButton: "Neues Team",
 				teamName: "Team Name",
-				teamNameInvalid: "Bitte mindestens 4 Zeichen als Teamname!",
+				teamNameInvalid: "Bitte mindestens 6 Zeichen als Teamname!",
 				adminEmail: "Admin E-Mail",
 				youWillBecomeAdmin: "Du wirst der Admin des neuen Teams.",
 
@@ -264,9 +280,7 @@ export default {
 				shareThisLink: "Teile diesen Link",
 				tellInvitationCode: "oder sage ihnen deinen Einadungscode:",
 				scanQrCode: "oder lass sie diesen QR code scannen:",
-				teamInfo:
-					'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) im Footer.',
-
+				teamInfo:	'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) oben rechts.',
 				pollInfo:
 					'Jetzt kannst du deine erste Abstimung (<i class="fas fa-poll"></i>) erstellen, zu der jedes Teammitglied dann seinen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen kann.',
 				createPoll: "Abstimmung anlegen",
@@ -280,8 +294,9 @@ export default {
 			user: {
 				name: undefined,
 				email: undefined,
-				invite: undefined, // if user already has an invitation code
 			},
+
+			inviteCode: undefined,
 
 			// data when new team has been created
 			newTeam: {
@@ -305,12 +320,6 @@ export default {
 				 9 -new  team created
 			*/
 			flowState: 0,
-
-			// These variables store if the field has been validated before. If false => do not show any error message yet.
-			usernameValidated: false,
-			inviteValidated: false,
-			emailValidated: false,
-			teamNameValidated: false,
 
 			chatAnimationStarted: false,
 		}
@@ -349,38 +358,11 @@ export default {
 		}
 	},
 	computed: {
-		inviteState() {
-			if (
-				this.user.invite &&
-				this.user.invite.replace(/\s/g, "").length === 6
-			) {
-				this.inviteValidated = true
-				return this.inviteValidated
-			}
-			return this.inviteValidated ? false : null
-		},
-		eMailState() {
-			if (this.user.email && eMailRegEx.test(this.user.email)) {
-				this.emailValidated = true
-				return this.emailValidated
-			}
-			return this.emailValidated ? false : null
-		},
-		teamNameState() {
-			if (
-				this.newTeam.name &&
-				this.newTeam.name.replace(/\s/g, "").length >= 4
-			) {
-				this.teamNameValidated = true
-				return this.teamNameValidated
-			}
-			return this.teamNameValidated ? false : null
-		},
 		joinTeamOkButtonDisabled() {
-			return !this.inviteState || !this.eMailState || this.flowState > 7
+			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 7
 		},
 		createNewTeamOkButtonDisabled() {
-			return !this.teamNameState || !this.eMailState || this.flowState > 8
+			return !this.isTeamNameValid(this.newTeam.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 8
 		},
 	},
 	watch: {
@@ -391,18 +373,12 @@ export default {
 		*/
 	},
 	methods: {
-		//
-		// Input Field for user.name
-		//
-
+		/* username must not be empty and contain at least 4 chars */
 		isUsernameValid(val) {
 			return val !== undefined && val !== null && val.trim().length >= 4
 		},
 
-		userNameKeyUp(evt) {
-			this.$refs.userNameInput.validateField()
-		},
-
+		/* username can be submitted by pressing ENTER or by blurring the field or by clicking on "done" on the iOS keyboard */
 		userNameSubmit() {
 			this.$refs.userNameInput.validateField(true)
 			if (this.isUsernameValid(this.user.name) && this.flowState < 4) {
@@ -416,6 +392,30 @@ export default {
 			}
 		},
 
+		/* invite must be ast least 6 chars */
+		isInviteCodeValid(val) {
+			return val !== undefined && val !== null &&	val.trim().length === 6
+		},
+
+		/* user's email must match regex */
+		isEmailValid(val) {
+			return val !== undefined && val !== null && eMailRegEx.test(val)
+		},
+
+		/* team name must be at least 6 chars */
+		isTeamNameValid(val) {
+			return val !== undefined && val !== null && val.trim().length >= 6
+		},
+
+		/* admin email must match regex */
+		isAdminEmailValid(val) {
+			return val !== undefined && val !== null && eMailRegEx.test(val)
+		},
+
+
+
+
+		/** Click join team button */
 		clickJoinTeam() {
 			if (this.flowState === 6) {
 				this.flowState = 7
@@ -442,10 +442,10 @@ export default {
 		joinTeam() {
 			console.log(
 				this.user.name +
-					"<" +
+					" <" +
 					this.user.email +
-					"> joins team with invite " +
-					this.user.invite
+					"> joins team with invite code " +
+					this.invite
 			)
 		},
 
@@ -475,7 +475,7 @@ export default {
 		/** scroll to the very bottom of the content. Show last chat message */
 		scrollToBottom() {
 			this.$nextTick(() => {
-				$("html, body").animate({ scrollTop: $(document).height() }, 1000)
+				$("#app").animate({ scrollTop: $("#app").height() }, 1000)
 			})
 		},
 
