@@ -31,13 +31,12 @@
 		</div>
 		<div class="d-flex">
 			<div class="flex-fixed-width">
-				<img
-					:src="'https://picsum.photos/seed/' + law.id + '/100'"
-					alt="Image"
-					class="law-image"
-				/>
+				<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Image" class="law-image" />
 			</div>
 			<div class="law-description">{{ law.description }}</div>
+			<a v-if="!readOnly" class="collapse-icon" href="#" @click="toggleCollapse()">
+				<i class="fa"></i>
+			</a>
 		</div>
 	</b-card>
 </template>
@@ -51,6 +50,7 @@ export default {
 	props: {
 		law: { type: Object, required: true },
 		readOnly: { type: Boolean, required: false, default: false },
+		collapsed: { type: Boolean, required: false, default: false },
 	},
 	mixins: [],
 	data() {
@@ -59,7 +59,9 @@ export default {
 	beforeCreate() {},
 	created() {},
 	beforeMount() {},
-	mounted() {},
+	mounted() {
+		if (this.collapsed) this.toggleCollapse()
+	},
 	computed: {
 		iconForLaw() {
 			switch (this.law.status) {
@@ -88,6 +90,10 @@ export default {
 		formatDate(dateVal) {
 			return moment(dateVal).format("L")
 		},
+		toggleCollapse() {
+			$(".law-panel").toggleClass("collapse-law-panel")
+			$(".collapse-icon").toggleClass("collapsed")
+		},
 	},
 	filters: {},
 	beforeUpdate() {},
@@ -100,9 +106,17 @@ export default {
 $avatar_size: 90px;
 
 .law-panel {
-	height: 30px + 25px + $avatar_size + 15px; // title + subtitle + avatar_img + padding
+	// Law panel has a fixed height:   title + subtitle + avatar_img + padding
+	height: 30px + 25px + $avatar_size + 15px;
 	overflow: hidden;
 	padding: 5px 10px 10px 10px;
+
+	&.collapse-law-panel {
+		height: 55px;
+		.like-button {
+			margin-right: 1.4rem; // some space for collapse icon
+		}
+	}
 
 	.flex-fixed-width {
 		flex: 0 0 100px;
@@ -153,6 +167,20 @@ $avatar_size: 90px;
 		max-height: $avatar_size;
 		overflow: hidden;
 	}
+}
+
+.collapse-icon {
+	position: absolute;
+	bottom: 0;
+	right: 10px;
+}
+
+.collapse-icon .fa:before {
+	content: "\f139";
+}
+
+.collapse-icon.collapsed .fa:before {
+	content: "\f13a";
 }
 
 .supported {

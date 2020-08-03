@@ -20,18 +20,16 @@
 					<law-panel
 						v-for="prop in ballot"
 						:law="prop"
-						:read-only="false"
+						:read-only="true"
 						:key="prop.id"
+						:collapsed="true"
 						class="mb-2 shadow-sm"
 					/>
 				</draggable>
 			</div>
 
 			<div class="text-right mb-3">
-				<b-button variant="primary" size="lg" @click="clickCastVote()">
-					{{ $t("castVote") }}&nbsp;
-					<i class="fas fa-angle-double-right"></i>
-				</b-button>
+				<b-button variant="primary" size="lg" @click="clickCastVote()">{{ $t("castVote") }}</b-button>
 			</div>
 
 			<div

@@ -1,22 +1,15 @@
 <template>
 	<div>
 		<div class="container-lg mt-3">
-			<b-card
-				id="welcomeBubble"
-				:class="{ 'hide-left': flowState < 1 }"
-				class="chat-bubble shadow-sm"
-			>
+			<b-card id="welcomeBubble" :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm">
 				<b-card-text v-html="$t('welcome')"></b-card-text>
 			</b-card>
 
-			<b-card
-				:class="{ 'hide-left': flowState < 2 }"
-				class="chat-bubble shadow-sm"
-			>
+			<b-card :class="{ 'hide-left': flowState < 2 }" class="chat-bubble shadow-sm">
 				<b-card-text v-html="$t('whatsYourName')"></b-card-text>
 			</b-card>
 
-			<b-card	:class="{ 'hide-right': flowState < 3 }" class="chat-bubble chat-right">
+			<b-card :class="{ 'hide-right': flowState < 3 }" class="chat-bubble chat-right">
 				<liquido-input
 					v-model="user.name"
 					ref="userNameInput"
@@ -30,24 +23,13 @@
 				></liquido-input>
 			</b-card>
 
-			<div
-				:class="{ 'collapse-max-height': flowState < 4 }"
-				class="transition-all"
-			>
-				<b-card
-					:class="{ 'hide-left': flowState < 4 }"
-					class="chat-bubble shadow-sm"
-				>
-					<b-card-text
-						v-html="$t('niceToMeetYou', { nickname: user.name })"
-					></b-card-text>
+			<div :class="{ 'collapse-max-height': flowState < 4 }" class="transition-all">
+				<b-card :class="{ 'hide-left': flowState < 4 }" class="chat-bubble shadow-sm">
+					<b-card-text v-html="$t('niceToMeetYou', { nickname: user.name })"></b-card-text>
 				</b-card>
 			</div>
 
-			<div
-				:class="{ 'collapse-max-height': flowState < 5 }"
-				class="transition-all"
-			>
+			<div :class="{ 'collapse-max-height': flowState < 5 }" class="transition-all">
 				<b-card
 					id="createOrJoinBubble"
 					:class="{ 'hide-left': flowState < 5 }"
@@ -70,9 +52,7 @@
 						}"
 						class="btn"
 						@click="clickJoinTeam()"
-					>
-						{{ $t("joinTeamButton") }}
-					</button>
+					>{{ $t("joinTeamButton") }}</button>
 					<button
 						id="createNewTeamButton"
 						:class="{
@@ -82,18 +62,13 @@
 						}"
 						class="btn"
 						@click="clickCreateNewTeam()"
-					>
-						{{ $t("createNewTeamButton") }}
-					</button>
+					>{{ $t("createNewTeamButton") }}</button>
 				</div>
 			</div>
 
 			<!-- Join a team (flowState == 7) -->
 
-			<b-card
-				:class="{ 'collapse-max-height': flowState !== 7 }"
-				class="chat-bubble chat-right"
-			>
+			<b-card :class="{ 'collapse-max-height': flowState !== 7 }" class="chat-bubble chat-right">
 				<form id="joinTeamForm">
 					<liquido-input
 						v-model="inviteCode"
@@ -119,11 +94,7 @@
 						<small :class="{ invisible: flowState > 7 }" class="ml-1">
 							<a href="#" @click="cancelJoinTeam()">{{ $t("Cancel") }}</a>
 						</small>
-						<b-button
-							:disabled="joinTeamOkButtonDisabled"
-							variant="primary"
-							@click="joinTeam()"
-						>
+						<b-button :disabled="joinTeamOkButtonDisabled" variant="primary" @click="joinTeam()">
 							{{ $t("Ok") }}
 							<i class="fas fa-angle-double-right"></i>
 						</b-button>
@@ -133,10 +104,7 @@
 
 			<!-- Create a new team (flowState == 8) -->
 
-			<b-card
-				:class="{ 'collapse-max-height': flowState < 8 }"
-				class="chat-bubble chat-right"
-			>
+			<b-card :class="{ 'collapse-max-height': flowState < 8 }" class="chat-bubble chat-right">
 				<form id="createNewTeamForm">
 					<liquido-input
 						v-model="newTeam.name"
@@ -207,10 +175,7 @@
 				<p v-html="$t('teamInfo')"></p>
 			</b-card>
 
-			<b-card
-				:class="{ 'collapse-max-height': flowState !== 9 }"
-				class="chat-bubble shadow-sm"
-			>
+			<b-card :class="{ 'collapse-max-height': flowState !== 9 }" class="chat-bubble shadow-sm">
 				<p v-html="$t('pollInfo')"></p>
 				<b-button
 					:class="{ 'd-none': flowState !== 9 }"
@@ -280,7 +245,8 @@ export default {
 				shareThisLink: "Teile diesen Link",
 				tellInvitationCode: "oder sage ihnen deinen Einadungscode:",
 				scanQrCode: "oder lass sie diesen QR code scannen:",
-				teamInfo:	'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) oben rechts.',
+				teamInfo:
+					'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) oben rechts.',
 				pollInfo:
 					'Jetzt kannst du deine erste Abstimung (<i class="fas fa-poll"></i>) erstellen, zu der jedes Teammitglied dann seinen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen kann.',
 				createPoll: "Abstimmung anlegen",
@@ -359,10 +325,18 @@ export default {
 	},
 	computed: {
 		joinTeamOkButtonDisabled() {
-			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 7
+			return (
+				!this.isInviteCodeValid(this.inviteCode) ||
+				!this.isEmailValid(this.user.email) ||
+				this.flowState > 7
+			)
 		},
 		createNewTeamOkButtonDisabled() {
-			return !this.isTeamNameValid(this.newTeam.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 8
+			return (
+				!this.isTeamNameValid(this.newTeam.name) ||
+				!this.isAdminEmailValid(this.user.email) ||
+				this.flowState > 8
+			)
 		},
 	},
 	watch: {
@@ -394,7 +368,7 @@ export default {
 
 		/* invite must be ast least 6 chars */
 		isInviteCodeValid(val) {
-			return val !== undefined && val !== null &&	val.trim().length === 6
+			return val !== undefined && val !== null && val.trim().length === 6
 		},
 
 		/* user's email must match regex */
@@ -411,9 +385,6 @@ export default {
 		isAdminEmailValid(val) {
 			return val !== undefined && val !== null && eMailRegEx.test(val)
 		},
-
-
-
 
 		/** Click join team button */
 		clickJoinTeam() {
@@ -462,7 +433,7 @@ export default {
 			//TODO: backend call createNewTeam
 			this.flowState = 9
 			this.$nextTick(() => {
-				this.scrollElemToTop("#newTeamCreatedBubble", 10)
+				this.scrollElemToTop("#newTeamCreatedBubble", 0)
 			})
 		},
 
@@ -486,10 +457,13 @@ export default {
 		 * @param {Number} margin margin below headerHeight in pixels (default 0)
 		 */
 		scrollElemToTop(elem, margin = 0) {
-			let scrollTop = $(elem).offset().top - this.$root.headerHeight - margin
-			console.log(scrollTop)
+			let scrollTop =
+				$("#app").scrollTop() +
+				$(elem).offset().top -
+				this.$root.headerHeight -
+				margin
 			this.$nextTick(() => {
-				$("html, body").animate({ scrollTop: scrollTop }, 2000)
+				$("#app").animate({ scrollTop: scrollTop }, 1000)
 			})
 		},
 
