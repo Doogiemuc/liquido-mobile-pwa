@@ -78,6 +78,7 @@
 						:maxlength="100"
 						:invalid-feedback="$t('inviteCodeInvalid')"
 						:disabled="flowState > 7"
+						tabindex="1"
 					></liquido-input>
 
 					<liquido-input
@@ -88,13 +89,19 @@
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
 						:disabled="flowState > 7"
+						tabindex="2"
 					></liquido-input>
 
 					<div class="d-flex justify-content-between align-items-center">
 						<small :class="{ invisible: flowState > 7 }" class="ml-1">
-							<a href="#" @click="cancelJoinTeam()">{{ $t("Cancel") }}</a>
+							<a href="#" @click="cancelJoinTeam()" tabindex="4">{{ $t("Cancel") }}</a>
 						</small>
-						<b-button :disabled="joinTeamOkButtonDisabled" variant="primary" @click="joinTeam()">
+						<b-button
+							:disabled="joinTeamOkButtonDisabled"
+							variant="primary"
+							@click="joinTeam()"
+							tabindex="3"
+						>
 							{{ $t("Ok") }}
 							<i class="fas fa-angle-double-right"></i>
 						</b-button>
@@ -114,6 +121,7 @@
 						:maxlength="100"
 						:invalid-feedback="$t('teamNameInvalid')"
 						:disabled="flowState > 8"
+						tabindex="1"
 					></liquido-input>
 
 					<liquido-input
@@ -125,6 +133,7 @@
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
 						:disabled="flowState > 8"
+						tabindex="2"
 					></liquido-input>
 
 					<small class="ml-1 mb-1">{{ $t("youWillBecomeAdmin") }}</small>
@@ -134,12 +143,13 @@
 						class="d-flex justify-content-between align-items-center"
 					>
 						<small class="ml-1">
-							<a href="#" @click="cancelCreateNewTeam()">{{ $t("Cancel") }}</a>
+							<a href="#" @click="cancelCreateNewTeam()" tabindex="4">{{ $t("Cancel") }}</a>
 						</small>
 						<b-button
 							:disabled="createNewTeamOkButtonDisabled"
 							variant="primary"
 							@click="createNewTeam()"
+							tabindex="3"
 						>
 							{{ $t("Ok") }}
 							<i class="fas fa-angle-double-right"></i>
@@ -490,7 +500,6 @@ export default {
 		},
 
 		shareLink() {
-			console.log("click share link")
 			if (navigator.share) {
 				navigator
 					.share({

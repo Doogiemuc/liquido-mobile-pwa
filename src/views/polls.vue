@@ -16,12 +16,7 @@
 				</template>
 			</liquido-input>
 
-			<poll-panel
-				v-for="poll in filteredPolls"
-				:poll="poll"
-				:key="poll.id"
-				class="shadow mb-3"
-			></poll-panel>
+			<poll-panel v-for="poll in filteredPolls" :poll="poll" :key="poll.id" class="shadow mb-3"></poll-panel>
 		</div>
 
 		<div class="container mb-3">
@@ -59,10 +54,7 @@
 				class="alert alert-secondary"
 			>
 				<p v-html="$t('noPollsInVoting')"></p>
-				<p
-					v-if="pollsInElaboration > 0"
-					v-html="$t('butProposalsInDiscussion')"
-				></p>
+				<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')"></p>
 			</div>
 			<div
 				v-if="
@@ -79,7 +71,7 @@
 
 		<div v-if="userIsAdmin" class="container my-5 text-right">
 			<b-button variant="primary" @click="createPoll()">
-				<i class="fas fa-person-booth"></i>
+				<i class="fas fa-poll"></i>
 				{{ $t("createPoll") }}
 				<i class="fas fa-angle-double-right"></i>
 			</b-button>
@@ -97,28 +89,21 @@ export default {
 	i18n: {
 		messages: {
 			en: {
-				noPollsInElaboration:
-					"There currently are no polls whose proposals can still be discussed.",
+				noPollsInElaboration: "There currently are no polls whose proposals can still be discussed.",
 				noPollsInVoting: "There currently are no polls open for voting.",
 				noFinishedPolls: "There are no finished polls yet.",
-				butProposalsInDiscussion:
-					"However there are proposals that you can discuss.",
+				butProposalsInDiscussion: "However there are proposals that you can discuss.",
 				butPollInVoting: "However there is a poll in which you can vote.",
 			},
 			de: {
 				noPollsYet: "Es wurde bisher noch keine Abstimmung erstellt.",
-				noPollsYetAdmin:
-					'Möchstest du eine <a href="/createPoll">Abstimmung erstellen</a>?',
+				noPollsYetAdmin: 'Möchstest du eine <a href="/createPoll">Abstimmung erstellen</a>?',
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
-				noPollsInElaboration:
-					"Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
+				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es gibt gerade keine laufenden Abstimmungen.",
-				noFinishedPolls:
-					"Es gibt bisher noch keine abgeschlossenen Abstimmungen.",
-				butProposalsInDiscussion:
-					"Es gibt jedoch Wahlvorschläge die ihr diskutieren könnt.",
-				butPollInVoting:
-					"Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
+				noFinishedPolls: "Es gibt bisher noch keine abgeschlossenen Abstimmungen.",
+				butProposalsInDiscussion: "Es gibt jedoch Wahlvorschläge die ihr diskutieren könnt.",
+				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
 				createPoll: "Neue Abstimmung anlegen",
 				allPolls: "Alle Abstimmungen",
 				ELABORATION: "Neue Abstimmungen",

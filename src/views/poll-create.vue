@@ -2,7 +2,8 @@
 	<div>
 		<div class="container-lg">
 			<h2 class="page-title">
-				<i class="fas fa-poll"></i> {{ $t("newPoll") }}
+				<i class="fas fa-poll"></i>
+				{{ $t("newPoll") }}
 			</h2>
 
 			<b-card class="chat-bubble form-bubble">
@@ -16,28 +17,29 @@
 				></liquido-input>
 
 				<div class="d-flex justify-content-between align-items-center">
-					<small class="ml-1"
-					><a href="#" @click="cancelCreatePoll()">{{
+					<small class="ml-1">
+						<a href="#" @click="cancelCreatePoll()">
+							{{
 							$t("cancel")
-						}}</a></small
-					>
+							}}
+						</a>
+					</small>
 					<b-button
 						:disabled="pollTitleState !== true"
 						variant="primary"
 						class="float-right"
 						@click="clickCreateNewPoll()"
-					>{{ $t("create") }} <i class="fas fa-angle-double-right"></i
-					></b-button>
+					>
+						{{ $t("create") }}
+						<i class="fas fa-angle-double-right"></i>
+					</b-button>
 				</div>
 			</b-card>
 
-			<b-card
-				:class="{ 'hide-left': flowState < 1 }"
-				class="chat-bubble shadow-sm my-5"
-			>
+			<b-card :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm my-5">
 				<!-- a class="float-right px-1" data-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="true" aria-controls="collapseOne">
 					<i class="fa" aria-hidden="true"></i>
-				</a -->
+				</a-->
 				<div v-html="$t('createPollInfo')"></div>
 			</b-card>
 		</div>
@@ -90,6 +92,9 @@ export default {
 		},
 	},
 	methods: {
+		cancelCreatePoll() {
+			this.$router.push("/polls")
+		},
 		clickCreateNewPoll() {
 			this.$root.store
 				.savePoll(this.poll)
