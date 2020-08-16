@@ -11,21 +11,17 @@
 					id="pollTitleInput"
 					v-model="poll.title"
 					:label="$t('pollTitle')"
-					:state="pollTitleState"
+					:validFunc="isPollTitleValid"
 					:invalid-feedback="$t('pollTitleInvalid')"
 					@blur="pollTitleValidated = true"
 				></liquido-input>
 
 				<div class="d-flex justify-content-between align-items-center">
 					<small class="ml-1">
-						<a href="#" @click="cancelCreatePoll()">
-							{{
-							$t("cancel")
-							}}
-						</a>
+						<a href="#" @click="cancelCreatePoll()">{{ $t("cancel") }}</a>
 					</small>
 					<b-button
-						:disabled="pollTitleState !== true"
+						:disabled="createPollButtonDisabled"
 						variant="primary"
 						class="float-right"
 						@click="clickCreateNewPoll()"
@@ -58,8 +54,8 @@ export default {
 				newPoll: "Neue Abstimmung",
 				createPollInfo:
 					'<p>Eine Abstimmung (<i class="fas fa-poll"></i>) enthält mehrere Wahlvorschläge (<i class="fas fa-vote-yea"></i>) und läuft über zwei Phasen:<p>' +
-					'<p>Während der Elaborationsphase kann jeder in deinem Team seinen Vorschlag (bzw. Kandidaten) hinzufügen. Diese können dann diskutiert (<i class="fas fa-comments"></i>) werden.</p>' +
-					'<p>Nachdem du als Admin die Wahlphase der Abstimmung gestartet hast, kann dann jeder im Team seine Stimme abgeben. (<i class="fas fa-person-booth"></i>)</p>',
+					'<p>(1) Während der Elaborationsphase kann jeder in deinem Team seinen Vorschlag zur Abstimmung hinzufügen. Diese können dann diskutiert (<i class="fas fa-comments"></i>) werden.</p>' +
+					'<p>(2) Nachdem du als Admin die Wahlphase dieser Abstimmung gestartet hast, kann dann jeder im Team seine Stimme abgeben. (<i class="fas fa-person-booth"></i>)</p>',
 				pollTitle: "Titel der Abstimmung",
 				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. 10 Zeichen.",
 				create: "Anlegen",
@@ -72,7 +68,6 @@ export default {
 	data() {
 		return {
 			poll: {},
-			pollTitleValidated: false,
 			flowState: 0,
 		}
 	},
@@ -85,20 +80,19 @@ export default {
 		}, 500)
 	},
 	computed: {
-		pollTitleState() {
-			if (this.poll.title && this.poll.title.replace(/\s/g, "").length >= 10)
-				return (this.pollTitleValidated = true)
-			return this.pollTitleValidated ? false : null
+		createPollButtonDisabled() {
+			return !this.isPollTitleValid(this.poll.title)
 		},
 	},
 	methods: {
+		isPollTitleValid(val) {
+			return val !== undefined && val !== null && val.trim().length >= 10
+		},
 		cancelCreatePoll() {
 			this.$router.push("/polls")
 		},
 		clickCreateNewPoll() {
-			this.$root.store
-				.savePoll(this.poll)
-				.then((createdPoll) => this.$router.push("/polls/" + createdPoll.id))
+			this.$root.store.savePoll(this.poll).then((createdPoll) => this.$router.push("/polls/" + createdPoll.id))
 		},
 	},
 }

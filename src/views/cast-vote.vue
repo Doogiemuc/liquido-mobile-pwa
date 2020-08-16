@@ -1,43 +1,52 @@
 <template>
-	<div>
-		<div class="container">
-			<h2 class="page-title">
-				<i class="fas fa-person-booth"></i>
-				&nbsp;{{ $t("castVoteTitle") }}
-			</h2>
+	<div class="container">
+		<h2 class="page-title">
+			<i class="fas fa-person-booth"></i>
+			&nbsp;{{ $t("castVoteTitle") }}
+		</h2>
 
-			<p>{{ $t("castVoteInfo") }}</p>
+		<p>{{ $t("castVoteInfo") }}</p>
 
-			<div id="ballot" class="ballot">
-				<h2 class="ballot-title">{{ $t("yourBallot") }}</h2>
-				<draggable
-					v-model="ballot"
-					:swap-threshold="0.5"
-					:delay="50"
-					:animation="500"
-					:can-scroll-x="false"
-				>
-					<law-panel
-						v-for="prop in ballot"
-						:law="prop"
-						:read-only="true"
-						:key="prop.id"
-						:collapsed="true"
-						class="mb-2 shadow-sm"
-					/>
-				</draggable>
-			</div>
+		<div id="ballot" class="ballot">
+			<h2 class="ballot-title">{{ $t("yourBallot") }}</h2>
+			<draggable
+				v-model="ballot"
+				:swap-threshold="0.5"
+				:delay="50"
+				:animation="500"
+				:can-scroll-x="false"
+			>
+				<law-panel
+					v-for="prop in ballot"
+					:law="prop"
+					:read-only="true"
+					:key="prop.id"
+					:collapsed="true"
+					class="mb-2 shadow-sm"
+				/>
+			</draggable>
+		</div>
 
-			<div class="text-right mb-3">
-				<b-button variant="primary" size="lg" @click="clickCastVote()">{{ $t("castVote") }}</b-button>
-			</div>
+		<div class="text-right mb-3">
+			<b-button variant="primary" @click="clickCastVote()" :disabled="castVoteLoading">
+				<b-spinner v-if="castVoteLoading" small></b-spinner>
+				<i v-if="voteCastedSuccessfully" class="far fa-check-circle"></i>
+				{{ $t("castVote") }}
+			</b-button>
+		</div>
 
-			<div
-				v-if="voteCastedSuccessfully"
-				class="alert alert-success"
-				v-html="$t('voteCastedSuccessfully')"
-			></div>
-			<div v-if="voteCastedError" class="alert alert-danger" v-html="$t('voteCastedError')"></div>
+		<div
+			v-if="voteCastedSuccessfully"
+			class="alert alert-success"
+			v-html="$t('voteCastedSuccessfully')"
+		></div>
+		<div v-if="voteCastedError" class="alert alert-danger" v-html="$t('voteCastedError')"></div>
+
+		<div v-if="voteCastedSuccessfully" class="text-right mb-3">
+			<b-button variant="primary" @click="goToPoll()">
+				{{ $t("ok") }}
+				<i class="fas fa-angle-double-right"></i>
+			</b-button>
 		</div>
 	</div>
 </template>
@@ -81,6 +90,7 @@ export default {
 		return {
 			poll: undefined,
 			ballot: [],
+			castVoteLoading: false,
 			voteCastedSuccessfully: false,
 			voteCastedError: false,
 		}
@@ -96,24 +106,25 @@ export default {
 		clickCastVote() {
 			this.voteCastedError = false
 			this.voteCastedSuccessfully = false
+			this.castVoteLoading = true
 			this.$api
 				.castVote(this.poll.id, this.ballot)
 				.then(() => {
 					console.log("Vote casted successfully")
+					this.castVoteLoading = false
 					this.voteCastedSuccessfully = true
-					this.scrollToBottom()
+					this.$root.scrollToBottom()
 				})
 				.catch((err) => {
 					console.error("Cannot cast vote", err)
+					this.castVoteLoading = false
 					this.voteCastedError = true
-					this.scrollToBottom()
+					this.$root.scrollToBottom()
 				})
 		},
 
-		scrollToBottom() {
-			this.$nextTick(() => {
-				$("html, body").animate({ scrollTop: $(document).height() }, 1000)
-			})
+		goToPoll() {
+			this.$router.go(-1)
 		},
 	},
 }

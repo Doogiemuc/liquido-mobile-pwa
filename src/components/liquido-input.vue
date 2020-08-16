@@ -1,8 +1,10 @@
 <template>
 	<div class="liquido-input">
-		<label v-if="label" :for="id" :class="{ disabled: disabled }">{{
+		<label v-if="label" :for="id" :class="{ disabled: disabled }">
+			{{
 			label
-		}}</label>
+			}}
+		</label>
 		<input
 			:id="id"
 			:name="name"
@@ -20,9 +22,7 @@
 		<div class="iconRight">
 			<slot name="iconRight"></slot>
 		</div>
-		<div v-if="invalidFeedback" class="invalid-feedback">
-			{{ invalidFeedback }}
-		</div>
+		<div v-if="invalidFeedback" class="invalid-feedback">{{ invalidFeedback }}</div>
 	</div>
 </template>
 
@@ -54,7 +54,7 @@
  * Example Usage
  * =============
  *
- *   <liquido-input v-model="idea.title" id="ideaTitleInput" :label="$t('ideaTitle')" :state="titleStatus" @blur="titleValidated = true"></liquido-input>
+ *   <liquido-input v-model="idea.title" id="ideaTitleInput" :label="$t('ideaTitle')" :validFunc="isTitleValid" validateOn="blur"></liquido-input>
  */
 export default {
 	name: "LiquidoInput",
@@ -69,7 +69,7 @@ export default {
 		maxlength: Number,
 		invalidFeedback: String,
 		validFunc: { type: Function, required: false, default: () => true },
-		validateOn: { type: String, required: false, default: "keyup" },
+		validateOn: { type: String, required: false, default: "keyup" }, //TODO: these could be arrays, e.g. validateOn: ["keyup", "blur"]
 		forceValidateOn: { type: String, required: false, default: "blur" },
 	},
 	data() {
@@ -102,14 +102,14 @@ export default {
 			if (this.validateOn === "keyup") {
 				this.validateField()
 			}
-			this.$emit('keyup', evt)  // let event bubble up
+			this.$emit("keyup", evt) // let event bubble up
 		},
 
 		blur(evt) {
 			if (this.forceValidateOn === "blur") {
 				this.validateField(true)
 			}
-			this.$emit('blur', evt)
+			this.$emit("blur", evt)
 		},
 
 		/**

@@ -219,8 +219,7 @@ export default {
 				joinTeamButton: "Join a team",
 				createNewTeamButton: "Create new team",
 
-				teamCreated:
-					"Ok your team has been created. Now you can invite your friends to join your team:",
+				teamCreated: "Ok your team has been created. Now you can invite your friends to join your team:",
 				shareThisLink: "Share this link",
 				tellInvitationCode: "or tell them your invitation code:",
 				scanQrCode: "or let them scan this QR code:",
@@ -250,8 +249,7 @@ export default {
 				adminEmail: "Admin E-Mail",
 				youWillBecomeAdmin: "Du wirst der Admin des neuen Teams.",
 
-				teamCreated:
-					"Ok, dein Team ist angelegt. Lade jetzt deine Freunde in dein Team ein:",
+				teamCreated: "Ok, dein Team ist angelegt. Lade jetzt deine Freunde in dein Team ein:",
 				shareThisLink: "Teile diesen Link",
 				tellInvitationCode: "oder sage ihnen deinen Einadungscode:",
 				scanQrCode: "oder lass sie diesen QR code scannen:",
@@ -324,10 +322,7 @@ export default {
 			this.startChatAnimation()
 		} else {
 			$(window).scroll(() => {
-				if (
-					!this.chatAnimationStarted &&
-					this.isBottomInView("#welcomeBubble")
-				) {
+				if (!this.chatAnimationStarted && this.isBottomInView("#welcomeBubble")) {
 					this.startChatAnimation()
 				}
 			})
@@ -335,18 +330,10 @@ export default {
 	},
 	computed: {
 		joinTeamOkButtonDisabled() {
-			return (
-				!this.isInviteCodeValid(this.inviteCode) ||
-				!this.isEmailValid(this.user.email) ||
-				this.flowState > 7
-			)
+			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 7
 		},
 		createNewTeamOkButtonDisabled() {
-			return (
-				!this.isTeamNameValid(this.newTeam.name) ||
-				!this.isAdminEmailValid(this.user.email) ||
-				this.flowState > 8
-			)
+			return !this.isTeamNameValid(this.newTeam.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 8
 		},
 	},
 	watch: {
@@ -421,25 +408,13 @@ export default {
 
 		/** Join an existing team */
 		joinTeam() {
-			console.log(
-				this.user.name +
-					" <" +
-					this.user.email +
-					"> joins team with invite code " +
-					this.invite
-			)
+			console.log(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
 		},
 
 		/** Create a new team */
 		createNewTeam() {
 			if (this.createNewTeamOkButtonDisabled) return
-			console.log(
-				this.user.name +
-					"<" +
-					this.user.email +
-					"> creates new team: " +
-					this.newTeam.name
-			)
+			console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.name)
 			//TODO: backend call createNewTeam
 			this.flowState = 9
 			this.$nextTick(() => {
@@ -448,7 +423,7 @@ export default {
 		},
 
 		createPoll() {
-			this.$router.push("/createPoll")
+			this.$router.push("/polls/create")
 		},
 
 		// Here comes some UX magic :-)
@@ -467,11 +442,7 @@ export default {
 		 * @param {Number} margin margin below headerHeight in pixels (default 0)
 		 */
 		scrollElemToTop(elem, margin = 0) {
-			let scrollTop =
-				$("#app").scrollTop() +
-				$(elem).offset().top -
-				this.$root.headerHeight -
-				margin
+			let scrollTop = $("#app").scrollTop() + $(elem).offset().top - this.$root.headerHeight - margin
 			this.$nextTick(() => {
 				$("#app").animate({ scrollTop: scrollTop }, 1000)
 			})

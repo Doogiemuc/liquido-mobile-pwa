@@ -97,7 +97,7 @@ export default {
 			},
 			de: {
 				noPollsYet: "Es wurde bisher noch keine Abstimmung erstellt.",
-				noPollsYetAdmin: 'Möchstest du eine <a href="/createPoll">Abstimmung erstellen</a>?',
+				noPollsYetAdmin: 'Möchstest du eine <a href="/polls/create">Abstimmung erstellen</a>?',
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es gibt gerade keine laufenden Abstimmungen.",
@@ -169,7 +169,7 @@ export default {
 	},
 	methods: {
 		createPoll() {
-			this.$router.push("/createPoll")
+			this.$router.push("/polls/create")
 		},
 
 		/**

@@ -15,7 +15,7 @@ const routes = [
 		component: () => import("@/views/welcome-chat"),
 	},
 	{
-		path: "/createPoll",
+		path: "/polls/create",
 		name: "createPoll",
 		component: () => import("@/views/poll-create"),
 	},

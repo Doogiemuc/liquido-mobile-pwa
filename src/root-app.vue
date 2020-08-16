@@ -26,22 +26,72 @@ export default {
 		$route(to, from) {
 			const fromDepth = from.path.split("/").length
 			const toDepth = to.path.split("/").length
+
+			/*
+			this.transitionName = ""
+			if (from.path === "/polls" && /^\/polls\/\d+$/.test(to.path)) { this.transitionName = "slide-left"  } else
+			if (to.path === "/polls" && /^\/polls\/\d+$/.test(from.path)) { this.transitionName = "slide-right" }
+			*/
+
 			if (fromDepth < toDepth) this.transitionName = "slide-left"
 			if (fromDepth > toDepth) this.transitionName = "slide-right"
 		},
 	},
 	computed: {
-		/** If we show one poll, then show a backlink */
+		/**
+		 * Show appropriate backlink in liquido-header
+		 *
+		 * show one poll -> back to list of polls
+		 * add proposal  -> back to poll
+		 * cast vote     -> back to poll
+		 */
 		backLink() {
-			return /\/polls\/\d+/.test(this.$route.path) ? "BACK" : undefined
-			//TODO: show backlinks to other URLs where apropriate
+			if (/^\/polls\/\d+$/.test(this.$route.path)) {
+				return "/polls"
+			} else if (/^\/polls\/\d+\/castVote$/.test(this.$route.path)) {
+				return "BACK"
+			} else if (/^\/polls\/\d+\/add$/.test(this.$route.path)) {
+				return "BACK"
+			}
+			return undefined
 		},
 		/** which footer to show */
 		showPollsFooter() {
 			return this.$route.path === "/polls"
 		},
 	},
-	methods: {},
+	methods: {
+		//These methods are available to all sub components
+
+		/** scroll to the very bottom of the content. Show last chat message */
+		scrollToBottom() {
+			this.$nextTick(() => {
+				$("#app").animate({ scrollTop: $("#app").height() }, 1000)
+			})
+		},
+
+		/**
+		 * scroll an HTML elemant right under the header
+		 * (as far up as possible, depending on content below the elem)
+		 * @param {String} elem JQuery selector for dom elem
+		 * @param {Number} margin margin below headerHeight in pixels (default 0)
+		 */
+		scrollElemToTop(elem, margin = 0) {
+			let scrollTop = $("#app").scrollTop() + $(elem).offset().top - this.$root.headerHeight - margin
+			this.$nextTick(() => {
+				$("#app").animate({ scrollTop: scrollTop }, 1000)
+			})
+		},
+
+		/** Check if the bottom of elem is scrolled into view */
+		isBottomInView(elem) {
+			let docViewTop = $(window).scrollTop()
+			let docViewBottom = docViewTop + $(window).height()
+			let elemTop = $(elem).offset().top
+			let elemBottom = elemTop + $(elem).height()
+			return elemBottom <= docViewBottom
+		},
+	},
 }
 </script>
 
