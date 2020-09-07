@@ -8,6 +8,12 @@ module.exports = {
 	configureWebpack: {
 		// Merged into the final Webpack config
 		devtool: "source-map",
+		resolve: {
+			alias: {
+				// make config.<env>.js available from root /config directory (which is one dir above ./src)
+				'config': path.join(__dirname, "/config")
+			}
+		},
 		plugins: [
 			new PurgecssPlugin({
 				paths: glob.sync([

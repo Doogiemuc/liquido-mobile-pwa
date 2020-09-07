@@ -4,3 +4,5 @@ dist/
 docs/
 *.log
 *.md
+docs/
+config/

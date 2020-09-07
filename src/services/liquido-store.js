@@ -9,7 +9,7 @@
 import { uniqueId } from "lodash"
 
 // just a dummy to create test data
-let addDays = function(date, days) {
+let addDays = function (date, days) {
 	let result = new Date(date)
 	result.setDate(result.getDate() + days)
 	return result
@@ -31,7 +31,7 @@ export default {
 	team: {
 		name: undefined,
 		inviteCode: undefined,
-		qrCode: undefined,
+		//qrCode: undefined,
 	},
 
 	/** Current filter on the /polls page: undefined|ELABORATION|VOTING|FINISHED */
@@ -513,10 +513,10 @@ export default {
 			poll.proposals.push(proposal)
 			console.log(
 				"Added new proposal to poll(id=" +
-					poll.id +
-					"): '" +
-					proposal.title +
-					"'"
+				poll.id +
+				"): '" +
+				proposal.title +
+				"'"
 			)
 		}
 

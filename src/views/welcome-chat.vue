@@ -275,8 +275,8 @@ export default {
 			// data when new team has been created
 			newTeam: {
 				name: undefined,
-				inviteCode: "A3F43D",
-				inviteLink: "http://liquido.me/invite/A3F43D",
+				//inviteCode: "A3F43D",
+				inviteLink: "http://liquido.me/invite/A3F43D_static",
 				qrCode: "/img/qrcode.svg",
 			},
 
@@ -415,11 +415,25 @@ export default {
 		createNewTeam() {
 			if (this.createNewTeamOkButtonDisabled) return
 			console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.name)
-			//TODO: backend call createNewTeam
-			this.flowState = 9
-			this.$nextTick(() => {
-				this.scrollElemToTop("#newTeamCreatedBubble", 0)
-			})
+			let newTeam = {
+				teamName: this.newTeam.name,
+				adminName: this.user.name,
+				adminEmail: this.user.email,
+			}
+			this.$api
+				.createNewTeam(newTeam)
+				.then((createdTeam) => {
+					this.flowState = 9
+					this.inviteCode = createdTeam.inviteCode
+					this.$root.store.team = createdTeam
+					this.$nextTick(() => {
+						this.scrollElemToTop("#newTeamCreatedBubble", 0)
+					})
+				})
+				.catch((err) => {
+					console.error("Cannot create new team", err)
+					//TODO: handle error show to user go back to ???
+				})
 		},
 
 		createPoll() {

@@ -6,22 +6,27 @@
 
 import axios from 'axios'
 import store from "@/services/liquido-store"
+import config from 'config/config.int.js'
+const log = require('loglevel').getLogger('liquido-api');
+log.enableAll()
 
 // Little utility for mocking
 async function stall(stallTime = 3000) {
 	await new Promise(resolve => setTimeout(resolve, stallTime))
 }
 
-axios.defaults.baseURL = "http://localhost:8080"
+axios.defaults.baseURL = config.LIQUIDO_API_URL
 //axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 
 // AXIOS HTTP client
 const HTTP = () => {
 	return axios.create({
-		baseURL: "http://localhost:8080",
+		/*
+		baseURL: config.LIQUIDO_API_URL,
 		headers: {
 			Authorization: `Bearer ${bearerToken}`,
 		},
+		*/
 	})
 }
 
@@ -29,13 +34,16 @@ const LiquidoAPI = {
 	install(Vue, options) {
 		Vue.prototype.$api = {
 
-			async createNewTeam(newTeam) {
+			createNewTeam(newTeam) {
 				return axios.post("/createTeam", newTeam)
 					.then(res => {
 						log.info("created new team", res.data)
 						return res.data
 					})
-					.catch(err => log.error("Cannot create new Team", err))
+					.catch(err => {
+						log.error("Cannot create new Team", err)
+						return Promise.reject("Cannot create new team")
+					})
 			},
 
 			async joinTeam(inviteCode) {
