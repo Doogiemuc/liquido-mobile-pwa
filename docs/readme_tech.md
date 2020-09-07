@@ -65,26 +65,37 @@ On next app starts
  * Bar at the bottom: proposals - polls - search
 
 
-# Logging
+# Logging on Mobile Device when developping
 
-## Logging on Mobile Device when developping
-
-https://github.com/christlee1989/vue-mobile-log
-
-# Debug
-
-//TODO: Use Visual Studio Code   Chrome Debugger  with Vue
-https://medium.com/@brockreece/how-i-stopped-using-console-log-when-debugging-vue-components-14e0f7aa280d
-
-### Logging on mobile
-
-TODO: Create a Vue Plugin that can show a loging component on mobile phone.
+ * https://github.com/christlee1989/vue-mobile-log
+ * TODO: Use Visual Studio Code Chrome Debugger with Vue  https://medium.com/@brockreece/how-i-stopped-using-console-log-when-debugging-vue-components-14e0f7aa280d
+ * TODO: Create a Vue Plugin that can show a loging component on mobile phone.
 
 # Test
 
-## Simulate test on mobile phone
+Simulate test on mobile phone with this very nice mobile simulator: http://mobiletest.me/apple_iphone_6s/8028826 
 
-Very nice mobile simulator: http://mobiletest.me/apple_iphone_6s/8028826 
 
+# Backend
+
+## AWS Lambda Function via AWS API Gateway
+
+https://github.com/awsdocs/aws-lambda-developer-guide/tree/master/sample-apps/nodejs-apig
+
+## Micronaut
+
+See this very nice blog post by adesso that compares Spring to Micronaut.
+https://www.adesso.de/de/news/blog/micronaut-eine-alternative-zu-spring-4.jsp
+
+=> Install Micronaut
+=> Use Micronaut CLI project generator "mn" 
+
+
+
+
+or  www.sparkjava.com
 
 # Furhter Links & Resources
+
+ * node/express and ORMs:  https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose   e.g. mongoose, objection, graphql
+ * node/express REST with mongoose example:  https://github.com/makinhs/rest-api-tutorial 

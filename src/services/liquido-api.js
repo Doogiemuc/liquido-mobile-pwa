@@ -1,18 +1,64 @@
 /**
- * Vue plugin for backend api
- * Currently all methods in this class are only mocks
+ * Vue plugin for LIQUIDO backend REST api
+ * 
+ * Will install a global Vue.$api object that contains all LIQUIDO API methods.
  */
 
+import axios from 'axios'
 import store from "@/services/liquido-store"
-import { BIconPeopleFill } from "bootstrap-vue";
 
+// Little utility for mocking
 async function stall(stallTime = 3000) {
-	await new Promise(resolve => setTimeout(resolve, stallTime));
+	await new Promise(resolve => setTimeout(resolve, stallTime))
+}
+
+axios.defaults.baseURL = "http://localhost:8080"
+//axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+
+// AXIOS HTTP client
+const HTTP = () => {
+	return axios.create({
+		baseURL: "http://localhost:8080",
+		headers: {
+			Authorization: `Bearer ${bearerToken}`,
+		},
+	})
 }
 
 const LiquidoAPI = {
 	install(Vue, options) {
 		Vue.prototype.$api = {
+
+			async createNewTeam(newTeam) {
+				return axios.post("/createTeam", newTeam)
+					.then(res => {
+						log.info("created new team", res.data)
+						return res.data
+					})
+					.catch(err => log.error("Cannot create new Team", err))
+			},
+
+			async joinTeam(inviteCode) {
+				return Promise.reject("not yet implemented")
+			},
+
+			async getPollById(pollId) {
+				return Promise.reject("not yet implemented")
+			},
+
+			async getPolls(status = undefined) {
+				return Promise.reject("not yet implemented")
+			},
+
+			async savePoll(poll) {
+				return Promise.reject("not yet implemented")
+			},
+
+			/** save new or update existing proposal */
+			async saveProposal(proposal) {
+				return Promise.reject("not yet implemented")
+			},
+
 			async startVotingPhase(pollId) {
 				//TODO: call backend
 				console.log("starting voting phase of poll(id=" + pollId + ")")
@@ -38,6 +84,12 @@ const LiquidoAPI = {
 				poll.usersBallot = ballot   // only return usesr own ballot to the client
 				return Promise.resolve(poll)
 			},
+
+			async endVotingPhase(pollId) {
+				return Promise.reject("not yet implemented")
+			},
+
+
 		}
 	},
 }

@@ -1,0 +1,33 @@
+@startuml
+participant Client
+participant Server
+database DB
+
+note over Client, Server #FFAAAA: Precondition User is already registered. 
+
+== Step 1: Login ==
+
+Client -> Server : ""POST /login""\nrequest JWT
+
+Server -> DB : check that this user is\nregistered and allowed to login
+
+DB --> Server : return user data
+
+Server -> Server : create JWT\n""{"sub": "userId"}""\nand sign with server's secret
+
+Server --> Client : return JWT
+
+...
+
+== Step 2: Request protected resource ==
+
+Client -> Server : ""GET    /blog-posts""\n""HEADER Authorization: Bearer <JWT>""
+
+Server -> Server : Validate JWT's signature\nwith the secret that only the server knows!
+
+Server -> DB : Load additional userdata\n(with id from "sub" field in JWT)
+
+DB --> Server : return user data (rights & roles)
+
+Server --> Client : return data from protected resource
+@enduml
