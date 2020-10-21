@@ -73,7 +73,25 @@ On next app starts
 
 # Test
 
-Simulate test on mobile phone with this very nice mobile simulator: http://mobiletest.me/apple_iphone_6s/8028826 
+## Unit Tests
+
+There are **mocha** unit tests in the `test` directory. We use (bable-node)[https://babeljs.io/docs/en/next/babel-node.html] to run them, so that moch can understand the ES6 `import` statements. Simply run tests with
+
+    npm run unit-tests
+
+## Integration tests
+
+## End-2-End tests
+
+We use Cypress.io to for automated end-2-end tests. Cypress is like Selenium and automatically interacts with the web frontend of our PWA. These tests like exactkly like a normal user would. They cover then frontend, calls to the backend API, and everything in the backend including the database.
+
+
+
+
+MAYBE: Simulate test on mobile phone with this very nice mobile simulator: http://mobiletest.me/apple_iphone_6s/8028826 
+
+
+
 
 
 # Backend

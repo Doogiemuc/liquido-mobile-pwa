@@ -11,7 +11,14 @@ import VueI18n from "vue-i18n"
 
 Vue.use(BootstrapVue)
 Vue.use(VueI18n)
-Vue.use(liquidoApi)
+
+/** This will install the liquido-api as a Vue plugin under Vue.$api for all Vue components */
+const liquidoApiPlugin = {
+	install(Vue, options) {
+		Vue.prototype.$api = liquidoApi
+	}
+}
+Vue.use(liquidoApiPlugin)
 
 Vue.config.productionTip = false
 Vue.config.debug = true
