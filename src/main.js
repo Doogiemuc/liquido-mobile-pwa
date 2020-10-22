@@ -8,6 +8,8 @@ import { BootstrapVue } from "bootstrap-vue"
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
 import VueI18n from "vue-i18n"
+import config from 'config'  // automatically mapped to environment specific config file vue.config.js as a webpack alias
+console.log(process.env.NODE_ENV, "=>", config)
 
 Vue.use(BootstrapVue)
 Vue.use(VueI18n)

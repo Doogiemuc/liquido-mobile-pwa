@@ -13,11 +13,12 @@
 				<liquido-input
 					v-model="user.name"
 					ref="userNameInput"
+					id="userNameInput"
 					:label="$t('yourNickname')"
 					:valid-func="isUsernameValid"
 					:maxlength="100"
 					:invalid-feedback="$t('userNameInvalid')"
-					:disabled="flowState >= 4"
+					:disabled="flowState != 3"
 					@keyup.enter="userNameSubmit"
 					@blur="userNameSubmit"
 				></liquido-input>
@@ -116,6 +117,7 @@
 					<liquido-input
 						v-model="newTeam.name"
 						ref="teamNameInput"
+						id="teamNameInput"
 						:label="$t('teamName')"
 						:valid-func="isTeamNameValid"
 						:maxlength="100"
@@ -128,6 +130,7 @@
 						class="mb-0"
 						v-model="user.email"
 						ref="adminEmailInput"
+						id="adminEmailInput"
 						:label="$t('adminEmail')"
 						:valid-func="isAdminEmailValid"
 						:maxlength="200"
@@ -147,6 +150,7 @@
 						</small>
 						<b-button
 							:disabled="createNewTeamOkButtonDisabled"
+							id="createNewTeamOkButton"
 							variant="primary"
 							@click="createNewTeam()"
 							tabindex="3"
@@ -198,6 +202,23 @@
 					<i class="fas fa-angle-double-right"></i>
 				</b-button>
 			</b-card>
+		</div>
+
+		<!-- Error message modal popup -->
+		<div class="modal" id="errorMessage" tabindex="-1" role="dialog" aria-labelledby="errorMessage" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content bg-danger text-white">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLongTitle">{{$t('error')}}</h5>
+					</div>
+					<div class="modal-body">
+						{{errorMessage}}
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn bg-white text-black" data-dismiss="modal">{{$t('ok')}}</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -258,6 +279,9 @@ export default {
 				pollInfo:
 					'Jetzt kannst du deine erste Abstimung (<i class="fas fa-poll"></i>) erstellen, zu der jedes Teammitglied dann seinen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen kann.',
 				createPoll: "Abstimmung anlegen",
+
+				error: "Fehler",
+				cannotCreateNewTeam: "Fehler beim anlegen des neuen Teams. Bitte versuche es später noch einmal.",
 			},
 		},
 	},
@@ -296,6 +320,8 @@ export default {
 			flowState: 0,
 
 			chatAnimationStarted: false,
+
+			errorMessage: "",
 		}
 	},
 	/**
@@ -314,15 +340,13 @@ export default {
 	mounted() {
 		//$("html, body").animate({ scrollTop: 0 }, 500);
 		$("html, body").scrollTop(0)
-		window.setTimeout(() => {
-			this.flowState = 1
-		}, 500)
-
+		this.flowState = 0
+		//this.chatAnimationStarted = false
 		if (this.isBottomInView("#welcomeBubble")) {
 			this.startChatAnimation()
 		} else {
 			$(window).scroll(() => {
-				if (!this.chatAnimationStarted && this.isBottomInView("#welcomeBubble")) {
+				if (this.isBottomInView("#welcomeBubble")) {
 					this.startChatAnimation()
 				}
 			})
@@ -337,11 +361,11 @@ export default {
 		},
 	},
 	watch: {
-		/*
+		
 		'flowState': function(newVal, oldVal) {
-			console.log("flowState", oldVal, "=>", newVal)
+			console.log(" ====>>> flowState", oldVal, "=>", newVal)
 		}
-		*/
+		
 	},
 	methods: {
 		/* username must not be empty and contain at least 4 chars */
@@ -352,7 +376,7 @@ export default {
 		/* username can be submitted by pressing ENTER or by blurring the field or by clicking on "done" on the iOS keyboard */
 		userNameSubmit() {
 			this.$refs.userNameInput.validateField(true)
-			if (this.isUsernameValid(this.user.name) && this.flowState < 4) {
+			if (this.isUsernameValid(this.user.name) && this.flowState == 3) {
 				this.flowState = 4
 				$("#userNameInput").blur()
 				this.scrollToBottom()
@@ -433,6 +457,8 @@ export default {
 				.catch((err) => {
 					console.error("Cannot create new team", err)
 					//TODO: handle error show to user go back to ???
+					this.errorMessage = this.$t('cannotCreateNewTeam')
+					$('#errorMessage').modal({show: true})
 				})
 		},
 
@@ -472,8 +498,13 @@ export default {
 		},
 
 		startChatAnimation() {
+			if (this.chatAnimationStarted) return  // start chat animation only once
 			this.chatAnimationStarted = true
 			$(window).off("scroll")
+			window.setTimeout(() => {
+				this.flowState = 1
+				this.scrollToBottom()
+			}, 500)
 			window.setTimeout(() => {
 				this.flowState = 2
 				this.scrollToBottom()
@@ -553,11 +584,14 @@ export default {
 	transform: translateX(20px);
 }
 .collapse-max-height {
+	display: none;
+	/*
 	max-height: 0;
 	overflow: hidden;
 	margin-top: 0;
 	margin-bottom: 0;
 	border: none;
+	*/
 }
 
 #joinOrCreateButtons {

@@ -4,12 +4,14 @@
 
 import axios from 'axios'
 import store from "../services/liquido-store"
-import config from '../../config/config.int.js'
+import config from 'config'
+
 const log = require('loglevel').getLogger('liquido-api');
 log.enableAll()
 
 axios.defaults.baseURL = config.LIQUIDO_API_URL
 //axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+console.log("liquido-api: "+axios.defaults.baseURL)
 
 // AXIOS HTTP client
 const HTTP = () => {
@@ -30,7 +32,7 @@ export default {
 	},
 
 	createNewTeam(newTeam) {
-		return axios.post("/createTeam", newTeam)
+		return axios.post("/team", newTeam)
 			.then(res => {
 				log.info("created new team", res.data)
 				return res.data
