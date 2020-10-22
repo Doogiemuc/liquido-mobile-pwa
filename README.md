@@ -33,4 +33,3 @@ docker run -p 8080:8080 peridot:latest
 # Lint .vue, .js, .scss
 yarn run lint
 ```
-

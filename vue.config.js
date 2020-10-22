@@ -5,6 +5,10 @@ const path = require("path")
 
 module.exports = {
 	lintOnSave: undefined,
+	devServer: {
+		port: 3001,   // 8080 is take by backend API!
+		// proxy: 'http://other_host:4000'    // Problems with CORS? Vue Dev serve can proxy API requests for your: https://cli.vuejs.org/config/#devserver-proxy
+	},
 	configureWebpack: {
 		// Merged into the final Webpack config
 		devtool: "source-map",

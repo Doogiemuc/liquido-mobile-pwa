@@ -8,7 +8,7 @@ const routes = [
 	{
 		path: "/",
 		name: "index",
-		redirect: "/polls", //TODO: redirect depending on auth token
+		redirect: "/welcome", //TODO: redirect depending on auth token
 	},
 	{
 		path: "/welcome",
