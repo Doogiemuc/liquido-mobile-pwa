@@ -1,450 +1,69 @@
 /**
- * This is a very simple Store singleton.
+ * This is a very simple and lightweight Store singleton.
+ * Here we store local data that many liquido Vue components need.
  *
  * See https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
  *
- * I don't need - and I also don't like - VUEX. Its plain simply over engineered.
+ * LIQUIDO doesn't need - and I also don't like - VUEX, because its plain and simple over-engineered.
  */
 
 import { uniqueId } from "lodash"
 
-// just a dummy to create test data
-let addDays = function (date, days) {
-	let result = new Date(date)
-	result.setDate(result.getDate() + days)
-	return result
-}
-
-export default {
-	// All these attributes are even reactive.
+// Client side cache for data that was fetched from the server
+let cache = {
+	JWT: undefined,
 
 	/** Currently logged in User */
 	user: {
 		profile: {
-			name: "Demo Admin",
+			name: undefined,
 		},
-		email: "admin1@liquido.me",
-		isAdmin: true,
+		email: undefined,
+		isAdmin: false,
 	},
 
-	/** Users team */
+	/** User's own team */
 	team: {
 		name: undefined,
+		members: [],
 		inviteCode: undefined,
-		//qrCode: undefined,
+		qrCode: undefined,
 	},
 
-	/** Current filter on the /polls page: undefined|ELABORATION|VOTING|FINISHED */
-	pollStatusFilter: undefined,
+	polls: []
+}
 
-	//
-	// ==========DUMMY DATA FOR TESTING ==========
-	//
 
-	polls: [
-		{
-			id: 99,
-			title: "Ich bin eine neue erstellte Abstimmung",
-			status: "ELABORATION",
-			votingStartAt: addDays(new Date(), 10),
-			votingEndAt: addDays(new Date(), 20),
-		},
-		{
-			id: 101,
-			title: "Example poll in voting with a very long titela asddfasdf dd",
-			status: "VOTING",
-			votingStartAt: addDays(new Date(), -1),
-			votingEndAt: addDays(new Date(), +9),
 
-			proposals: [
-				{
-					id: 2001,
-					title: "Proposal One qurg ASD asdfcvvef fdadsf ddd fff ddccc c ewe e",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "VOTING",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1longname Mobileasdf",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-				{
-					id: 2002,
-					title: "Proposal Two",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 9,
-					supportedByCurrentUser: false,
-					createdBy: {
-						id: 7002,
-						email: "user2@liqudo.vote",
-						profile: {
-							name: "User2 Mobile",
-							mobilephone: "#491234518",
-							picture: "/img/avatars/Avatar2.png",
-						},
-					},
-				},
-				{
-					id: 2003,
-					title:
-						"Proposal Three with a very long title that will break more than three lines just to besure we make it very long",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 92345,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7002,
-						email: "user4@liqudo.vote",
-						profile: {
-							name: "User4 Mobile",
-							mobilephone: "#491234514",
-							picture: "/img/avatars/Avatar4.png",
-						},
-					},
-				},
-			],
-			area: {
-				id: 4001,
-				title: "Example Area",
-			},
-			winner: undefined,
-			duelMatrix: undefined,
-		},
-
-		{
-			id: 102,
-			title: "Example poll in elaboration",
-			status: "ELABORATION",
-			votingStartAt: addDays(new Date(), -5),
-			votingEndAt: addDays(new Date(), +9),
-
-			proposals: [
-				{
-					id: 2001,
-					title: "Proposal One qurg ASD asdfcvvef fdadsf ddd fff ddccc c ewe e",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "VOTING",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1longname Mobileasdf",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-				{
-					id: 2002,
-					title: "Proposal Two",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 9,
-					supportedByCurrentUser: false,
-					createdBy: {
-						id: 7002,
-						email: "user2@liqudo.vote",
-						profile: {
-							name: "User2 Mobile",
-							mobilephone: "#491234518",
-							picture: "/img/avatars/Avatar2.png",
-						},
-					},
-				},
-				{
-					id: 2003,
-					title:
-						"Proposal Three with a very long title that will break more than three lines just to besure we make it very long",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 92345,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7002,
-						email: "user4@liqudo.vote",
-						profile: {
-							name: "User4 Mobile",
-							mobilephone: "#491234514",
-							picture: "/img/avatars/Avatar4.png",
-						},
-					},
-				},
-			],
-			area: {
-				id: 4001,
-				title: "Example Area",
-			},
-			winner: undefined,
-			duelMatrix: undefined,
-		},
-
-		{
-			id: 103,
-			title: "Poll numbe two",
-			status: "ELABORATION",
-			votingStartAt: addDays(new Date(), -1),
-			votingEndAt: addDays(new Date(), +9),
-
-			proposals: [
-				{
-					id: 2001,
-					title: "Proposal One qurg ASD asdfcvvef fdadsf ddd fff ddccc c ewe e",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "VOTING",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1longname Mobileasdf",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-				{
-					id: 2002,
-					title: "Proposal Threeeeeeee eee e e e",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 9,
-					supportedByCurrentUser: false,
-					createdBy: {
-						id: 7002,
-						email: "user2@liqudo.vote",
-						profile: {
-							name: "User2 Mobile",
-							mobilephone: "#491234518",
-							picture: "/img/avatars/Avatar2.png",
-						},
-					},
-				},
-				{
-					id: 2003,
-					title:
-						"Proposal Three with a very long title that will break more than three lines just to besure we make it very long",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 92345,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7002,
-						email: "user4@liqudo.vote",
-						profile: {
-							name: "User4 Mobile",
-							mobilephone: "#491234514",
-							picture: "/img/avatars/Avatar4.png",
-						},
-					},
-				},
-			],
-			area: {
-				id: 4001,
-				title: "Example Area",
-			},
-			winner: undefined,
-			duelMatrix: undefined,
-		},
-
-		{
-			id: 104,
-			title: "Poll numbe four",
-			status: "ELABORATION",
-			votingStartAt: addDays(new Date(), -1),
-			votingEndAt: addDays(new Date(), +9),
-
-			proposals: [
-				{
-					id: 2001,
-					title: "Proposal One qurg ASD asdfcvvef fdadsf ddd fff ddccc c ewe e",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "VOTING",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1longname Mobileasdf",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-				{
-					id: 2002,
-					title: "Proposal Two",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 9,
-					supportedByCurrentUser: false,
-					createdBy: {
-						id: 7002,
-						email: "user2@liqudo.vote",
-						profile: {
-							name: "User2 Mobile",
-							mobilephone: "#491234518",
-							picture: "/img/avatars/Avatar2.png",
-						},
-					},
-				},
-				{
-					id: 2003,
-					title:
-						"Proposal Three with a very long title that will break more than three lines just to besure we make it very long",
-					description:
-						"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-					status: "VOTING",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4002,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 92345,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7002,
-						email: "user4@liqudo.vote",
-						profile: {
-							name: "User4 Mobile",
-							mobilephone: "#491234514",
-							picture: "/img/avatars/Avatar4.png",
-						},
-					},
-				},
-			],
-			area: {
-				id: 4001,
-				title: "Example Area",
-			},
-			winner: undefined,
-			duelMatrix: undefined,
-		},
-	],
-
-	//
-	// read only getters for state values
-	//
-
-	isAdmin() {
-		return this.user.isAdmin
+export default {
+	/**
+	 * Local application state.
+	 * Vue components can directly use these values, for example in computed getter methods
+	 * and then reactively update the UI when the state changes.
+	 */
+	state: {
+		// Current filter on the /polls page: undefined|ELABORATION|VOTING|FINISHED
+		pollStatusFilter: undefined,
 	},
 
-	getCurrentUser() {
-		return this.user
+
+
+	/** Put obj into the cache under key */
+	put(key, obj) {
+		cache[key] = obj
 	},
 
-	getToken() {
-		return "dummy-JWT-token"
+	/** Get object from cache. Use `defaultValue` if there is nothing yet cached under this key. */
+	get(key, defaultValue) {
+		return cache[key] || defaultValue
 	},
+
+
+	// Helper methods
 
 	/** Find a poll by its ID. May return undefined if ID is not found! */
 	getPollById(pollId) {
-		return this.polls.find((p) => p.id == pollId) // pollId might be a String or a Number!
+		return cache.polls.find(p => p.id == pollId) 		// pollId might be a String or a Number!
 	},
 
 	getProposalById(poll, proposalId) {
@@ -452,7 +71,10 @@ export default {
 	},
 
 	getPollStatusFilter(newVal) {
-		return this.pollStatusFilter
+		return state.pollStatusFilter
+	},
+	setPollStatusFilter(newVal) {
+		state.pollStatusFilter = newVal
 	},
 
 	getPollById(pollId) {
@@ -462,10 +84,6 @@ export default {
 	//
 	// ========== These methods change the content of the store ("mutations" in vuex) ==========
 	//
-
-	setPollStatusFilter(newVal) {
-		this.pollStatusFilter = newVal
-	},
 
 	savePoll(poll) {
 		if (!typeof poll === "object")

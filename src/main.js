@@ -28,28 +28,28 @@ Vue.config.debug = true
 /** Global translations that are available to all components */
 const globalTranslations = {
 	en: {
-		helloWorld: "Hello world!",
+		HelloWorld: "Hello world!",
 		Ok: "Ok",
 		Yes: "Yes",
 		No: "No",
 		Cancel: "Cancel",
 	},
 	de: {
-		helloWorld: "Hallo Welt!",
-		ok: "Ok",
-		yes: "Ja",
-		no: "Nein",
-		save: "Speichern",
-		cancel: "Abbrechen",
-		back: "Zurück",
-		search: "Suche",
+		HelloWorld: "Hallo Welt!",
+		Ok: "Ok",
+		Yes: "Ja",
+		No: "Nein",
+		Save: "Speichern",
+		Cancel: "Abbrechen",
+		Back: "Zurück",
+		Search: "Suche",
 
 		// Every noun in singular and plural form!
 		idea: "Idee",
 		ideas: "Ideen",
 		proposal: "Vorschlag",
 		proposals: "Vorschläge",
-		poll: "Abstimmung", // Entscheidung von Robert: nein nicht "Wahl(en)" !!  Deutsche Übersetzung von poll ist Abstimmung!
+		poll: "Abstimmung", // Entscheidung von Robert: nein nicht "Wahl(en)"!! Deutsche Übersetzung von poll ist Abstimmung!
 		polls: "Abstimmungen",
 		law: "Regel",
 		laws: "Regeln",

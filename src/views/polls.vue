@@ -141,10 +141,10 @@ export default {
 			}
 		},
 		userIsAdmin() {
-			return this.$root.store.user.isAdmin
+			return this.$root.store.get("user", {}).isAdmin
 		},
 		polls() {
-			return this.$root.store.polls
+			return this.$root.store.get("polls")
 		},
 		filteredPolls() {
 			return this.polls
@@ -164,7 +164,7 @@ export default {
 		},
 		/** current filter for poll status, undefined|ELABORATION|VOTING|FINISHED */
 		pollStatusFilter() {
-			return this.$root.store.pollStatusFilter
+			return this.$root.store.state.pollStatusFilter
 		},
 	},
 	methods: {

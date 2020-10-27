@@ -22,7 +22,7 @@ module.exports = {
 		devtool: "source-map",
 		resolve: {
 			alias: {
-				// make config.<env>.js available from root /config directory (which is one dir above ./src)
+				// make config.<NODE_ENV>.js available from root /config directory (which is one dir above ./src)
 				// https://stackoverflow.com/questions/30030031/passing-environment-dependent-variables-in-webpack
 				'config': path.join(__dirname, "config/config."+process.env.NODE_ENV)
 			}

@@ -71,6 +71,17 @@ On next app starts
  * TODO: Use Visual Studio Code Chrome Debugger with Vue  https://medium.com/@brockreece/how-i-stopped-using-console-log-when-debugging-vue-components-14e0f7aa280d
  * TODO: Create a Vue Plugin that can show a loging component on mobile phone.
 
+# Client side storage and caching
+
+### Library evaluation
+
+ * https://web.dev/storage-for-the-web/  Nice overview article
+ * https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API   Mozilla IndexDB  -> complicated
+ * https://www.npmjs.com/package/idb   Promise based wrapper around indexdb
+ * https://github.com/mWater/minimongo  - or go the mongo way?
+ * 
+
+
 # Test
 
 ## Unit Tests

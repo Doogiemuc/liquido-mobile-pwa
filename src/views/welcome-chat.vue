@@ -74,6 +74,7 @@
 					<liquido-input
 						v-model="inviteCode"
 						ref="inviteCodeInput"
+						id="inviteCodeInput"
 						:label="$t('inviteCode')"
 						:valid-func="isInviteCodeValid"
 						:maxlength="100"
@@ -85,6 +86,7 @@
 					<liquido-input
 						v-model="user.email"
 						ref="emailInput"
+						id="emailInput"
 						:label="$t('yourEMail')"
 						:valid-func="isEmailValid"
 						:maxlength="200"
@@ -99,6 +101,7 @@
 						</small>
 						<b-button
 							:disabled="joinTeamOkButtonDisabled"
+							id="joinTeamOkButton"
 							variant="primary"
 							@click="joinTeam()"
 							tabindex="3"
@@ -115,7 +118,7 @@
 			<b-card :class="{ 'collapse-max-height': flowState < 8 }" class="chat-bubble chat-right">
 				<form id="createNewTeamForm">
 					<liquido-input
-						v-model="newTeam.name"
+						v-model="team.name"
 						ref="teamNameInput"
 						id="teamNameInput"
 						:label="$t('teamName')"
@@ -166,25 +169,26 @@
 
 			<b-card
 				id="newTeamCreatedBubble"
-				:class="{ 'collapse-max-height': flowState < 9 }"
+				:class="{ 'collapse-max-height': flowState !== 9 }"
 				class="chat-bubble shadow-sm"
 			>
 				<p>{{ $t("teamCreated") }}</p>
 				<ul>
 					<li>
-						<a :href="newTeam.inviteLink" @click.prevent="shareLink()">
-							{{ $t("shareThisLink") }}
+						{{ $t("shareThisLink") }}
+						<a id="inviteLink" :href="team.inviteLink" @click.prevent="shareLink()">
+							{{ team.inviteLink }}
 							<i class="fas fa-external-link-alt"></i>
 						</a>
 					</li>
 					<li>
 						{{ $t("tellInvitationCode") }}
-						<b>{{ newTeam.inviteCode }}</b>
+						<b id="newTeamInviteCode">{{ team.inviteCode }}</b>
 					</li>
 					<li>{{ $t("scanQrCode") }}</li>
 				</ul>
 				<div class="text-center my-3">
-					<img :src="newTeam.qrCode" class="qr-code" />
+					<img :src="team.qrCodeUrl" class="qr-code" />
 				</div>
 				<p v-html="$t('teamInfo')"></p>
 			</b-card>
@@ -202,7 +206,27 @@
 					<i class="fas fa-angle-double-right"></i>
 				</b-button>
 			</b-card>
-		</div>
+		
+
+			<!--Joined team successfull (flowState == 10) -->
+
+			<b-card
+				id="joinedTeamBubble"
+				:class="{ 'collapse-max-height': flowState !== 10 }"
+				class="chat-bubble shadow-sm"
+			>
+				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.name })"></p>
+				<b-button
+					variant="primary"
+					class="float-right mb-1"
+					@click="$router.push('/team')"
+				>
+					{{ $t("goToTeam") }}
+					<i class="fas fa-angle-double-right"></i>
+				</b-button>
+			</b-card>
+
+		</div> <!-- end of container-lg -->
 
 		<!-- Error message modal popup -->
 		<div class="modal" id="errorMessage" tabindex="-1" role="dialog" aria-labelledby="errorMessage" aria-hidden="true">
@@ -220,11 +244,13 @@
 				</div>
 			</div>
 		</div>
+
 	</div>
 </template>
 
 <script>
 import liquidoInput from "@/components/liquido-input"
+import config from "config"
 
 const eMailRegEx = /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}\b/
 
@@ -264,6 +290,9 @@ export default {
 				eMailPlaceholder: "info@domain.de",
 				emailInvalid: "E-Mail ungültig",
 
+				joinedTeamSuccessfully: "Herzlich willkommen im Team <b>{teamName}</b>. Du kannst nun deine Wahlvorschläge zu den Abstimmungen im Team hinzufügen. Viel Spaß beim wählen!",
+				goToTeam: "Zum Team",
+
 				createNewTeamButton: "Neues Team",
 				teamName: "Team Name",
 				teamNameInvalid: "Bitte mindestens 6 Zeichen als Teamname!",
@@ -272,8 +301,8 @@ export default {
 
 				teamCreated: "Ok, dein Team ist angelegt. Lade jetzt deine Freunde in dein Team ein:",
 				shareThisLink: "Teile diesen Link",
-				tellInvitationCode: "oder sage ihnen deinen Einadungscode:",
-				scanQrCode: "oder lass sie diesen QR code scannen:",
+				tellInvitationCode: "Sage ihnen deinen Einadungscode:",
+				scanQrCode: "Oder lass sie diesen QR code scannen:",
 				teamInfo:
 					'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) oben rechts.',
 				pollInfo:
@@ -282,6 +311,7 @@ export default {
 
 				error: "Fehler",
 				cannotCreateNewTeam: "Fehler beim anlegen des neuen Teams. Bitte versuche es später noch einmal.",
+				cannotJoinTeam: "Du kannst diesem Team nicht beitreten. {errorDetails}"
 			},
 		},
 	},
@@ -294,14 +324,14 @@ export default {
 				email: undefined,
 			},
 
-			inviteCode: undefined,
+			inviteCode: undefined,    // inviteCode when joining an existing team
 
-			// data when new team has been created
-			newTeam: {
-				name: undefined,
+			// newly created or joined Team
+			team: {
+				//name: undefined,
 				//inviteCode: "A3F43D",
-				inviteLink: "http://liquido.me/invite/A3F43D_static",
-				qrCode: "/img/qrcode.svg",
+				//inviteLink: "http://liquido.me/invite/A3F43D_static",
+				//qrCode: "/img/qrcode.svg",
 			},
 
 			/*
@@ -329,7 +359,7 @@ export default {
 	 * only start automatic scrolling if first bubble is completely visible (> iPhone5)
 	 */
 	created() {
-		//this.$root.store.setShowFooter(false)
+		
 	},
 
 	/**
@@ -357,7 +387,7 @@ export default {
 			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 7
 		},
 		createNewTeamOkButtonDisabled() {
-			return !this.isTeamNameValid(this.newTeam.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 8
+			return !this.isTeamNameValid(this.team.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 8
 		},
 	},
 	watch: {
@@ -389,7 +419,7 @@ export default {
 
 		/* invite must be ast least 6 chars */
 		isInviteCodeValid(val) {
-			return val !== undefined && val !== null && val.trim().length === 6
+			return val !== undefined && val !== null && val.trim().length === config.inviteCodeLength
 		},
 
 		/* user's email must match regex */
@@ -430,41 +460,53 @@ export default {
 			this.scrollToBottom()
 		},
 
-		/** Join an existing team */
-		joinTeam() {
-			console.log(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
-		},
-
 		/** Create a new team */
 		createNewTeam() {
 			if (this.createNewTeamOkButtonDisabled) return
-			console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.name)
-			let newTeam = {
-				teamName: this.newTeam.name,
+			//console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.name)
+			let newTeamRequest = {
+				teamName: this.team.name,
 				adminName: this.user.name,
 				adminEmail: this.user.email,
 			}
-			this.$api
-				.createNewTeam(newTeam)
-				.then((createdTeam) => {
+			this.$api.createNewTeam(newTeamRequest)
+				.then((res) => {
 					this.flowState = 9
-					this.inviteCode = createdTeam.inviteCode
-					this.$root.store.team = createdTeam
+					this.team = res.team
 					this.$nextTick(() => {
 						this.scrollElemToTop("#newTeamCreatedBubble", 0)
 					})
 				})
-				.catch((err) => {
+				.catch((err) => {			// on error show modal
 					console.error("Cannot create new team", err)
-					//TODO: handle error show to user go back to ???
 					this.errorMessage = this.$t('cannotCreateNewTeam')
 					$('#errorMessage').modal({show: true})
 				})
 		},
 
-		createPoll() {
-			this.$router.push("/polls/create")
+		/** Join an existing team */
+		joinTeam() {
+			console.log(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
+			let joinTeamRequest = {
+				inviteCode: this.inviteCode,
+				userName: this.user.name,
+				userEmail: this.user.email
+			}
+			this.$api.joinTeam(joinTeamRequest)
+				.then(res => {
+					this.flowState = 10
+					this.team = res.team
+					this.$nextTick(() => {
+						this.scrollElemToTop("#joinedTeamBubble", 0)
+					})
+				})
+				.catch(err => {
+					console.error("Cannot join team", err)
+					this.errorMessage = this.$t('cannotJoinTeam', {errorDetails: err.err })
+					$('#errorMessage').modal({show: true})
+				})
 		},
+
 
 		// Here comes some UX magic :-)
 
@@ -520,7 +562,7 @@ export default {
 				navigator
 					.share({
 						title: "Share LIQUIDO invite",
-						url: this.newTeam.inviteLink,
+						url: this.team.inviteLink,
 					})
 					.then(() => {
 						console.log("Invite has been sent!")
@@ -592,6 +634,15 @@ export default {
 	margin-bottom: 0;
 	border: none;
 	*/
+}
+
+.createOrJoinTable {
+	td {
+		width: 50%;
+	}
+	td:fist-child() {
+		border-right: 1px solid grey;
+	}
 }
 
 #joinOrCreateButtons {
