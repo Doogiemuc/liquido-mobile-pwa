@@ -1,5 +1,5 @@
 /**
- * These styles are imported in App.vue so they are a available to every component.
+ * These styles are imported in root-app.vue so they are a available to every component.
  */
 
 
@@ -21,18 +21,6 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 																	supported by Chrome, Opera and Firefox */
 }
 
-.page-title {
-	font-family: 'Libre Baskerville', serif;
-	font-size: 1.6rem;
-	margin: 1rem 0;
-}
-
-.alert, .card-body {
-	p:last-child {
-		margin-bottom: 0;					// Why is this not the default in bootstrap???
-	}
-}
-
 /** LIQUIDO - beautifull brand mark */
 .liquido:after {
 	content: "LIQUIDO";
@@ -40,6 +28,91 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 	color: $primary;
 }
 
-h1,h2,h3,h4,h5,h6 {
-	font-family: 'Libre Baskerville', serif;
+.opacity0 {
+	opacity: 0;
+}
+
+/*
+//TODO: find right base font size for everything, MAYBE depending on screen size
+html {
+	font-size: 16px;   
+}
+*/
+
+// need to be more CSS specific than bootstrap's default. So therefore the #app
+#app {
+	.page-title {
+		font-family: 'Libre Baskerville', serif;
+		font-size: 1.6rem;
+		margin: 1rem 0;
+	}
+
+	.alert, .card-body {
+		p:last-child {
+			margin-bottom: 0;					// Why is this not the default in bootstrap???
+		}
+	}
+
+	h1,h2,h3,h4,h5,h6 {
+		font-family: 'Libre Baskerville', serif;
+	}
+
+	h3 {
+		font-size: 1.4rem;
+	}
+
+	.card.chat-bubble {
+		//background-color: $secondary-bg;
+		margin-bottom: 1rem;
+		opacity: 1;
+		transform: none;
+		max-height: 1000px;
+		-webkit-transition: all 0.5s ease;
+		-moz-transition: all 0.5s ease;
+		-o-transition: all 0.5s ease;
+		transition: all 0.5s ease;
+		.card-body {
+			padding: 0.5rem;
+			ul {
+				padding-inline-start: 25px;
+			}
+			input {
+				width: 100%;
+			}
+			p:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	.card.chat-right {
+		background-color: $input-bg;
+		margin-left: 2rem;
+		margin-bottom: 1rem;
+	}
+
+	.transition-all {
+		-webkit-transition: all 0.5s ease;
+		-moz-transition: all 0.5s ease;
+		-o-transition: all 0.5s ease;
+		transition: all 0.5s ease;
+	}
+	.hide-left {
+		opacity: 0;
+		transform: translateX(-20px);
+	}
+	.hide-right {
+		opacity: 0;
+		transform: translateX(20px);
+	}
+	.collapse-max-height {
+		display: none !important;
+		/*
+		max-height: 0;
+		overflow: hidden;
+		margin-top: 0;
+		margin-bottom: 0;
+		border: none;
+		*/
+	}
 }

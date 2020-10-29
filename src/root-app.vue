@@ -2,7 +2,7 @@
 	<div id="app">
 		<liquido-header :back-link="backLink"></liquido-header>
 		<transition :name="transitionName">
-			<router-view id="appContent" :key="$route.fullPath" class="router-view" />
+			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
 		<pollsFooter v-if="showPollsFooter"></pollsFooter>
 	</div>
@@ -33,8 +33,10 @@ export default {
 			if (to.path === "/polls" && /^\/polls\/\d+$/.test(from.path)) { this.transitionName = "slide-right" }
 			*/
 
-			if (fromDepth < toDepth) this.transitionName = "slide-left"
-			if (fromDepth > toDepth) this.transitionName = "slide-right"
+			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
+			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
+			if (from.path == "/team")  { this.transitionName = "slide-left" } else
+			if (fromDepth == toDepth) { this.transitionName = "fade" }
 		},
 	},
 	computed: {
@@ -44,6 +46,7 @@ export default {
 		 * show one poll -> back to list of polls
 		 * add proposal  -> back to poll
 		 * cast vote     -> back to poll
+		 * otherwise don't show a back link
 		 */
 		backLink() {
 			if (/^\/polls\/\d+$/.test(this.$route.path)) {
@@ -112,10 +115,20 @@ export default {
 	margin-bottom: 50px; // for footer
 	overflow-x: hidden;
 }
+
 // Slide animation between pages
 .router-view {
-	transition: transform 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
 }
+.fade-enter,
+.fade-leave-to {
+	opacity: 0;
+}
+.fade-leave-active {
+	position: absolute;
+	width: 100%;
+}
+
 .slide-left-enter,
 .slide-right-leave-to {
 	-webkit-transform: translate(100%, 0);

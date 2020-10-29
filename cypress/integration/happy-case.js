@@ -82,7 +82,12 @@ context('Happy Case', () => {
 		cy.get('#joinTeamOkButton').click()
 
 		//THEN
-		cy.get('#joinedTeamBubble')		
+		cy.get('#joinedTeamBubble')
+	})
+
+	it('Show team', function() {
+		cy.visit('/team')
+		
 	})
 
 	it('cleanup DB', function() {

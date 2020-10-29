@@ -8,21 +8,12 @@
  */
 
 import { uniqueId } from "lodash"
+import testPolls from "../../cypress/fixtures/testPolls"
 
 // Client side cache for data that was fetched from the server
 let cache = {
-	JWT: undefined,
-
-	/** Currently logged in User */
-	user: {
-		profile: {
-			name: undefined,
-		},
-		email: undefined,
-		isAdmin: false,
-	},
-
-	/** User's own team */
+	
+	// User's own team
 	team: {
 		name: undefined,
 		members: [],
@@ -30,7 +21,23 @@ let cache = {
 		qrCode: undefined,
 	},
 
-	polls: []
+	// Currently logged in User
+	user: {
+		profile: {
+			name: undefined,
+		},
+		email: undefined,
+		isAdmin: false,
+	},
+	
+	// Json Web Token when authenticated
+	jwt: undefined,
+
+	// User's voterToken for casting LIQUIDO votes
+	voterToken: undefined,
+
+	// List of polls in the team. Each poll has proposals
+	polls: testPolls
 }
 
 
@@ -43,6 +50,7 @@ export default {
 	 */
 	state: {
 		// Current filter on the /polls page: undefined|ELABORATION|VOTING|FINISHED
+		// This is used in polls-footer.vue and in polls.vue
 		pollStatusFilter: undefined,
 	},
 
@@ -61,6 +69,10 @@ export default {
 
 	// Helper methods
 
+	isAuthenticated() {
+		return cache.jwt !== undefined
+	},
+
 	/** Find a poll by its ID. May return undefined if ID is not found! */
 	getPollById(pollId) {
 		return cache.polls.find(p => p.id == pollId) 		// pollId might be a String or a Number!
@@ -70,12 +82,6 @@ export default {
 		return poll.proposals.find((prop) => prop.id == proposalId)
 	},
 
-	getPollStatusFilter(newVal) {
-		return state.pollStatusFilter
-	},
-	setPollStatusFilter(newVal) {
-		state.pollStatusFilter = newVal
-	},
 
 	getPollById(pollId) {
 		return this.polls.find((poll) => poll.id == pollId)

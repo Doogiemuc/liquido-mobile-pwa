@@ -1,15 +1,15 @@
 <template>
 	<b-card :pollid="poll.id" no-body class="poll-panel shadow mb-3">
 		<template v-slot:header>
-			<h3 v-if="readOnly" class="read-only">
+			<h4 v-if="readOnly" class="read-only">
 				<i class="fas fa-poll"></i>
 				&nbsp;{{ poll.title }}
-			</h3>
-			<h3 v-else @click="goToPoll(poll.id)">
+			</h4>
+			<h4 v-else @click="goToPoll(poll.id)">
 				<i class="fas fa-angle-double-right goto-poll-icon"></i>
 				<i class="fas fa-poll"></i>
 				&nbsp;{{ poll.title }}
-			</h3>
+			</h4>
 		</template>
 		<div
 			v-if="!poll.proposals || poll.proposals.length === 0"
@@ -158,7 +158,7 @@ $avatar_size: 70px;
 	.card-header {
 		margin: 0;
 		padding: 0;
-		h3 {
+		h4 {
 			// same as .law-title
 			color: $primary;
 			margin: 5px 10px;

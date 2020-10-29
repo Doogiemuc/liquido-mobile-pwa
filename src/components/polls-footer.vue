@@ -45,7 +45,7 @@ export default {
 	name: "LiquidoFooter",
 	computed: {
 		activeStatus() {
-			return this.$root.store.pollStatusFilter
+			return this.$root.store.state.pollStatusFilter
 		},
 	},
 	methods: {
@@ -55,9 +55,9 @@ export default {
 		 */
 		clickFooter(newFilterValue) {
 			if (this.activeStatus === newFilterValue) {
-				this.$root.store.setPollStatusFilter(undefined)
+				this.$root.store.state.pollStatusFilter = undefined
 			} else {
-				this.$root.store.setPollStatusFilter(newFilterValue)
+				this.$root.store.state.pollStatusFilter = newFilterValue
 			}
 		},
 	},

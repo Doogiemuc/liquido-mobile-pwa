@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="container-lg">
+		<div class="container">
 			<h2 class="page-title">
 				<i class="fas fa-poll"></i>
 				{{ $t("newPoll") }}
@@ -18,7 +18,7 @@
 
 				<div class="d-flex justify-content-between align-items-center">
 					<small class="ml-1">
-						<a href="#" @click="cancelCreatePoll()">{{ $t("cancel") }}</a>
+						<a href="#" @click="cancelCreatePoll()">{{ $t("Cancel") }}</a>
 					</small>
 					<b-button
 						:disabled="createPollButtonDisabled"
@@ -32,7 +32,7 @@
 				</div>
 			</b-card>
 
-			<b-card :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm my-5">
+			<b-card class="chat-bubble shadow-sm my-5">
 				<!-- a class="float-right px-1" data-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="true" aria-controls="collapseOne">
 					<i class="fa" aria-hidden="true"></i>
 				</a-->
@@ -43,7 +43,6 @@
 </template>
 
 <script>
-import liquidoHeader from "../components/liquido-header"
 import liquidoInput from "../components/liquido-input"
 
 export default {
@@ -55,7 +54,7 @@ export default {
 				createPollInfo:
 					'<p>Eine Abstimmung (<i class="fas fa-poll"></i>) enthält mehrere Wahlvorschläge (<i class="fas fa-vote-yea"></i>) und läuft über zwei Phasen:<p>' +
 					'<p>(1) Während der Elaborationsphase kann jeder in deinem Team seinen Vorschlag zur Abstimmung hinzufügen. Diese können dann diskutiert (<i class="fas fa-comments"></i>) werden.</p>' +
-					'<p>(2) Nachdem du als Admin die Wahlphase dieser Abstimmung gestartet hast, kann dann jeder im Team seine Stimme abgeben. (<i class="fas fa-person-booth"></i>)</p>',
+					'<p>(2) Wenn du als Admin die Wahlphase der Abstimmung gestartet hast, dann kann jeder im Team seine Stimme abgeben. (<i class="fas fa-person-booth"></i>)</p>',
 				pollTitle: "Titel der Abstimmung",
 				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. 10 Zeichen.",
 				create: "Anlegen",
@@ -64,20 +63,13 @@ export default {
 		},
 	},
 	name: "CreatePollPage",
-	components: { liquidoHeader, liquidoInput },
+	components: { liquidoInput },
 	data() {
 		return {
 			poll: {},
-			flowState: 0,
 		}
 	},
-	created() {
-		//this.$root.store.setShowFooter(false)
-	},
 	mounted() {
-		window.setTimeout(() => {
-			this.flowState = 1
-		}, 500)
 	},
 	computed: {
 		createPollButtonDisabled() {

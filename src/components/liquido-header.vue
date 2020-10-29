@@ -15,7 +15,7 @@
 						<span class="liquido" @click="clickLiquidoTitle()"></span>
 					</div>
 					<div class="col header-right">
-						<i class="fas fa-users"></i>
+						<i v-if="$route.path !== '/welcome'" @click="gotoTeam()" class="fas fa-users"></i>
 					</div>
 				</div>
 			</div>
@@ -59,8 +59,15 @@ export default {
 		},
 
 		clickLiquidoTitle() {
-			if (this.$route.path !== "/" && this.$route.path !== "/polls")
-				this.$router.push("/")
+			if (this.$route.path !== "/welcome" && this.$route.path !== "/polls") {
+				this.$router.push({name: "polls"})
+			}
+		},
+
+		gotoTeam() {
+			if (this.$route.path !== "/welcome" && this.$route.path !== "/team") {
+				this.$router.push({name: "teamHome"})
+			}
 		},
 
 		/** check if current $route.path starts with the given pathPrefix. so that we can add the .active class to the outer li element */

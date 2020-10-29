@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="container-lg mt-3">
+		<div class="container mt-3">
 			<b-card id="welcomeBubble" :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm">
 				<b-card-text v-html="$t('welcome')"></b-card-text>
 			</b-card>
@@ -199,7 +199,7 @@
 					:class="{ 'd-none': flowState !== 9 }"
 					variant="primary"
 					class="float-right mb-3"
-					@click="createPoll()"
+					@click="gotoCreatePoll()"
 				>
 					<i class="fas fa-user-shield"></i>
 					{{ $t("createPoll") }}
@@ -226,7 +226,7 @@
 				</b-button>
 			</b-card>
 
-		</div> <!-- end of container-lg -->
+		</div> <!-- end of container -->
 
 		<!-- Error message modal popup -->
 		<div class="modal" id="errorMessage" tabindex="-1" role="dialog" aria-labelledby="errorMessage" aria-hidden="true">
@@ -239,7 +239,7 @@
 						{{errorMessage}}
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn bg-white text-black" data-dismiss="modal">{{$t('ok')}}</button>
+						<button type="button" class="btn bg-white text-black" data-dismiss="modal">{{$t("Ok")}}</button>
 					</div>
 				</div>
 			</div>
@@ -354,14 +354,9 @@ export default {
 			errorMessage: "",
 		}
 	},
-	/**
-	 * Do not show the Footer on the index page and
-	 * only start automatic scrolling if first bubble is completely visible (> iPhone5)
-	 */
 	created() {
 		
 	},
-
 	/**
 	 * By default scroll to the top of the page (e.g. when reloading the page)
 	 * When the bottom of the #welcomeBubble becomes visible (or already is visible on larger screens)
@@ -391,11 +386,11 @@ export default {
 		},
 	},
 	watch: {
-		
+		/*
 		'flowState': function(newVal, oldVal) {
 			console.log(" ====>>> flowState", oldVal, "=>", newVal)
 		}
-		
+		*/
 	},
 	methods: {
 		/* username must not be empty and contain at least 4 chars */
@@ -482,6 +477,10 @@ export default {
 					this.errorMessage = this.$t('cannotCreateNewTeam')
 					$('#errorMessage').modal({show: true})
 				})
+		},
+
+		gotoCreatePoll() {
+			this.$router.push({name: "createPoll"})
 		},
 
 		/** Join an existing team */
@@ -578,63 +577,6 @@ export default {
 </script>
 
 <style lang="scss">
-.chat-bubble {
-	//background-color: $secondary-bg;
-	margin-bottom: 1rem;
-	opacity: 1;
-	transform: none;
-	max-height: 1000px;
-	-webkit-transition: all 0.5s ease;
-	-moz-transition: all 0.5s ease;
-	-o-transition: all 0.5s ease;
-	transition: all 0.5s ease;
-	.card-body {
-		padding: 0.5rem;
-		ul {
-			padding-inline-start: 25px;
-		}
-		input {
-			width: 100%;
-		}
-		p:last-child {
-			margin-bottom: 0;
-		}
-	}
-}
-
-.chat-right {
-	background-color: $input-bg;
-	margin-left: 2rem;
-	margin-bottom: 1rem;
-}
-
-.transition-all {
-	-webkit-transition: all 0.5s ease;
-	-moz-transition: all 0.5s ease;
-	-o-transition: all 0.5s ease;
-	transition: all 0.5s ease;
-}
-.opacity0 {
-	opacity: 0;
-}
-.hide-left {
-	opacity: 0;
-	transform: translateX(-20px);
-}
-.hide-right {
-	opacity: 0;
-	transform: translateX(20px);
-}
-.collapse-max-height {
-	display: none;
-	/*
-	max-height: 0;
-	overflow: hidden;
-	margin-top: 0;
-	margin-bottom: 0;
-	border: none;
-	*/
-}
 
 .createOrJoinTable {
 	td {

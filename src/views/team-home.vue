@@ -1,389 +1,110 @@
 <template>
-	<div class="container-lg team-container">
-		<h3>Team Fabolous</h3>
+	<div class="container">
+		<h2 class="page-title">{{ teamName }}</h2>
 
-		<b-tabs content-class="tabs-content" justified>
-			<b-tab active>
-				<template v-slot:title>
-					<i class="far fa-lightbulb"></i>
-				</template>
-				<law-panel
-					v-for="idea in ideas"
-					:key="'idea-' + idea.id"
-					:law="idea"
-					:read-only="false"
-					class="mb-3 shadow-sm"
-				/>
-			</b-tab>
-			<b-tab>
-				<template v-slot:title>
-					<i class="far fa-file-alt"></i>
-				</template>
-				<law-panel
-					v-for="prop in proposals"
-					:key="'prop-' + prop.id"
-					:law="prop"
-					:read-only="false"
-					class="mb-3 shadow-sm"
-				/>
-			</b-tab>
+		<b-card class="chat-bubble shadow-sm">
+			<b-card-text>
+				{{ $t('introYourTeam') }}
+			</b-card-text>
+		</b-card>
 
-			<b-tab>
-				<template v-slot:title>
-					<i class="far fa-comments"></i>
-				</template>
-			</b-tab>
+		<b-button
+				id="gotoPollsButton"
+				variant="primary"
+				size="sm"
+				class="float-right mb-3"
+				@click="gotoPolls()"
+			>
+				{{ $t("gotoPolls") }}
+				<i class="fas fa-angle-double-right"></i>
+			</b-button>
 
-			<b-tab>
-				<template v-slot:title>
-					<i class="fas fa-poll"></i>
-				</template>
+		<div class="clearfix"></div>
 
-				<b-card v-for="poll in polls" :key="poll.id" no-body class="poll-panel mb-3 shadow-sm">
-					<template v-slot:header>
-						<b-button variant="primary" size="sm" class="float-right">
-							<i class="fas fa-angle-double-right"></i>
-						</b-button>
-						<h5 class="m-0">
-							<i class="fas fa-poll"></i>
-							&nbsp;{{ poll.title }}
-						</h5>
-					</template>
+		<h3 class="my-3">{{ $t('teamMembers') }}</h3>
 
-					<b-list-group flush>
-						<b-list-group-item v-for="prop in poll.proposals" :key="prop.id" class="prop-list-group-item">
-							<img :src="'https://picsum.photos/seed/' + prop.id + '/100'" class="prop-image" />
-							<h4 class="prop-title">{{ prop.title }}</h4>
-							<div class="author">
-								<i class="far fa-user"></i>
-								&nbsp;{{ prop.createdBy.profile.name }}&nbsp;
-								<span
-									:class="{ supported: prop.supportedByCurrentUser }"
-								>
-									<i
-										:class="{
-											far: !prop.supportedByCurrentUser,
-											fas: prop.supportedByCurrentUser,
-										}"
-										class="fa-thumbs-up"
-									>&nbsp;{{ prop.numSupporters }}</i>
-								</span>
-							</div>
-						</b-list-group-item>
-					</b-list-group>
-				</b-card>
-			</b-tab>
-		</b-tabs>
+		<b-card-group deck id="memberCards">
+			<b-card v-for="member in members" :key="member.email" :img-src="member.avatarUrl" img-alt="Avatar" img-top>
+				<b-card-text class="text-center">
+					{{ member.name }}
+				</b-card-text>
+			</b-card>
+		</b-card-group>
+		
 	</div>
 </template>
 
 <script>
-// import moment from 'moment'
-import lawPanel from "../components/law-panel"
 
 export default {
 	i18n: {
 		messages: {
 			en: {
-				welcome:
-					'Welcome to <span class="liquido"></span> - the free, secure and liquid eVoting platform. With this mobile app you can create polls and then take votes with your team.',
+				introYourTeam: "",
 			},
 			de: {
-				ideas: "Ideen",
-				newIdeas: "Neue Ideen",
-				proposals: "Vorschläge",
-				polls: "Wahlen", // Abstimmungen, Umfragen ??
-				elaboration: "Diskussion",
-				inVoting: "Abstimmung", // laufende Wahlen ??
+				introYourTeam: "Willkommen in deinem Team! Wenn euer Admin eine Abstimmung erstellt, kann jeder im Team seinen Wahlvorschlag hinzufügen. Nachdem der Admin dann die Wahlphase gestartet hat, kann jeder seine Stimme abgeben. Bis am Ende das Wahlergebnis feststeht.",
+				teamMembers: "Teammitglieder",
+				gotoPolls: "Zu den Abstimmungen"
 			},
 		},
 	},
-	components: { lawPanel },
+	components: { },
 	data() {
-		return {
-			ideas: [
-				{
-					id: 1001,
-					title: "This is a great idea with a long tittle",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "IDEA",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1 Mobile",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-				{
-					id: 1002,
-					title:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative)",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "IDEA",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1 Mobile",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-				{
-					id: 1003,
-					title: "asdfklfj ewml,rtn wvasdoi v weweklv  gfdsfasdf",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "IDEA",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1 Mobile",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-				{
-					id: 1004,
-					title: "Fourht idea with a long title",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "IDEA",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 9,
-					supportedByCurrentUser: false,
-					createdBy: {
-						id: 7002,
-						email: "user2@liqudo.vote",
-						profile: {
-							name: "User2 Mobile",
-							mobilephone: "#491234512",
-							picture: "/img/avatars/Avatar2.png",
-						},
-					},
-				},
-				{
-					id: 1005,
-					title: "Fifth 555 idea with a vey long title",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "IDEA",
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 0,
-					supportedByCurrentUser: false,
-					createdBy: {
-						id: 7004,
-						email: "user4@liqudo.vote",
-						profile: {
-							name: "User4 Mobile",
-							mobilephone: "#49123454",
-							picture: "/img/avatars/Avatar4.png",
-						},
-					},
-				},
-			],
-			proposals: [
-				{
-					id: 2001,
-					title: "Just a dummy proposal with a very long title",
-					description:
-						"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-					status: "PROPOSAL",
-					createdAt: new Date(),
-
-					updatedAt: new Date(),
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					supporters: [],
-					numSupporters: 15,
-					supportedByCurrentUser: true,
-					createdBy: {
-						id: 7001,
-						email: "user1@liqudo.vote",
-						profile: {
-							name: "User1 Mobile",
-							mobilephone: "#491234517",
-							picture: "/img/avatars/Avatar1.png",
-						},
-					},
-				},
-			],
-			polls: [
-				{
-					id: 101,
-					title: "Example poll in voting",
-					status: "VOTING",
-					votingStartAt: this.addDays(new Date(), -1),
-					votingEndAt: this.addDays(new Date(), +9),
-
-					proposals: [
-						{
-							id: 2001,
-							title:
-								"Proposal One qurg ASD asdfcvvef fdadsf ddd fff ddccc c ewe e",
-							description:
-								"Just an example proposal Bei relativ positionierten Elementen (position: relative) wird das Element aus seiner normalen Position im Elementfluss verschoben. Dabei gilt: Wenn die top Eigenschaft definiert wurde, überschreibt diese den Wert der bottom Eigenschaft. Wenn top den Wert auto besitzt, ist der berechnete Wert für bottom gleich dem Wert der top Eigenschaft mit umgedrehtem Vorzeichen. Wenn beide Eigenschaften nicht den Wert auto besitzen, wird bottom ignoriert und auf auto gesetzt.",
-							status: "VOTING",
-							createdAt: new Date(),
-
-							updatedAt: new Date(),
-							area: {
-								id: 4001,
-								title: "Example Area",
-							},
-							supporters: [],
-							numSupporters: 15,
-							supportedByCurrentUser: true,
-							createdBy: {
-								id: 7001,
-								email: "user1@liqudo.vote",
-								profile: {
-									name: "User1 Mobile",
-									mobilephone: "#491234517",
-									picture: "/img/avatars/Avatar1.png",
-								},
-							},
-						},
-						{
-							id: 2002,
-							title: "Proposal Two",
-							description:
-								"Yet another example proposal xcvxclk c vd xc asdf cxvyxcv yxcv xycv ",
-							status: "VOTING",
-							createdAt: new Date(),
-							updatedAt: new Date(),
-							area: {
-								id: 4002,
-								title: "Example Area",
-							},
-							supporters: [],
-							numSupporters: 9,
-							supportedByCurrentUser: false,
-							createdBy: {
-								id: 7002,
-								email: "user2@liqudo.vote",
-								profile: {
-									name: "User2 Mobile",
-									mobilephone: "#491234518",
-									picture: "/img/avatars/Avatar2.png",
-								},
-							},
-						},
-					],
-
-					area: {
-						id: 4001,
-						title: "Example Area",
-					},
-					winner: undefined,
-					duelMatrix: undefined,
-				},
-			],
-		}
+		return {}
 	},
-	created() {},
+	computed: {
+		teamName() { return this.$root.store.get('team').name },
+		members()  { return this.$root.store.get('team').members },
+	},
+	created() {
+		this.$root.store.put('team', {
+			name: "Test Dummy Team",
+			members: [
+				{ name: "User1", email: "user1@liquiod.me", avatarUrl: "/img/avatars/Avatar1.png" },
+				{ name: "User2", email: "user2@liquiod.me", avatarUrl: "/img/avatars/Avatar2.png" },
+				{ name: "User3", email: "user3@liquiod.me", avatarUrl: "/img/avatars/Avatar3.png" },
+				{ name: "User4", email: "user4@liquiod.me", avatarUrl: "/img/avatars/Avatar4.png" },
+				{ name: "User5", email: "user5@liquiod.me", avatarUrl: "/img/avatars/Avatar5.png" },
+			]
+		})
+	},
 	mounted() {},
-	computed: {},
+	
 	methods: {
-		addDays(date, days) {
-			let result = new Date(date)
-			result.setDate(result.getDate() + days)
-			return result
-		},
+		gotoPolls() {
+			this.$router.push({name: "polls"})
+		}
 	},
 }
 </script>
 
 <style lang="scss">
-$avatar_size: 90px;
-
-.tabs-content {
-	margin-left: -15px;
-	margin-right: -15px;
-	padding: 1rem 15px;
-	background-color: #f0f0f0;
+@media (min-width: 320px) {
+	#memberCards {
+		display: -ms-flexbox;
+		display: -webkit-box;
+		display: flex;
+		-ms-flex-flow: row wrap;
+		-webkit-box-orient: horizontal;
+		-webkit-box-direction: normal;
+		flex-flow: row wrap;
+		justify-content: space-between;
+		//margin-right: -15px;
+		//margin-left: -15px;
+		.card {
+			width: 30%;
+			//margin-right: 10px;
+			.card-body {
+				padding: 0.5rem;
+			}
+		}
+	}
 }
 
-.nav-tabs .nav-link.active {
-	background-color: #f0f0f0;
-	border-bottom-color: #f0f0f0;
-}
 
-.poll-panel {
-	.prop-list-group-item {
-		padding: 5px;
-	}
-	.prop-title {
-		//line-height: 30px;
-		margin: 0;
-		font-size: 18px;
-		//white-space: nowrap;
-		//overflow: hidden;
-		//text-overflow: ellipsis;
-	}
-	.prop-image {
-		float: left;
-		margin-right: 5px;
-		border-radius: 5px;
-		min-width: $avatar_size;
-		max-width: $avatar_size;
-		width: $avatar_size;
-		min-height: $avatar_size;
-		max-height: $avatar_size;
-		height: $avatar_size;
-	}
+.team-member-img {
+	border-radius: 10px;
+
 }
 </style>

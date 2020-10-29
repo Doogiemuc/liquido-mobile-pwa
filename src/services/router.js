@@ -29,7 +29,7 @@ const routes = [
 		name: "showPoll",
 		component: () => import("@/views/poll-show"),
 		props: true,
-	},
+	}, 
 	{
 		path: "/polls/:pollId/add",
 		name: "addProposal",
@@ -41,7 +41,7 @@ const routes = [
 		name: "teamHome",
 		component: () => import("@/views/team-home"),
 		meta: {
-			requiresAuth: true,
+			requiresAuth: false,
 		},
 	},
 	{
