@@ -11,18 +11,35 @@ const routes = [
 		redirect: "/welcome", //TODO: redirect depending on auth token
 	},
 	{
+		path: "/devLogin",
+		name: "devLogin",
+		component: () => import('@/services/dev-login'),
+		props: (route) => ({
+			userEmail: route.query.userEmail,
+			teamName: route.query.teamName
+		})
+	},
+	{
 		path: "/welcome",
 		component: () => import("@/views/welcome-chat"),
 	},
 	{
-		path: "/polls/create",
-		name: "createPoll",
-		component: () => import("@/views/poll-create"),
+		path: "/team",
+		name: "teamHome",
+		component: () => import("@/views/team-home"),
+		meta: {
+			requiresAuth: false,
+		},
 	},
 	{
 		path: "/polls",
 		name: "polls",
 		component: () => import("@/views/polls"),
+	},
+	{
+		path: "/polls/create",
+		name: "createPoll",
+		component: () => import("@/views/poll-create"),
 	},
 	{
 		path: "/polls/:pollId",
@@ -35,14 +52,6 @@ const routes = [
 		name: "addProposal",
 		component: () => import("@/views/proposal-add"),
 		props: true,
-	},
-	{
-		path: "/team",
-		name: "teamHome",
-		component: () => import("@/views/team-home"),
-		meta: {
-			requiresAuth: false,
-		},
 	},
 	{
 		path: "/polls/:pollId/castVote",
@@ -63,7 +72,7 @@ const routes = [
 ]
 
 const router = new Router({
-	mode: "history",
+	mode: "history",   //TODO: Router History mode needs server configuration
 	base: process.env.BASE_URL,
 	/*
 	scrollBehavior(to, from, savedPosition) {
@@ -80,6 +89,9 @@ const router = new Router({
 
 // route checks for authentication and redirects
 router.beforeEach((routeTo, routeFrom, next) => {
+
+	//TODO: every route except welcome requires auth
+
 	const requiresAuth = routeTo.matched.some((route) => route.meta.requiresAuth)
 	const redirectIfAuthenticated = routeTo.matched.some(
 		(route) => route.meta.redirectIfAuthenticated

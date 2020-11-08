@@ -1,3 +1,9 @@
+console.log("==================================================")
+console.log("===> LIQUIDO Mobile Progressive Web App (PWA) <===")
+console.log("===> Running in NODE_ENV="+process.env.NODE_ENV+ " <===")
+console.log("==================================================")
+
+
 import Vue from "vue"
 import RootApp from "@/root-app.vue"
 import liquidoStore from "@/services/liquido-store"
@@ -9,12 +15,11 @@ import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
 import VueI18n from "vue-i18n"
 import config from 'config'  // automatically mapped to environment specific config file vue.config.js as a webpack alias
-console.log(process.env.NODE_ENV, "=>", config)
 
 Vue.use(BootstrapVue)
 Vue.use(VueI18n)
 
-/** This will install the liquido-api as a Vue plugin under Vue.$api for all Vue components */
+/** This will install the liquido-api as a Vue plugin under this.$api for all Vue components */
 const liquidoApiPlugin = {
 	install(Vue, options) {
 		Vue.prototype.$api = liquidoApi
@@ -43,16 +48,17 @@ const globalTranslations = {
 		Cancel: "Abbrechen",
 		Back: "Zurück",
 		Search: "Suche",
+		Error: "Fehler",
 
 		// Every noun in singular and plural form!
-		idea: "Idee",
-		ideas: "Ideen",
-		proposal: "Vorschlag",
-		proposals: "Vorschläge",
-		poll: "Abstimmung", // Entscheidung von Robert: nein nicht "Wahl(en)"!! Deutsche Übersetzung von poll ist Abstimmung!
+		Idea: "Idee",
+		Ideas: "Ideen",
+		Proposal: "Vorschlag",
+		Proposals: "Vorschläge",
+		Poll: "Abstimmung", 					// Entscheidung von Robert: nein nicht "Wahl" oder "Wahlen"!! Deutsche Übersetzung von poll ist Abstimmung! Wir stimmen ab in LIQUIDO. Der Begriff "Wahl" passt eher zu einer Wahl von Kandidaten, also Personen.
 		polls: "Abstimmungen",
-		law: "Regel",
-		laws: "Regeln",
+		Law: "Regel",
+		Laws: "Regeln",
 
 		newPoll: "Neue Abstimmung",
 		pollInElaboration: "Abstimmung in Diskussion",
@@ -81,9 +87,9 @@ const rootApp = new Vue({
 	i18n,
 	router,
 	data: {
-		store: liquidoStore, // this is available to all sub components as this.$root.store
-		headerHeight: 0, // will be set to height of header in liquido-header.vue
-		transitionName: "", // CSS sliding transition between page components
+		store: liquidoStore, 	// this is available to all sub components as this.$root.store
+		headerHeight: 0, 			// will be set to height of header in liquido-header.vue
+		transitionName: "", 	// CSS sliding transition between page components
 	},
 	...RootApp, // merge these attributes into root-app.vue
 	//render: (h) => h(App),

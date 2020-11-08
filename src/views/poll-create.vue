@@ -1,44 +1,40 @@
 <template>
-	<div>
-		<div class="container">
-			<h2 class="page-title">
-				<i class="fas fa-poll"></i>
-				{{ $t("newPoll") }}
-			</h2>
+	<div id="poll-create">
+		<h2 class="page-title">
+			<i class="fas fa-poll"></i>
+			{{ $t("newPoll") }}
+		</h2>
 
-			<b-card class="chat-bubble form-bubble">
-				<liquido-input
-					id="pollTitleInput"
-					v-model="poll.title"
-					:label="$t('pollTitle')"
-					:validFunc="isPollTitleValid"
-					:invalid-feedback="$t('pollTitleInvalid')"
-					@blur="pollTitleValidated = true"
-				></liquido-input>
+		<b-card class="chat-bubble form-bubble">
+			<liquido-input
+				id="pollTitleInput"
+				v-model="poll.title"
+				:label="$t('pollTitle')"
+				:validFunc="isPollTitleValid"
+				:invalid-feedback="$t('pollTitleInvalid')"
+				@blur="pollTitleValidated = true"
+			></liquido-input>
 
-				<div class="d-flex justify-content-between align-items-center">
-					<small class="ml-1">
-						<a href="#" @click="cancelCreatePoll()">{{ $t("Cancel") }}</a>
-					</small>
-					<b-button
-						:disabled="createPollButtonDisabled"
-						variant="primary"
-						class="float-right"
-						@click="clickCreateNewPoll()"
-					>
-						{{ $t("create") }}
-						<i class="fas fa-angle-double-right"></i>
-					</b-button>
-				</div>
-			</b-card>
+			<div class="d-flex justify-content-between align-items-center">
+				<small class="ml-1">
+					<a href="#" @click="cancelCreatePoll()">{{ $t("Cancel") }}</a>
+				</small>
+				<b-button
+					id="createPollButton"
+					:disabled="createPollButtonDisabled"
+					variant="primary"
+					class="float-right"
+					@click="clickCreateNewPoll()"
+				>
+					{{ $t("create") }}
+					<i class="fas fa-angle-double-right"></i>
+				</b-button>
+			</div>
+		</b-card>
 
-			<b-card class="chat-bubble shadow-sm my-5">
-				<!-- a class="float-right px-1" data-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="true" aria-controls="collapseOne">
-					<i class="fa" aria-hidden="true"></i>
-				</a-->
-				<div v-html="$t('createPollInfo')"></div>
-			</b-card>
-		</div>
+		<b-card class="chat-bubble shadow-sm my-3">
+ 			<div v-html="$t('createPollInfo')"></div>
+		</b-card>
 	</div>
 </template>
 
@@ -52,9 +48,10 @@ export default {
 			de: {
 				newPoll: "Neue Abstimmung",
 				createPollInfo:
-					'<p>Eine Abstimmung (<i class="fas fa-poll"></i>) enthält mehrere Wahlvorschläge (<i class="fas fa-vote-yea"></i>) und läuft über zwei Phasen:<p>' +
-					'<p>(1) Während der Elaborationsphase kann jeder in deinem Team seinen Vorschlag zur Abstimmung hinzufügen. Diese können dann diskutiert (<i class="fas fa-comments"></i>) werden.</p>' +
-					'<p>(2) Wenn du als Admin die Wahlphase der Abstimmung gestartet hast, dann kann jeder im Team seine Stimme abgeben. (<i class="fas fa-person-booth"></i>)</p>',
+					'<p>Nur du als Admin kannst neue Abstimmungen erstellen.</p>'+
+					'<p>(1) Während eine Abstimmung noch in Diskussion (<i class="fas fa-comments"></i>) ist, kann jeder aus deinem Team seinen eigenen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen.</p>' +
+					'<p>(2) Wenn du dann die Wahlphase der Abstimmung startest, kann jeder im Team seine Stimme anonym abgeben. (<i class="fas fa-person-booth"></i>)</p>' +
+					'<p>(3) Nachdem du die Wahlphase beendet hast, ist das Wahlergebnis für alle sichtbar.',
 				pollTitle: "Titel der Abstimmung",
 				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. 10 Zeichen.",
 				create: "Anlegen",
@@ -84,7 +81,16 @@ export default {
 			this.$router.push("/polls")
 		},
 		clickCreateNewPoll() {
-			this.$root.store.savePoll(this.poll).then((createdPoll) => this.$router.push("/polls/" + createdPoll.id))
+			console.log("clickCreateNewPoll")
+			return this.$api.createPoll(this.poll)
+				.then(createdPoll => {
+					console.log("routerPush")
+					this.$router.push("/polls/" + createdPoll.id)
+				})
+				.catch(err => {
+					console.warn("Error", err)
+				})
+			console.log("clickCreateNewPoll")
 		},
 	},
 }

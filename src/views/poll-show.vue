@@ -1,8 +1,15 @@
 <template>
-	<div class="container mb-3">
+	<div id="poll-show">
 		<h2 class="page-title">{{ pageTitleLoc }}</h2>
 
-		<poll-panel :poll="poll" :key="poll.id" :read-only="true" class="shadow mb-3"></poll-panel>
+		<poll-panel v-if="poll.id" :poll="poll" :key="poll.id" :read-only="true" class="shadow mb-3"></poll-panel>
+
+		<div v-else	class="alert alert-danger mb-3">
+			<div v-html="$t('cannotFindPoll', {pollId: pollId})"></div>
+			<b-button variant="primary" class="float-right" @click="$router.push({name: 'polls'})">
+				{{ $t("Back") }}
+			</b-button>
+		</div>
 
 		<div
 			v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0"
@@ -73,6 +80,7 @@ export default {
 				editOwnVote: "Stimmzettel ändern",
 				alreadyVotedInfo:
 					"<p>Du hast in dieser Abstimmung bereits eine Stimme abgegeben.</p><p>So lange die Wahlphase dieser Abstimmung noch läuft, kannst du in <span class='liquido'></span> die Prio Reihenfolge auf deinem Stimmzettel auch noch ändern wenn du möchstest.</p>",
+				cannotFindPoll: "<h4>Fehler</h4><hr/><p>Diese Abstimmung konnte nicht gefunden werden.</p>",
 			},
 		},
 	},
@@ -86,13 +94,16 @@ export default {
 		}
 	},
 	created() {
-		this.poll = this.$root.store.getPollById(this.pollId)
-		//TODO: show error if this.poll === undefined
-		if (!this.poll || !this.poll.title) console.warn("Cannot find poll.id=" + this.pollId)
+		this.$api.getPollById(this.pollId, true)
+			.then(poll => this.poll = poll)
+			.catch(err => {
+				console.warn("Cannot find poll.id=" + this.pollId)
+			})
 	},
 	mounted() {},
 	computed: {
 		pageTitleLoc() {
+			if (!this.poll.id) return this.$t('Poll')
 			if (!this.poll.proposals || this.poll.proposals.length === 0) return this.$t("newPoll")
 			if (this.poll.status === "ELABORATION") return this.$t("pollInElaboration")
 			if (this.poll.status === "VOTING") return this.$t("pollInVoting")
@@ -100,7 +111,7 @@ export default {
 			return this.$t("poll")
 		},
 		userIsAdmin() {
-			return this.$root.store.user.isAdmin
+			return this.$root.store.isAdmin()
 		},
 		/** User can add his own proposal if the poll is in status ELABORATION and he did not add a proposal to this poll yet. */
 		showAddProposal() {

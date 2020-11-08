@@ -8,7 +8,7 @@
  */
 
 import { uniqueId } from "lodash"
-import testPolls from "../../cypress/fixtures/testPolls"
+//import testPolls from "../../cypress/fixtures/testPolls"
 
 // Client side cache for data that was fetched from the server
 let cache = {
@@ -36,8 +36,9 @@ let cache = {
 	// User's voterToken for casting LIQUIDO votes
 	voterToken: undefined,
 
-	// List of polls in the team. Each poll has proposals
-	polls: testPolls
+	// Polls by their ID in the team. Each poll has proposals
+	//TODO: move polls to their own cache (by poll.Id)  This way we can make a generic vue-cache module
+	polls: {} // testPolls
 }
 
 
@@ -66,16 +67,57 @@ export default {
 		return cache[key] || defaultValue
 	},
 
+	/**
+	 * Fetch a value from the cache or 
+	 * call a "fetch" function, remember the returned result in the cache and return this result
+	 * @param {String} key cache key
+	 * @param {Function} fetchFunc Function that will lazily be called if there is no value under key yet.
+	 * @returns {Promise} A Promise that will resolve to the value. Either directly from the cache or otherwise what the fetchFunc returns
+	 */
+	remember(key, fetchFunc) {
+		// Nice idea from https://yarkovaleksei.github.io/vue2-storage/en/api.html#set
+		let valueFromCache = get(key)
+		if (valueFromCache) return Promise.resolve(valueFromCache)
+		return fetchFunc().then(res => {
+			this.put(key, res)
+			return Promise.resolve(res)
+		})
+	},
 
-	// Helper methods
+	getProposalById(poll, proposalId) {
+		return poll.proposals.find((prop) => prop.id == proposalId)
+	},
 
+	/** 
+	 * Get a poll by its ID (either from the cache or from the backend)
+	 * @return A Promise that resolves to the poll or a rejected Promise if there is no poll with that ID
+	 */
+	getPollById(pollId) {
+		return cache.polls[pollId]
+	},
+
+	/**
+	 * Cache the given poll under its ID
+	 * @param {Object} poll poll that MUST have an ID
+	 */
+	cachePoll(poll) {
+		if (!poll.id) {
+			console.error("Cannot cache poll. (title='"+poll.title+"') It has no ID")
+		} else {
+			cache.polls[poll.id] = poll
+		}
+	},
+
+
+	//
+	// Little utility methods
+	// 
 	isAuthenticated() {
 		return cache.jwt !== undefined
 	},
 
-	/** Find a poll by its ID. May return undefined if ID is not found! */
-	getPollById(pollId) {
-		return cache.polls.find(p => p.id == pollId) 		// pollId might be a String or a Number!
+	isAdmin() {
+		return cache.user && cache.user.isAdmin
 	},
 
 	getProposalById(poll, proposalId) {
@@ -83,14 +125,11 @@ export default {
 	},
 
 
-	getPollById(pollId) {
-		return this.polls.find((poll) => poll.id == pollId)
-	},
-
 	//
 	// ========== These methods change the content of the store ("mutations" in vuex) ==========
 	//
 
+	/*
 	savePoll(poll) {
 		if (!typeof poll === "object")
 			return Promise.reject("Cannot savePoll. Need poll object")
@@ -113,6 +152,7 @@ export default {
 		}
 		return Promise.resolve(poll)
 	},
+	*/
 
 	/**
 	 * Add or update a proposal in a poll.

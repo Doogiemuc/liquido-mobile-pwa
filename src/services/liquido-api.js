@@ -33,6 +33,42 @@ export default {
 		return axios.get("/")
 	},
 
+	login(user, team, jwt, voterToken) {
+		store.put("team", team)
+		store.put("user", user)
+		store.put("jwt",  jwt)
+		store.put("voterToken", voterToken)
+		axios.defaults.headers.common['Authorization'] = "Bearer " + jwt;
+		console.log("Login <"+user.email+"> in "+team.name)
+	},
+
+	/* login for development. Only available in NODE_ENV=development or test */
+	async devLogin(userEmail, teamName) {
+		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test") throw Error("devLogin is only allowed in NODE_ENV development or test")
+		//console.log("API: devLogin email="+email+" in team="+teamName)
+		return axios({
+			method: "GET", 
+			url: "/devLogin", 
+			params: {
+				userEmail: userEmail,
+				teamName: teamName
+			}
+		}).then(res => {
+			console.log("API: devLogin for <"+userEmail+"> in team '"+teamName+"'")
+			this.login(res.data.user, res.data.team, res.data.jwt, res.data.jwt)
+			return res.data
+		}).catch(err => { 
+			console.error(err.response ? err.response : err)
+			return Promise.reject(err.response ? err.response : err)
+		})
+	},
+
+	/** Logout the current user. Remove JWT */
+	logout() {
+		axios.defaults.headers.common['Authorization'] = undefined
+		console.log("API: logout")
+	},
+
 	/**
 	 * Create a new team.
 	 * This method will also save the current user, jwt and voterToken to liquido-store.
@@ -43,10 +79,7 @@ export default {
 		return axios.post("/team", newTeam)
 			.then(res => {
 				log.info("Created new team:", res.data)
-				store.put("team", res.data.team)
-				store.put("user", res.data.team.admin)
-				store.put("jwt",  res.data.jwt)
-				store.put("voterToken", res.data.voterToken)
+				this.login(res.data.user, res.data.team, res.data.jwt, res.data.voterToken)
 				return res.data
 			})
 			// There is deliberately no error handling here, because we can't handle the error in this method :-)
@@ -58,10 +91,7 @@ export default {
 		return axios.put("/team/join", joinTeamRequest)
 		.then(res => {
 			log.info("Joined team:", res.data)
-			store.put("team", res.data.team)
-			store.put("user", res.data.user)
-			store.put("jwt",  res.data.jwt)
-			store.put("voterToken", res.data.voterToken)
+			this.login(res.data.user, res.data.team, res.data.jwt, res.data.voterToken)
 			return res.data
 		})
 	},
@@ -70,17 +100,42 @@ export default {
 		return Promise.reject("not yet implemented")
 	},
 
-	async getPollById(pollId) {
-		return Promise.reject("not yet implemented")
+	/**
+	 * Create a new poll and cache the returned result
+	 * @param {Object} poll 
+	 */
+	async createPoll(poll) {
+		return axios.post("polls", poll)
+		.then(res => {
+			let createdPoll = res.data
+			log.info("Poll created:", createdPoll)
+			store.cachePoll(createdPoll)
+			return createdPoll
+		})
+	},
+
+	/**
+	 * 
+	 * @param {Number} pollId poll.id
+	 * @param {Boolean} forceRefresh by default cache from liquido-store will be used. Set this to true to force an API call to the backend
+	 */
+	async getPollById(pollId, forceRefresh = false) {
+		let pollFromCache = store.getPollById(pollId)
+		if (!pollFromCache || noCache) {
+			return axios.get("/polls/"+pollId)
+				.then(res => { 
+					store.cachePoll(res.data)
+					return res.data
+				})
+		}
+		return Promise.resolve(pollFromCache)
 	},
 
 	async getPolls(status = undefined) {
 		return Promise.reject("not yet implemented")
 	},
 
-	async savePoll(poll) {
-		return Promise.reject("not yet implemented")
-	},
+	
 
 	/** save new or update existing proposal */
 	async saveProposal(proposal) {

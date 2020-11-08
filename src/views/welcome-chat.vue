@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="container mt-3">
+		<div class="mt-3">
 			<b-card id="welcomeBubble" :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm">
 				<b-card-text v-html="$t('welcome')"></b-card-text>
 			</b-card>
@@ -52,7 +52,7 @@
 							opacity0: flowState >= 8,
 						}"
 						class="btn"
-						@click="clickJoinTeam()"
+						@click="chooseJoinTeam()"
 					>{{ $t("joinTeamButton") }}</button>
 					<button
 						id="createNewTeamButton"
@@ -62,14 +62,14 @@
 							opacity0: flowState == 7,
 						}"
 						class="btn"
-						@click="clickCreateNewTeam()"
+						@click="chooseCreateNewTeam()"
 					>{{ $t("createNewTeamButton") }}</button>
 				</div>
 			</div>
 
-			<!-- Join a team (flowState == 7) -->
+			<!-- Join a team - form (flowState == 10) -->
 
-			<b-card :class="{ 'collapse-max-height': flowState !== 7 }" class="chat-bubble chat-right">
+			<b-card :class="{ 'collapse-max-height': ![10,11,12].includes(flowState) }" class="chat-bubble chat-right">
 				<form id="joinTeamForm">
 					<liquido-input
 						v-model="inviteCode"
@@ -79,7 +79,7 @@
 						:valid-func="isInviteCodeValid"
 						:maxlength="100"
 						:invalid-feedback="$t('inviteCodeInvalid')"
-						:disabled="flowState > 7"
+						:disabled="flowState !== 10"
 						tabindex="1"
 					></liquido-input>
 
@@ -91,12 +91,12 @@
 						:valid-func="isEmailValid"
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
-						:disabled="flowState > 7"
+						:disabled="flowState !== 10"
 						tabindex="2"
 					></liquido-input>
 
 					<div class="d-flex justify-content-between align-items-center">
-						<small :class="{ invisible: flowState > 7 }" class="ml-1">
+						<small :class="{ invisible: flowState !== 10 }" class="ml-1">
 							<a href="#" @click="cancelJoinTeam()" tabindex="4">{{ $t("Cancel") }}</a>
 						</small>
 						<b-button
@@ -113,9 +113,28 @@
 				</form>
 			</b-card>
 
-			<!-- Create a new team (flowState == 8) -->
+			<!--Joined team successfully (flowState == 12) -->
 
-			<b-card :class="{ 'collapse-max-height': flowState < 8 }" class="chat-bubble chat-right">
+			<b-card	id="joinedTeamBubble"	:class="{ 'collapse-max-height': flowState !== 12 }" class="chat-bubble shadow-sm">
+				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.name })"></p>
+				<b-button
+					variant="primary"
+					class="float-right mb-1"
+					@click="$router.push('/team')"
+				>
+					{{ $t("goToTeam") }}
+					<i class="fas fa-angle-double-right"></i>
+				</b-button>
+			</b-card>
+
+
+
+
+
+
+			<!-- Create a new team - form (flowState == 20) -->
+
+			<b-card :class="{ 'collapse-max-height': ![20,21,22].includes(flowState) }" class="chat-bubble chat-right">
 				<form id="createNewTeamForm">
 					<liquido-input
 						v-model="team.name"
@@ -125,7 +144,7 @@
 						:valid-func="isTeamNameValid"
 						:maxlength="100"
 						:invalid-feedback="$t('teamNameInvalid')"
-						:disabled="flowState > 8"
+						:disabled="flowState !== 20"
 						tabindex="1"
 					></liquido-input>
 
@@ -138,17 +157,14 @@
 						:valid-func="isAdminEmailValid"
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
-						:disabled="flowState > 8"
+						:disabled="flowState !== 20"
 						tabindex="2"
 					></liquido-input>
 
 					<small class="ml-1 mb-1">{{ $t("youWillBecomeAdmin") }}</small>
 
-					<div
-						:class="{ 'collapse-max-height': flowState > 8 }"
-						class="d-flex justify-content-between align-items-center"
-					>
-						<small class="ml-1">
+					<div class="d-flex justify-content-between align-items-center">
+						<small :class="{ invisible: flowState !== 20 }" class="ml-1">
 							<a href="#" @click="cancelCreateNewTeam()" tabindex="4">{{ $t("Cancel") }}</a>
 						</small>
 						<b-button
@@ -165,11 +181,11 @@
 				</form>
 			</b-card>
 
-			<!-- New team created (flowState == 9) -->
+			<!-- New team created successfully (flowState == 22) -->
 
 			<b-card
 				id="newTeamCreatedBubble"
-				:class="{ 'collapse-max-height': flowState !== 9 }"
+				:class="{ 'collapse-max-height': flowState !== 22 }"
 				class="chat-bubble shadow-sm"
 			>
 				<p>{{ $t("teamCreated") }}</p>
@@ -193,10 +209,10 @@
 				<p v-html="$t('teamInfo')"></p>
 			</b-card>
 
-			<b-card :class="{ 'collapse-max-height': flowState !== 9 }" class="chat-bubble shadow-sm">
+			<b-card :class="{ 'collapse-max-height': flowState !== 22 }" class="chat-bubble shadow-sm">
 				<p v-html="$t('pollInfo')"></p>
 				<b-button
-					:class="{ 'd-none': flowState !== 9 }"
+				  id="gotoCreatePollButton"
 					variant="primary"
 					class="float-right mb-3"
 					@click="gotoCreatePoll()"
@@ -207,25 +223,6 @@
 				</b-button>
 			</b-card>
 		
-
-			<!--Joined team successfull (flowState == 10) -->
-
-			<b-card
-				id="joinedTeamBubble"
-				:class="{ 'collapse-max-height': flowState !== 10 }"
-				class="chat-bubble shadow-sm"
-			>
-				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.name })"></p>
-				<b-button
-					variant="primary"
-					class="float-right mb-1"
-					@click="$router.push('/team')"
-				>
-					{{ $t("goToTeam") }}
-					<i class="fas fa-angle-double-right"></i>
-				</b-button>
-			</b-card>
-
 		</div> <!-- end of container -->
 
 		<!-- Error message modal popup -->
@@ -275,11 +272,11 @@ export default {
 			de: {
 				welcome:
 					'<p>Willkommen bei <span class="liquido"></span>, der freien, sicheren und liquiden e-voting App für euer Team.</p>' +
-					"In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag (oder Kandidaten), sondern jeder im Team sortiert alle Wahlvorschläge nach seiner eigenen Prio und Liquido berechnet daraus dann den Gesamtsieger der Wahl.</p>",
+					"In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag oder Kandidaten, sondern jeder im Team sortiert Wahlvorschläge nach seiner eigenen Priorität und Liquido berechnet daraus dann mit einem cleveren Algorithmus den Sieger der Wahl.</p>",
 				whatsYourName: "Darf ich fragen wie du heißt?",
 				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
-				niceToMeetYou: "Hallo {nickname}! Schön dich kennen zu lernen.",
+				niceToMeetYou: "Hallo <b>{nickname}</b>! Schön dich kennen zu lernen.",
 				createOrJoin:
 					"Möchtest du <ul><li>einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team</b> gründen?</li></ul>",
 
@@ -306,11 +303,11 @@ export default {
 				teamInfo:
 					'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) oben rechts.',
 				pollInfo:
-					'Jetzt kannst du deine erste Abstimung (<i class="fas fa-poll"></i>) erstellen, zu der jedes Teammitglied dann seinen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen kann.',
+					'Jetzt kannst du die erste Abstimung (<i class="fas fa-poll"></i>) erstellen, zu der jedes Teammitglied dann seinen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen kann.',
 				createPoll: "Abstimmung anlegen",
 
 				error: "Fehler",
-				cannotCreateNewTeam: "Fehler beim anlegen des neuen Teams. Bitte versuche es später noch einmal.",
+				cannotCreateNewTeam: "Es tut uns sehr leid, das neue Team konnt nicht angelegt werden. Bitte versuche es später noch einmal.",
 				cannotJoinTeam: "Du kannst diesem Team nicht beitreten. {errorDetails}"
 			},
 		},
@@ -343,14 +340,22 @@ export default {
 				 4 - Nice to meet you bubble
 				 5 - create or join Team bubble
 				 6 - create or join Team buttons
-				 7 - join a team form
-				 8 - create new team form
-				 9 -new  team created
+				 
+				 10 - join a team form
+				 11 - clicked on joinTeam button, waiting for server reply
+				 12 - new team joined successfully
+
+				 21 - create new team form
+				 22 - clicked on createTeam button,  waiting for server reply
+				 23 - new team created successfully
+				 
 			*/
 			flowState: 0,
 
+			//Semaphore so that the chat animation is only started once. This is for example relevant when the window is reloaded in the browser
 			chatAnimationStarted: false,
 
+			// localized message in the error modal popup
 			errorMessage: "",
 		}
 	},
@@ -379,18 +384,18 @@ export default {
 	},
 	computed: {
 		joinTeamOkButtonDisabled() {
-			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 7
+			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 10
 		},
 		createNewTeamOkButtonDisabled() {
-			return !this.isTeamNameValid(this.team.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 8
+			return !this.isTeamNameValid(this.team.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 20
 		},
 	},
 	watch: {
-		/*
+		
 		'flowState': function(newVal, oldVal) {
 			console.log(" ====>>> flowState", oldVal, "=>", newVal)
 		}
-		*/
+		
 	},
 	methods: {
 		/* username must not be empty and contain at least 4 chars */
@@ -433,9 +438,9 @@ export default {
 		},
 
 		/** Click join team button */
-		clickJoinTeam() {
+		chooseJoinTeam() {
 			if (this.flowState === 6) {
-				this.flowState = 7
+				this.flowState = 10
 				this.scrollToBottom()
 			}
 		},
@@ -444,9 +449,9 @@ export default {
 			this.scrollToBottom()
 		},
 
-		clickCreateNewTeam() {
+		chooseCreateNewTeam() {
 			if (this.flowState === 6) {
-				this.flowState = 8
+				this.flowState = 20
 				this.scrollToBottom()
 			}
 		},
@@ -458,6 +463,7 @@ export default {
 		/** Create a new team */
 		createNewTeam() {
 			if (this.createNewTeamOkButtonDisabled) return
+			this.flowState = 21
 			//console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.name)
 			let newTeamRequest = {
 				teamName: this.team.name,
@@ -466,7 +472,7 @@ export default {
 			}
 			this.$api.createNewTeam(newTeamRequest)
 				.then((res) => {
-					this.flowState = 9
+					this.flowState = 22
 					this.team = res.team
 					this.$nextTick(() => {
 						this.scrollElemToTop("#newTeamCreatedBubble", 0)
@@ -476,6 +482,7 @@ export default {
 					console.error("Cannot create new team", err)
 					this.errorMessage = this.$t('cannotCreateNewTeam')
 					$('#errorMessage').modal({show: true})
+					this.flowState = 20
 				})
 		},
 
@@ -485,6 +492,7 @@ export default {
 
 		/** Join an existing team */
 		joinTeam() {
+			this.flowState = 11
 			console.log(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
 			let joinTeamRequest = {
 				inviteCode: this.inviteCode,
@@ -493,7 +501,7 @@ export default {
 			}
 			this.$api.joinTeam(joinTeamRequest)
 				.then(res => {
-					this.flowState = 10
+					this.flowState = 12
 					this.team = res.team
 					this.$nextTick(() => {
 						this.scrollElemToTop("#joinedTeamBubble", 0)
@@ -503,6 +511,7 @@ export default {
 					console.error("Cannot join team", err)
 					this.errorMessage = this.$t('cannotJoinTeam', {errorDetails: err.err })
 					$('#errorMessage').modal({show: true})
+					this.flowState = 10
 				})
 		},
 

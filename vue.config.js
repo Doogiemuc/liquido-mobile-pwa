@@ -3,18 +3,17 @@ const PurgecssPlugin = require("purgecss-webpack-plugin")
 const glob = require("glob-all")
 const path = require("path")
 
-console.log("Mapping config to", path.join(__dirname, "config/config."+process.env.NODE_ENV))
 
-module.exports = {
+const vueConfig = {
 	lintOnSave: undefined,
 	devServer: {
 		port: 3001,				// 8080 is taken by backend API!
 		proxy: {					// Problems with CORS? Vue Dev serve can proxy API requests for your: https://cli.vuejs.org/config/#devserver-proxy
 			'^/liquido-api': {
-				target: 'http://localhost:8080/',    // the matched path will be appended to this!
-				//ws: true,
-				//changeOrigin: true
-			}
+					target: 'http://localhost:8080/',    // the matched path will be appended to this!
+					//ws: true,
+					//changeOrigin: true
+				}
 		}
 	},
 	configureWebpack: {
@@ -72,3 +71,14 @@ module.exports = {
 		appleMobileWebAppStatusBarStyle: "black",
 	},
 }
+
+console.log("==================================================")
+console.log("===> LIQUIDO Mobile Progressive Web App (PWA) <===")
+console.log("--------------------------------------------------")
+console.log("NODE_ENV:  "+process.env.NODE_ENV)
+console.log("config.js: "+vueConfig.configureWebpack.resolve.alias.config)
+console.log("devServer: http://localhost:"+vueConfig.devServer.port)
+console.log("API proxy: "+JSON.stringify(vueConfig.devServer.proxy))
+console.log("==================================================")
+
+module.exports = vueConfig

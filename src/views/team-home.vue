@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div id="team-home">
 		<h2 class="page-title">{{ teamName }}</h2>
 
 		<b-card class="chat-bubble shadow-sm">
