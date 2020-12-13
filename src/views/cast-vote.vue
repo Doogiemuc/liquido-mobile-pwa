@@ -96,7 +96,7 @@ export default {
 		}
 	},
 	created() {
-		this.poll = this.$root.store.getPollById(this.pollId)
+		this.poll = this.$api.getPollById(this.pollId)
 		if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
 		this.ballot = _.cloneDeep(this.poll.proposals)
 	},

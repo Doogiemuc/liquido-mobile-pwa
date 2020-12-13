@@ -1,6 +1,6 @@
 <template>
-	<div id="team-home">
-		<h2 class="page-title">{{ teamName }}</h2>
+	<div>
+		<h2 id="team-home" class="page-title">{{ teamName }}</h2>
 
 		<b-card class="chat-bubble shadow-sm">
 			<b-card-text>
@@ -11,7 +11,7 @@
 		<b-button
 				id="gotoPollsButton"
 				variant="primary"
-				size="sm"
+				size="m"
 				class="float-right mb-3"
 				@click="gotoPolls()"
 			>
@@ -45,7 +45,7 @@ export default {
 			de: {
 				introYourTeam: "Willkommen in deinem Team! Wenn euer Admin eine Abstimmung erstellt, kann jeder im Team seinen Wahlvorschlag hinzufügen. Nachdem der Admin dann die Wahlphase gestartet hat, kann jeder seine Stimme abgeben. Bis am Ende das Wahlergebnis feststeht.",
 				teamMembers: "Teammitglieder",
-				gotoPolls: "Zu den Abstimmungen"
+				gotoPolls: "Eure Abstimmungen"
 			},
 		},
 	},

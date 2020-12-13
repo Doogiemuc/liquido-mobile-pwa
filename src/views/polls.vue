@@ -77,7 +77,6 @@
 </template>
 
 <script>
-import liquidoHeader from "../components/liquido-header"
 import liquidoInput from "../components/liquido-input"
 import pollPanel from "../components/poll-panel"
 import pollsFooter from "../components/polls-footer"
@@ -103,28 +102,28 @@ export default {
 				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
 				createPoll: "Neue Abstimmung anlegen",
 				allPolls: "Alle Abstimmungen",
-				ELABORATION: "Neue Abstimmungen",
-				VOTING: "Laufende Wahlen",
-				FINISHED: "Abgeschlossene Abstimmungen",
 			},
 		},
 	},
-	components: { pollPanel, liquidoHeader, liquidoInput, pollsFooter },
+	components: { pollPanel, liquidoInput, pollsFooter },
 	props: {
 		status: { type: String, required: false, default: undefined },
 	},
 	data() {
 		return {
+			polls: [],
 			searchQuery: "",
 		}
 	},
 	created() {
 		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
-			this.$root.store.setPollStatusFilter(this.status)
+			this.$root.store.state.pollStatusFilter = this.status
 		}
+		this.$root.$api.getPolls().then(polls => {
+			this.polls = polls
+		})
 	},
 	mounted() {},
-	//TODO: watch pollStatusFilter and reset searchQuery on change
 	computed: {
 		pageTitleLoc() {
 			switch (this.pollStatusFilter) {
@@ -140,9 +139,6 @@ export default {
 		},
 		userIsAdmin() {
 			return this.$root.store.get("user", {}).isAdmin
-		},
-		polls() {
-			return this.$root.store.get("polls")
 		},
 		filteredPolls() {
 			return this.polls

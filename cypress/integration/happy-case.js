@@ -17,7 +17,7 @@ context('Happy Case', () => {
 		fix.adminEmail = 'cypressAdmin-'+now+'@liquido.me'
 		fix.teamName   = 'Cypress Team '+now
 		fix.inviteCode = undefined
-		fix.pollTitle  = 'Cypress Polll '+now
+		fix.pollTitle  = 'Cypress Poll '+now
 	})
 
 	beforeEach(() => {
@@ -66,7 +66,7 @@ context('Happy Case', () => {
 		})
 		cy.get('#gotoCreatePollButton').click()
 
-		// create first proposal
+		// ============= create first proposal
 		//GIVEN
 		cy.get('#poll-create')
 		//WHEN
@@ -74,7 +74,7 @@ context('Happy Case', () => {
 		cy.get('#createPollButton').click()
 		//THEN
 		cy.get('#poll-show')
-		cy.get('#pollTitle').should('have.text', fix.pollTitle)
+		cy.get('.poll-panel-title').should('contain.text', fix.pollTitle)
 	})
 
 	//TODO: create test with mocked error response to check error modal
@@ -99,11 +99,18 @@ context('Happy Case', () => {
 		cy.get('#joinedTeamBubble')
 	})
 
+	
 	it('Show team', function() {
+		//GIVEN a logged in user
+		//TODO: login user
+
+		//WHEN
 		cy.visit('/team')
+
+		//THEN
 		cy.get('#team-home')
 	})
-
+	
 	
 
 	it('cleanup DB', function() {

@@ -2,19 +2,20 @@
 	<div>
 		<h1 class="page-title">LIQUIDO - DevLogin</h1>
 		<div class="alert alert-secondary">NODE_ENV="{{nodeEnv}}"</div>
-		<div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
+		<div v-if="successMessage" class="alert alert-success">
+			{{ successMessage }}
+			<router-link tag="button" class="btn btn-primary" :to="{name: 'polls'}">Ok</router-link>
+		</div>
 		<div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-		<div v-if="showDetails">
-			<h4>User</h4>
-			<pre>{{ $root.store.get('user')}}</pre>
-			<h4>Team</h4>
-			<pre>{{ $root.store.get('team')}}</pre>
-			<div v-if="polls">
-				<h4>Polls of Team</h4>
-				<ul>
-					<li v-for="poll in polls" :key="poll.id"><router-link :to="{ name: 'showPoll', params: { pollId: ''+poll.id }}">{{poll.title}}</router-link></li>
-				</ul>
-			</div>			
+		<h4>User</h4>
+		<pre>{{ $root.store.get('user')}}</pre>
+		<h4>Team</h4>
+		<pre>{{ $root.store.get('team')}}</pre>
+		<div v-if="polls">
+			<router-link :to="{ name: 'polls'}"><h4>Polls of Team</h4></router-link>
+			<ul>
+				<li v-for="poll in polls" :key="poll.id"><router-link :to="{ name: 'showPoll', params: { pollId: ''+poll.id }}">{{poll.title}}</router-link></li>
+			</ul>
 		</div>
 	</div>
 </template>
@@ -34,28 +35,24 @@ export default {
 		return { 
 			successMessage: "",
 			errorMessage: "",
-			polls: undefined,
+			polls: []
 		}
 	},
 	created() {},
 	mounted() {
 		this.message = "Sending /devLogin request ..."
 		this.$api.devLogin(this.userEmail, this.teamName)
-			.then(res => { 
-				this.polls = res.polls
+			.then(loginData => { 
+				this.polls = loginData.polls
 				this.successMessage = "devLogin successfull"
 			})
 			.catch(err => {	this.errorMessage = "ERROR: "+JSON.stringify(err) })
 	},
 	computed: {
 		nodeEnv() { return process.env.NODE_ENV },
-		showDetails() { return true }
+		showDetails() { return true },
 	},
 	methods: {},
-	filters: {},
-	beforeUpdate() {},
-	updated() {},
-	beforeDestroy() {},
 }
 </script>
 

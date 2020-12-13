@@ -1,11 +1,11 @@
 <template>
 	<b-card :pollid="poll.id" no-body class="poll-panel shadow mb-3">
 		<template v-slot:header>
-			<h4 v-if="readOnly" class="read-only">
+			<h4 v-if="readOnly" class="read-only poll-panel-title">
 				<i class="fas fa-poll"></i>
 				&nbsp;{{ poll.title }}
 			</h4>
-			<h4 v-else @click="goToPoll(poll.id)">
+			<h4 v-else @click="goToPoll(poll.id)" class="poll-panel-title">
 				<i class="fas fa-angle-double-right goto-poll-icon"></i>
 				<i class="fas fa-poll"></i>
 				&nbsp;{{ poll.title }}
@@ -15,7 +15,7 @@
 			v-if="!poll.proposals || poll.proposals.length === 0"
 			class="card-body"
 		>
-			<p class="text-secondary">{{ $t("noProposalsInPollYet") }}</p>
+			<p class="text-secondary"><small>{{ $t("noProposalsInPollYet") }}</small></p>
 			<div v-if="showAddProposalButton" class="mb-1 text-right">
 				<b-button variant="primary" @click="goToAddProposal(poll.id)">
 					{{ $t("addProposal") }}
@@ -26,7 +26,7 @@
 		<div v-for="law in poll.proposals" v-else :key="law.id" class="law-panel">
 			<div>
 				<h4 class="law-title">
-					<i :class="getIconForLaw(law)" class="title-icon"></i>
+					<i class="title-icon far fa-lightbulb"></i>
 					&nbsp;{{ law.title }}
 				</h4>
 			</div>
@@ -37,7 +37,7 @@
 				</div>
 				<div class="user">
 					<i class="far fa-user"></i>
-					&nbsp;{{ law.createdBy.profile.name }}
+					&nbsp;{{ law.createdBy.name }}
 				</div>
 				<div
 					:class="{ supported: law.supportedByCurrentUser }"
@@ -83,8 +83,7 @@ export default {
 		messages: {
 			en: {},
 			de: {
-				noProposalsInPollYet:
-					"Es gibt bisher noch keine Wahlvorschläge oder Kandidat*innen in dieser Abstimmung.",
+				noProposalsInPollYet: "Diese Abstimmung enthält bisher noch keine Wahlvorschläge oder Kandidat*innen.",
 				addProposal: "Vorschlag hinzufügen",
 			},
 		},
@@ -111,6 +110,7 @@ export default {
 			return moment(dateVal).format("L")
 		},
 
+		/*
 		getIconForLaw(law) {
 			switch (law.status) {
 				case "IDEA":
@@ -133,6 +133,7 @@ export default {
 					return "fas fa-university"
 			}
 		},
+		*/
 
 		toggleCollapse() {
 			$(".law-panel").toggleClass("collapse-law-panel")

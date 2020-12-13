@@ -1,55 +1,54 @@
 <template>
 	<div>
-		<div class="container">
-			<h2 class="page-title">{{ $t("addProposal") }}</h2>
+		<h2 class="page-title">{{ $t("addProposal") }}</h2>
 
-			<div class="card input-bubble mb-3">
-				<div class="card-header">{{ $t("yourProposal") }}</div>
-				<div class="card-body">
-					<liquido-input
-						id="propTitle"
-						:label="$t('title')"
-						v-model="proposal.title"
-						:state="titleState"
-						:invalid-feedback="$t('titleInvalid')"
-						:maxlength="500"
-						name="propTitle"
-						@blur="titleValidated = true"
-					></liquido-input>
-					<textarea
-						id="descriptionId"
-						v-model="proposal.description"
-						:class="descriptionValidClass"
-						:placeholder="$t('describeYourProposal')"
-						name="description"
-						class="form-control"
-						rows="3"
-						@blur="descriptionValidated = true"
-					></textarea>
-					<div v-if="descriptionState === null" class="text-small">
-						{{ $t("descriptionInfo", { minChars: descriptionMinLength }) }}
-					</div>
-					<div v-if="descriptionState === false" class="invalid-feedback">
-						{{ $t("descriptionTooShort") }}
-					</div>
-					<button
-						:disabled="saveButtonDisabled"
-						type="button"
-						class="btn btn-primary mt-3 float-right"
-						@click="saveProposal()"
-					>
-						{{ $t("save") }}
-						<i class="fas fa-angle-double-right"></i>
-					</button>
+		<div class="card input-bubble mb-3">
+			<div class="card-header">{{ $t("yourProposal") }}</div>
+			<div class="card-body">
+				<liquido-input
+					id="propTitle"
+					:label="$t('title')"
+					v-model="proposal.title"
+					:validFunc="isProposalTitleValid"
+					:invalid-feedback="$t('titleInvalid', {minChars: titleMinLength})"
+					:maxlength="500"
+					name="propTitle"
+				></liquido-input>
+				<textarea
+					id="descriptionId"
+					v-model="proposal.description"
+					:class="descriptionValidClass"
+					:placeholder="$t('describeYourProposal')"
+					name="description"
+					class="form-control"
+					rows="3"
+					@blur="descriptionValidated = true"
+				></textarea>
+				<div v-if="descriptionState === null" class="text-small">
+					{{ $t("descriptionInfo", { minChars: descriptionMinLength }) }}
 				</div>
-			</div>
-
-			<div v-if="isOnlyProposal" class="card">
-				<div class="card-body">
-					<p>{{ $t("yoursIsOnlyProposal") }}</p>
+				<div v-if="descriptionState === false" class="invalid-feedback">
+					{{ $t("descriptionTooShort") }}
 				</div>
+				<button
+					:disabled="saveButtonDisabled"
+					type="button"
+					class="btn btn-primary mt-3 float-right"
+					@click="saveProposal()"
+				>
+					{{ $t("Save") }}
+					<i class="fas fa-angle-double-right"></i>
+				</button>
 			</div>
+		</div>
 
+		<div v-if="isOnlyProposal" class="card">
+			<div class="card-body">
+				<p>{{ $t("yoursIsOnlyProposal") }}</p>
+			</div>
+		</div>
+
+		<div v-if="poll.proposals && poll.proposals.length > 0">
 			<h2 class="page-title mt-5">{{ $t("thePoll") }}</h2>
 			<poll-panel
 				:poll="poll"
@@ -58,6 +57,7 @@
 				class="shadow mb-3"
 			></poll-panel>
 		</div>
+		
 	</div>
 </template>
 
@@ -75,12 +75,11 @@ export default {
 				yourProposal: "Dein Vorschlag",
 				thePoll: "Die Abstimmung",
 				title: "Titel",
-				titleInvalid: "Titel zu kurz",
+				titleInvalid: "Titel zu kurz. Mindestens {minChars} Zeichen!",
 				describeYourProposal: "Beschreibe deinen Wahlvorschlag ...",
 				descriptionInfo: "(Mindestes {minChars} Zeichen)",
 				descriptionTooShort:
 					"Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
-				firstProposal: "Das wird der erste Wahlvorschlag in dieser Abstimmung.",
 				yoursIsOnlyProposal:
 					"Dein Vorschlag ist bisher der einzige Wahlvorschlag in dieser Abstimmung.",
 			},
@@ -94,30 +93,20 @@ export default {
 		return {
 			poll: {},
 			proposal: {},
-			titleValidated: false,
+			titleMinLength: 10,
 			descriptionValidated: false,
 			descriptionMinLength: 20,
 		}
 	},
 	created() {
-		let p = this.$root.store.getPollById(this.pollId)
-		this.poll = p
+		this.$api.getPollById(this.pollId, true).then(poll => this.poll = poll)
 	},
 	mounted() {},
 	computed: {
-		titleState() {
-			if (
-				this.proposal.title &&
-				this.proposal.title.replace(/\s/g, "").length >= 5
-			)
-				return (this.titleValidated = true)
-			return this.titleValidated ? false : null
-		},
 		descriptionState() {
 			if (
 				this.proposal.description &&
-				this.proposal.description.replace(/\s/g, "").length >=
-					this.descriptionMinLength
+				this.proposal.description.trim().length >= this.descriptionMinLength
 			)
 				return (this.descriptionValidated = true)
 			return this.descriptionValidated ? false : null
@@ -129,7 +118,7 @@ export default {
 			} // status === null will set no class at all
 		},
 		saveButtonDisabled() {
-			return !this.titleState || !this.descriptionState
+			return !this.isProposalTitleValid(this.proposal.title) || !this.descriptionState
 		},
 		/** Is the user's proposal the only proposal in the poll. (This can only be true when editing an existing proposal.) */
 		isOnlyProposal() {
@@ -141,8 +130,11 @@ export default {
 		},
 	},
 	methods: {
+		isProposalTitleValid(val) {
+			return val !== undefined && val !== null && val.trim().length >= this.titleMinLength
+		},
 		saveProposal() {
-			this.$root.store.saveProposal(this.poll, this.proposal).then(() => {
+			this.$api.saveProposal(this.poll.id, this.proposal).then(() => {
 				this.$router.push("/polls/" + this.poll.id)
 			})
 		},

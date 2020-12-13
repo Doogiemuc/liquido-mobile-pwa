@@ -10,6 +10,4 @@ let config = {
 
 _.merge(config, commonConfig)
 
-console.log("NODE_ENV="+process.env.NODE_ENV+"   configuration:\n", config)
-
 export default config

@@ -1,10 +1,10 @@
 <template>
-	<div id="poll-show">
-		<h2 class="page-title">{{ pageTitleLoc }}</h2>
+	<div>
+		<h2 id="poll-show" class="page-title">{{ pageTitleLoc }}</h2>
 
 		<poll-panel v-if="poll.id" :poll="poll" :key="poll.id" :read-only="true" class="shadow mb-3"></poll-panel>
 
-		<div v-else	class="alert alert-danger mb-3">
+		<div v-if="showError"	class="alert alert-danger mb-3">
 			<div v-html="$t('cannotFindPoll', {pollId: pollId})"></div>
 			<b-button variant="primary" class="float-right" @click="$router.push({name: 'polls'})">
 				{{ $t("Back") }}
@@ -91,13 +91,15 @@ export default {
 	data() {
 		return {
 			poll: {},
+			showError: false
 		}
 	},
 	created() {
 		this.$api.getPollById(this.pollId, true)
 			.then(poll => this.poll = poll)
 			.catch(err => {
-				console.warn("Cannot find poll.id=" + this.pollId)
+				console.warn("Cannot find poll.id=" + this.pollId, err)
+				this.showError = true
 			})
 	},
 	mounted() {},
@@ -120,8 +122,8 @@ export default {
 				this.poll.proposals = []
 				return true
 			}
-			let currentUserEmail = this.$root.store.user.email
-			return this.poll.proposals.filter((prop) => prop.createdBy.email === currentUserEmail).length === 0
+			let currentUserId = this.$root.store.get("user").id
+			return this.poll.proposals.filter((prop) => prop.createdBy === currentUserId).length === 0
 		},
 		showStartVotingPhase() {
 			return (

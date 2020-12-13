@@ -1,13 +1,15 @@
 /**
- * This is a very simple and lightweight Store singleton.
- * Here we store local data that many liquido Vue components need.
- *
+ * LIQUIDO STORE & CACHE
+ * 
+ * This is a very simple and lightweight cache for data that was fetched from the server.
+ * The cache is just simply a local object. It contains data about the user, team and a list of polls of that team.
+ *	
+ * 
  * See https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
- *
- * LIQUIDO doesn't need - and I also don't like - VUEX, because its plain and simple over-engineered.
  */
 
 import { uniqueId } from "lodash"
+import assert from 'assert'
 //import testPolls from "../../cypress/fixtures/testPolls"
 
 // Client side cache for data that was fetched from the server
@@ -23,10 +25,10 @@ let cache = {
 
 	// Currently logged in User
 	user: {
-		profile: {
-			name: undefined,
-		},
+		//id: undefined,
+		name: undefined,
 		email: undefined,
+		pictureUrl: undefined,
 		isAdmin: false,
 	},
 	
@@ -38,7 +40,7 @@ let cache = {
 
 	// Polls by their ID in the team. Each poll has proposals
 	//TODO: move polls to their own cache (by poll.Id)  This way we can make a generic vue-cache module
-	polls: {} // testPolls
+  //DONE: Moved to pollsCache in liquido-api	polls: [] // testPolls
 }
 
 
@@ -57,9 +59,10 @@ export default {
 
 
 
-	/** Put obj into the cache under key */
-	put(key, obj) {
-		cache[key] = obj
+	/** Put obj into the cache under key. Use defaultValue if obj is undefined */
+	put(key, obj, defaultValue) {
+		assert(key, "key must be defined to put something into the cache")
+		cache[key] = obj !== undefined ? obj : defaultValue 
 	},
 
 	/** Get object from cache. Use `defaultValue` if there is nothing yet cached under this key. */
@@ -84,36 +87,14 @@ export default {
 		})
 	},
 
-	getProposalById(poll, proposalId) {
-		return poll.proposals.find((prop) => prop.id == proposalId)
-	},
-
-	/** 
-	 * Get a poll by its ID (either from the cache or from the backend)
-	 * @return A Promise that resolves to the poll or a rejected Promise if there is no poll with that ID
-	 */
-	getPollById(pollId) {
-		return cache.polls[pollId]
-	},
-
-	/**
-	 * Cache the given poll under its ID
-	 * @param {Object} poll poll that MUST have an ID
-	 */
-	cachePoll(poll) {
-		if (!poll.id) {
-			console.error("Cannot cache poll. (title='"+poll.title+"') It has no ID")
-		} else {
-			cache.polls[poll.id] = poll
-		}
-	},
-
-
-	//
 	// Little utility methods
 	// 
 	isAuthenticated() {
 		return cache.jwt !== undefined
+	},
+
+	getCurrentUser() {
+		return cache.user
 	},
 
 	isAdmin() {
@@ -125,65 +106,4 @@ export default {
 	},
 
 
-	//
-	// ========== These methods change the content of the store ("mutations" in vuex) ==========
-	//
-
-	/*
-	savePoll(poll) {
-		if (!typeof poll === "object")
-			return Promise.reject("Cannot savePoll. Need poll object")
-		if (!poll.title) return Promise.reject("Cannot savePoll. Need title")
-		//TODO: savePoll() call backend
-		if (!poll.id) {
-			console.log("Creating new poll: '" + poll.title + "'")
-			poll.id = uniqueId()
-			poll.status = "ELABORATION"
-			this.polls.push(poll)
-		} else {
-			let existingPoll = this.polls.find((p) => p.id === poll.id)
-			if (existingPoll === undefined)
-				return Promise.reject(
-					"Cannot savePoll. Cannot find poll with id=" + poll.id
-				)
-			existingPoll = poll
-			poll.id = existingPoll.id
-			console.log("poll(id=" + poll.id + ") saved.")
-		}
-		return Promise.resolve(poll)
-	},
-	*/
-
-	/**
-	 * Add or update a proposal in a poll.
-	 * @param {Object} poll An existing poll
-	 * @param {Object} proposal a new proposal to add (without an ID) or an existing proposal that shall be updated (with ID)
-	 */
-	saveProposal(poll, proposal) {
-		if (!poll || !poll.id) return Promise.reject("Need poll to saveProposal()")
-		if (!proposal) return Promise.reject("Need proposal to saveProposal()")
-		// more sanity checks in the backend ...
-		if (!poll.proposals) poll.proposals = []
-		proposal.createdBy = this.getCurrentUser()
-		if (proposal.id) {
-			// update existing proposal
-			let prop = this.getProposalById(poll, proposal.id)
-			prop = proposal
-			console.log(
-				"Updated proposal in poll(id=" + poll.id + "): '" + prop.title + "'"
-			)
-		} else {
-			proposal.id = uniqueId()
-			poll.proposals.push(proposal)
-			console.log(
-				"Added new proposal to poll(id=" +
-				poll.id +
-				"): '" +
-				proposal.title +
-				"'"
-			)
-		}
-
-		return Promise.resolve(poll)
-	},
 }

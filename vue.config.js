@@ -74,7 +74,7 @@ const vueConfig = {
 
 console.log("==================================================")
 console.log("===> LIQUIDO Mobile Progressive Web App (PWA) <===")
-console.log("--------------------------------------------------")
+console.log("==================================================")
 console.log("NODE_ENV:  "+process.env.NODE_ENV)
 console.log("config.js: "+vueConfig.configureWebpack.resolve.alias.config)
 console.log("devServer: http://localhost:"+vueConfig.devServer.port)

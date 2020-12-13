@@ -10,7 +10,7 @@
 				>
 					<a id="elaborationArrow" href="#" @click="clickFooter('ELABORATION')">
 						<i class="far fa-comments"></i>
-						<div class="icon-title">{{ $t("elaboration") }}</div>
+						<div class="icon-title">{{ $t("Elaboration") }}</div>
 					</a>
 				</li>
 				<li
@@ -21,7 +21,7 @@
 				>
 					<a id="votingArrow" href="#" @click="clickFooter('VOTING')">
 						<i class="fas fa-person-booth"></i>
-						<div class="icon-title">{{ $t("inVoting") }}</div>
+						<div class="icon-title">{{ $t("InVoting") }}</div>
 					</a>
 				</li>
 				<li
@@ -32,7 +32,7 @@
 				>
 					<a id="finishedArrow" href="#" @click="clickFooter('FINISHED')">
 						<i class="fas fa-check"></i>
-						<div class="icon-title">{{ $t("finished") }}</div>
+						<div class="icon-title">{{ $t("Finished") }}</div>
 					</a>
 				</li>
 			</ul>

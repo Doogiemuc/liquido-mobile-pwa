@@ -1,6 +1,6 @@
 <template>
-	<div id="poll-create">
-		<h2 class="page-title">
+	<div>
+		<h2 class="page-title" id="poll-create">
 			<i class="fas fa-poll"></i>
 			{{ $t("newPoll") }}
 		</h2>
@@ -81,16 +81,9 @@ export default {
 			this.$router.push("/polls")
 		},
 		clickCreateNewPoll() {
-			console.log("clickCreateNewPoll")
 			return this.$api.createPoll(this.poll)
-				.then(createdPoll => {
-					console.log("routerPush")
-					this.$router.push("/polls/" + createdPoll.id)
-				})
-				.catch(err => {
-					console.warn("Error", err)
-				})
-			console.log("clickCreateNewPoll")
+				.then(createdPoll => this.$router.push("/polls/" + createdPoll.id))
+				.catch(err => console.warn("Error", err))
 		},
 	},
 }
