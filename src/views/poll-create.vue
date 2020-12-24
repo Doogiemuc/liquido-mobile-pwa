@@ -50,7 +50,7 @@ export default {
 				createPollInfo:
 					'<p>Nur du als Admin kannst neue Abstimmungen erstellen.</p>'+
 					'<p>(1) Während eine Abstimmung noch in Diskussion (<i class="fas fa-comments"></i>) ist, kann jeder aus deinem Team seinen eigenen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen.</p>' +
-					'<p>(2) Wenn du dann die Wahlphase der Abstimmung startest, kann jeder im Team seine Stimme anonym abgeben. (<i class="fas fa-person-booth"></i>)</p>' +
+					'<p>(2) Wenn du die Wahlphase der Abstimmung startest, kann jeder im Team seine Stimme anonym abgeben. (<i class="fas fa-person-booth"></i>)</p>' +
 					'<p>(3) Nachdem du die Wahlphase beendet hast, ist das Wahlergebnis für alle sichtbar.',
 				pollTitle: "Titel der Abstimmung",
 				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. 10 Zeichen.",

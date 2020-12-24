@@ -61,6 +61,10 @@ html {
 		font-size: 1.4rem;
 	}
 
+	.alert {
+		padding: 0.5rem;
+	}
+
 	.chat-bubble {
 		//background-color: $secondary-bg;
 		margin-bottom: 1rem;
@@ -83,6 +87,24 @@ html {
 				margin-bottom: 0;
 			}
 		}
+	}
+
+	.input-bubble {
+		background-color: $input-bg;
+		.card-header {
+			padding: 10px;
+		}
+		.card-body {
+			padding: 10px;
+		}
+		.description-textarea {
+			width: 100%;
+		}
+	}
+	
+	.text-small {
+		font-size: 80%;
+		color: $secondary;
 	}
 
 	.chat-right {

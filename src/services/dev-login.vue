@@ -4,19 +4,18 @@
 		<div class="alert alert-secondary">NODE_ENV="{{nodeEnv}}"</div>
 		<div v-if="successMessage" class="alert alert-success">
 			{{ successMessage }}
-			<router-link tag="button" class="btn btn-primary" :to="{name: 'polls'}">Ok</router-link>
+			<router-link tag="button" class="btn btn-primary float-right" :to="{name: 'polls'}">Ok</router-link>
 		</div>
+		<div class="clearfix"></div>
 		<div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-		<h4>User</h4>
-		<pre>{{ $root.store.get('user')}}</pre>
-		<h4>Team</h4>
-		<pre>{{ $root.store.get('team')}}</pre>
 		<div v-if="polls">
 			<router-link :to="{ name: 'polls'}"><h4>Polls of Team</h4></router-link>
 			<ul>
 				<li v-for="poll in polls" :key="poll.id"><router-link :to="{ name: 'showPoll', params: { pollId: ''+poll.id }}">{{poll.title}}</router-link></li>
 			</ul>
 		</div>
+		<h4>LoginData</h4>
+		<pre>{{ $api.loginData }}</pre>
 	</div>
 </template>
 
@@ -33,9 +32,9 @@ export default {
 	},
 	data() {
 		return { 
-			successMessage: "",
-			errorMessage: "",
-			polls: []
+			successMessage: undefined,
+			errorMessage: undefined,
+			polls: undefined
 		}
 	},
 	created() {},
@@ -44,9 +43,13 @@ export default {
 		this.$api.devLogin(this.userEmail, this.teamName)
 			.then(loginData => { 
 				this.polls = loginData.polls
+				this.errorMessage = undefined
 				this.successMessage = "devLogin successfull"
 			})
-			.catch(err => {	this.errorMessage = "ERROR: "+JSON.stringify(err) })
+			.catch(err => {	
+				console.log("devLogin ERROR: ", err)
+				this.errorMessage = "ERROR: "+JSON.stringify(err) 
+			})
 	},
 	computed: {
 		nodeEnv() { return process.env.NODE_ENV },

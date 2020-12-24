@@ -2,7 +2,7 @@
 	<div>
 		<h2 class="page-title">{{ $t("addProposal") }}</h2>
 
-		<div class="card input-bubble mb-3">
+		<div class="card input-bubble mb-5">
 			<div class="card-header">{{ $t("yourProposal") }}</div>
 			<div class="card-body">
 				<liquido-input
@@ -42,14 +42,18 @@
 			</div>
 		</div>
 
+		<div v-if="!poll.proposals || poll.proposals.length == 0" class="alert alert-secondary mb-3">
+			<i class="fas fa-info-circle float-right"></i>
+			<p v-html="$t('noProposalYet', {pollTitle: poll.title})"></p>
+		</div>
+
 		<div v-if="isOnlyProposal" class="card">
 			<div class="card-body">
 				<p>{{ $t("yoursIsOnlyProposal") }}</p>
 			</div>
 		</div>
 
-		<div v-if="poll.proposals && poll.proposals.length > 0">
-			<h2 class="page-title mt-5">{{ $t("thePoll") }}</h2>
+		<div >
 			<poll-panel
 				:poll="poll"
 				:expanded="false"
@@ -72,14 +76,14 @@ export default {
 			en: {},
 			de: {
 				addProposal: "Vorschlag zu Abstimmung hinzufügen",
-				yourProposal: "Dein Vorschlag",
-				thePoll: "Die Abstimmung",
+				yourProposal: "Dein neuer Vorschlag",
 				title: "Titel",
 				titleInvalid: "Titel zu kurz. Mindestens {minChars} Zeichen!",
 				describeYourProposal: "Beschreibe deinen Wahlvorschlag ...",
 				descriptionInfo: "(Mindestes {minChars} Zeichen)",
 				descriptionTooShort:
 					"Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
+				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Deine Vorschlag wird der erste sein.",
 				yoursIsOnlyProposal:
 					"Dein Vorschlag ist bisher der einzige Wahlvorschlag in dieser Abstimmung.",
 			},
@@ -143,21 +147,5 @@ export default {
 </script>
 
 <style lang="scss">
-.input-bubble {
-	background-color: $input-bg;
-	.card-header {
-		padding: 10px;
-	}
-	.card-body {
-		padding: 10px;
-	}
-	.description-textarea {
-		width: 100%;
-	}
-}
 
-.text-small {
-	font-size: 80%;
-	color: $secondary;
-}
 </style>

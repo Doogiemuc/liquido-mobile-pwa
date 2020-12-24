@@ -15,6 +15,7 @@
 			v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0"
 			class="alert alert-secondary mb-3"
 		>
+			<i class="fas fa-info-circle float-right"></i>
 			<p v-html="$t('pollInElaborationInfo')"></p>
 		</div>
 
@@ -27,7 +28,7 @@
 		</div>
 		<div class="clearfix mb-3"></div>
 
-		<div v-if="showStartVotingPhase" class="alert alert-secondary mb-3">
+		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
 			<p v-html="$t('startVotingPhaseInfo')"></p>
 			<b-button variant="primary" class="float-right" @click="clickStartVote()">
 				<i class="fas fa-user-shield"></i>
@@ -61,7 +62,6 @@
 import liquidoHeader from "../components/liquido-header"
 import liquidoInput from "../components/liquido-input"
 import pollPanel from "../components/poll-panel"
-import pollsFooter from "../components/polls-footer"
 
 export default {
 	i18n: {
@@ -69,7 +69,9 @@ export default {
 			en: {},
 			de: {
 				pollInElaborationInfo:
-					"<p>Dieser Abstimmung ist in der <em>Diskussionphase</em>.</p><p>Wende dich an die Ersteller der einzelnen Wahlvorschläge und gib ihnen direkt Feedback. Wahlvorschläge können noch so lange angepasst und verbessert werden, bis euer Admin dann die <em>Wahlphase</em> für diese Abstimmung startet.</p>",
+					"<p>Dieser Abstimmung ist in der <em>Diskussionphase</em>.</p>" +
+					"<p>Diskutiert die Wahlvorschläge miteinander. In diese Phase kann jeder seinen eigenen Vorschlag noch weiter anpassen und verbessern." +
+					"Wahlvorschläge können noch so lange angepasst und verbessert werden, bis euer Admin dann die <em>Wahlphase</em> für diese Abstimmung startet.</p>",
 				addProposalInfo: "Du kannst deinen eigenen Wahlvorschlag zu dieser Abstimmung hinzufügen.",
 				addProposal: "Vorschlag hinzufügen",
 				startVotingPhaseInfo:
@@ -84,7 +86,7 @@ export default {
 			},
 		},
 	},
-	components: { pollPanel, liquidoHeader, liquidoInput, pollsFooter },
+	components: { pollPanel, liquidoHeader, liquidoInput },
 	props: {
 		pollId: { type: String, required: true }, // url parameter is passed as String
 	},

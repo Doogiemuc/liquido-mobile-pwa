@@ -21,14 +21,13 @@
 		<p v-html="$t('noPollsYet')"></p>
 		<p v-if="userIsAdmin" v-html="$t('noPollsYetAdmin')"></p>
 	</div>
-	<div
-		v-if="
+
+	<div v-if="
 			filteredPolls.length === 0 &&
 				searchQuery &&
 				searchQuery.trim().length > 0
 		"
-		class="alert alert-secondary"
-	>
+		class="alert alert-secondary">
 		<p v-html="$t('noPollsMatchSearch')"></p>
 	</div>
 	<div
@@ -73,6 +72,8 @@
 			<i class="fas fa-angle-double-right"></i>
 		</b-button>
 	</div>
+
+	<pollsFooter></pollsFooter>
 </div>
 </template>
 
@@ -92,7 +93,7 @@ export default {
 				butPollInVoting: "However there is a poll in which you can vote.",
 			},
 			de: {
-				noPollsYet: "Es wurde bisher noch keine Abstimmung erstellt.",
+				noPollsYet: "Euer Teamadmin hat bisher noch keine Abstimmung erstellt.",
 				noPollsYetAdmin: 'Möchstest du eine <a href="/polls/create">Abstimmung erstellen</a>?',
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
@@ -121,6 +122,7 @@ export default {
 		}
 		this.$root.$api.getPolls().then(polls => {
 			this.polls = polls
+			console.log("polls", polls)
 		})
 	},
 	mounted() {},

@@ -1,36 +1,20 @@
 /**
  * REST client for LIQUIDO backend API.
- * This module only handles the HTTP REST layer. For local storage of data see liquido-store.js
+ * This module only handles the HTTP REST layer.
+ * It uses the awesome populating-cache to locally cache values that were fetched from the server.
  */
 
 import axios from 'axios'
-import store from "./liquido-store"
 import config from 'config'
 import assert from 'assert'
-import NodeCache from 'node-cache'
+import PopulatingCache from 'populating-cache'
 
-
-//TODO:  WORK IN PROGRESS  finish using NodeCache instead of liquido-store.vue
-
-
-
-/** Cache for polls. Each poll is cached by its id */
-const pollsCache = new NodeCache({
-	stdTTL: 60,					// seconds
-	useClones: false,		// use references
-})
-/** Cache for team, currentUser, jwt, voterToken, all users in the team */
-const liquidoCache = new NodeCache({
-	stdTTL: 600,				// seconds
-	useClones: false,		// use references
-})
-
-
-
-
+// Console Logging
 const log = require('loglevel').getLogger('liquido-api');
-//log.debug("Liquido-api pointing to", config.LIQUIDO_API_URL)
-//log.enableAll()
+if (process.env.NODE_ENV === 'debug' || process.env.NODE_ENV === 'test') {
+	log.enableAll()
+}
+log.debug("Liquido-api pointing to", config.LIQUIDO_API_URL)
 
 // Configure axios HTTP REST client
 axios.defaults.baseURL = config.LIQUIDO_API_URL
@@ -48,8 +32,23 @@ const HTTP = () => {
 }
 */
 
-export default {
+/* Configuration for populating-cache */
+const cacheConfig = {
+	fetchFunc: function(path) {
+		log.debug("Call to global fetchFunc: ", path)
+	},
+	ttl: 10*60*1000,
+}
 
+
+export default {
+	/* Local cache for most basic data, e.g. JWT of logged in user, his team etc. */
+	loginData: {},
+
+	/** Cache for polls. Each poll is cached by its id */
+	pollsCache: new PopulatingCache(cacheConfig),
+
+	/** Smoke test if the backend is available at all. */
 	backendIsAvailable() {
 		return axios.get("/")
 	},
@@ -59,31 +58,40 @@ export default {
 	 * Caches that data in the liquido-store.js
 	 * @param {Object} loginData: user, team, jwt, voterToken and polls
 	 */
-	login(loginData) {
-		assert(loginData.team, "Need team to login")
-		assert(loginData.user, "Need user to login")
-		assert(loginData.jwt, "Need jwt to login")
-		assert(loginData.voterToken, "Need voterToken to login")
-		
-		store.put("team", loginData.team)
-		store.put("user", loginData.user)
-		store.put("voterToken", loginData.voterToken)
-		store.put("jwt",  loginData.jwt)
-		axios.defaults.headers.common['Authorization'] = "Bearer " + loginData.jwt;
+	login(loginDataRes) {
+		assert(loginDataRes, "Need loginData")
+		assert(loginDataRes.team, "Need team to login")
+		assert(loginDataRes.user, "Need user to login")
+		assert(loginDataRes.jwt, "Need jwt to login")
+		assert(loginDataRes.voterToken, "Need voterToken to login")
+		assert(loginDataRes.polls, "Need polls array in loginData")
+		this.loginData = loginDataRes
+
+		// Set JWT header for all future REST requests
+		axios.defaults.headers.common['Authorization'] = "Bearer " + this.loginData.jwt;
 
 		// Cache all current polls of the team in pollsCache by their poll.id
-		if (loginData.polls) {
-			loginData.polls.forEach(poll => {
-				pollsCache.set(poll.id, poll)
-			})
-		}
-		console.log("Login <"+loginData.user.email+"> in "+loginData.team.name)
+		this.pollsCache.put("polls", this.loginData.polls)
+
+		console.log("Login <"+this.loginData.user.email+"> in "+this.loginData.team.name)
+	},
+
+	isAuthenticated() {
+		return this.loginData.jwt !== undefined
+	},
+
+	isAdmin() {
+		return this.loginData.user && loginData.user.isAdmin
+	},
+
+	getCurrentUser() {
+		return this.loginData.user
 	},
 
 	/* login for development. Only available in NODE_ENV=development or test */
 	async devLogin(userEmail, teamName) {
-		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test") throw Error("devLogin is only allowed in NODE_ENV development or test")
-		//console.log("API: devLogin email="+email+" in team="+teamName)
+		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
+			throw Error("devLogin is only allowed in NODE_ENV development or test")
 		return axios({
 			method: "GET", 
 			url: "/devLogin", 
@@ -104,14 +112,13 @@ export default {
 	/** Logout the current user. Remove JWT */
 	logout() {
 		axios.defaults.headers.common['Authorization'] = undefined
-		pollsCache.flushAll()
-		liquidoCache.flushAll()
+		this.pollsCache.emptyCache()
 		console.log("API: logout")
 	},
 
 	/**
 	 * Create a new team.
-	 * This method will also save the current user, jwt and voterToken to liquido-store.
+	 * This method will also save the current user, jwt and voterToken to the local cache.
 	 * @param {Object} newTeam data for new Team: teamName, adminName and adminEmail
 	 * @returns {Object} response from the server with { team, jwt, voterToken}
 	 */
@@ -147,8 +154,8 @@ export default {
 	async createPoll(poll) {
 		return axios.post("/polls", poll).then(res => {
 			let createdPoll = res.data
+			this.pollsCache.put("polls/"+createdPoll.id, createdPoll)
 			log.info("Poll created:", createdPoll)
-			pollsCache.set(createdPoll.id, createdPoll)
 			return createdPoll
 		})
 	},
@@ -160,26 +167,8 @@ export default {
 	 * @returns A Promise that will resolve to the poll if it exists.
 	 */
 	async getPollById(pollId, forceRefresh = false) {
-		let pollFromCache = pollsCache.get(pollId)
-		if (!pollFromCache || forceRefresh) {  
-			return axios.get("/polls/"+pollId).then(res => { 
-				let poll = res.data
-				this.populateProposalData(poll)
-				pollsCache.set(poll.id, poll)
-				return poll
-			})
-		}
-		return Promise.resolve(pollFromCache)
-	},
-
-	/**
-	 * Get all polls from the cache
-	 */
-	getPollsFromCacheAsArray() {
-		let keys = pollsCache.keys()
-		return keys.map(key => pollsCache.get(key)).filter(elem => elem !== undefined)
-		//let pollsFromCache = pollsCache.mget(pollsCache.keys())  // returns polls mapped by their id
-		//return Array.from(pollsFromCache.values())
+		let fetchFunc = axios.get("/polls/"+pollId)
+		return this.pollsCache.getOrFetch("polls/"+poll.id, fetchFunc)
 	},
 
 	/**
@@ -188,16 +177,8 @@ export default {
 	 * @returns A Promise that will resolve to the list of polls in this team
 	 */
 	async getPolls(forceRefresh = false) {
-		let pollsFromCache = this.getPollsFromCacheAsArray()
-		if (!pollsFromCache || forceRefresh) {
-			return axios.get("/polls").then(res => { 
-				res.data.forEach(poll => {
-					pollsCache.set(poll.id, poll)
-				})
-				return res.data
-			})
-		}
-		return Promise.resolve(pollsFromCache)
+		let fetchFunc = axios.get("/polls")
+		return this.pollsCache.getOrFetch("polls", fetchFunc)
 	},
 
 	/**
@@ -221,15 +202,9 @@ export default {
 	 * @param {Object} poll a poll as fetched from the server
 	 */
 	populateProposalData(poll) {
-		if (!poll) throw new Error("Cannot populate undefined.")
+		if (!poll) throw new Error("Cannot populate undefined. poll")
 		if (!poll.proposals) return  // nothing todo, when poll has no proposals yet
-
-		let usersById = {}
-		store.get("team").members.forEach(member => usersById[member.id] = member)
-
-		poll.proposals.forEach(prop => {
-			prop.createdBy = usersById[prop.createdById]
-		})
+		return this.pollsCache.populate(poll, "createdBy")
 	},
 
 

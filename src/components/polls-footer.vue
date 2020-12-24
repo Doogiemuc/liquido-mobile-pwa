@@ -43,10 +43,10 @@
 <script>
 export default {
 	name: "LiquidoFooter",
-	computed: {
-		activeStatus() {
-			return this.$root.store.state.pollStatusFilter
-		},
+	data() {
+		return {
+			activeStatus: undefined
+		}
 	},
 	methods: {
 		/**
@@ -55,9 +55,9 @@ export default {
 		 */
 		clickFooter(newFilterValue) {
 			if (this.activeStatus === newFilterValue) {
-				this.$root.store.state.pollStatusFilter = undefined
+				this.activeStatus = undefined
 			} else {
-				this.$root.store.state.pollStatusFilter = newFilterValue
+				this.activeStatus = newFilterValue
 			}
 		},
 	},

@@ -1,6 +1,5 @@
 import Vue from "vue"
 import Router from "vue-router"
-import store from "@/services/liquido-store"
 
 Vue.use(Router)
 
@@ -99,7 +98,7 @@ router.beforeEach((routeTo, routeFrom, next) => {
 	// If auth isn't required for the route, just continue.
 	if (!requiresAuth && !redirectIfAuthenticated) return next()
 
-	let isAuthenticated = store.isAuthenticated()
+	let isAuthenticated = false // TODO: api.isAuthenticated()
 
 	if (requiresAuth && !isAuthenticated) return next("/login")
 

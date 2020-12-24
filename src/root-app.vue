@@ -4,18 +4,16 @@
 		<transition :name="transitionName">
 			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
-		<pollsFooter v-if="showPollsFooter"></pollsFooter>
 	</div>
 </template>
 
 <script>
 import liquidoHeader from "@/components/liquido-header"
-import pollsFooter from "@/components/polls-footer"
 
 /** Liquido Root App */
 export default {
 	name: "LiquidoApp",
-	components: { liquidoHeader, pollsFooter },
+	components: { liquidoHeader },
 	mixins: [],
 	// all data properties are set in main.js !
 	created() {},
@@ -26,13 +24,7 @@ export default {
 		$route(to, from) {
 			const fromDepth = from.path.split("/").length
 			const toDepth = to.path.split("/").length
-
-			/*
 			this.transitionName = ""
-			if (from.path === "/polls" && /^\/polls\/\d+$/.test(to.path)) { this.transitionName = "slide-left"  } else
-			if (to.path === "/polls" && /^\/polls\/\d+$/.test(from.path)) { this.transitionName = "slide-right" }
-			*/
-
 			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
 			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
 			if (from.path == "/team")  { this.transitionName = "slide-left" } else

@@ -8,7 +8,6 @@ log.debug("NODE_ENV="+process.env.NODE_ENV+"   configuration:\n", config)
 
 import Vue from "vue"
 import RootApp from "@/root-app.vue"
-import liquidoStore from "@/services/liquido-store"
 import liquidoApi from "@/services/liquido-api"
 import router from "@/services/router"
 import "@/registerServiceWorker"
@@ -93,7 +92,8 @@ const rootApp = new Vue({
 	i18n,
 	router,
 	data: {
-		store: liquidoStore, 	// this is available to all sub components as this.$root.store
+		//DEPRECATED: store: liquidoStore, 	// this is available to all sub components as this.$root.store
+
 		headerHeight: 0, 			// will be set to height of header in liquido-header.vue
 		transitionName: "", 	// CSS sliding transition between page components
 	},

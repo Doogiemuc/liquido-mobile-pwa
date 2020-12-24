@@ -3,12 +3,10 @@
  * 
  * This is a very simple and lightweight cache for data that was fetched from the server.
  * The cache is just simply a local object. It contains data about the user, team and a list of polls of that team.
- *	
- * 
+ *
  * See https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
  */
 
-import { uniqueId } from "lodash"
 import assert from 'assert'
 //import testPolls from "../../cypress/fixtures/testPolls"
 
@@ -37,12 +35,7 @@ let cache = {
 
 	// User's voterToken for casting LIQUIDO votes
 	voterToken: undefined,
-
-	// Polls by their ID in the team. Each poll has proposals
-	//TODO: move polls to their own cache (by poll.Id)  This way we can make a generic vue-cache module
-  //DONE: Moved to pollsCache in liquido-api	polls: [] // testPolls
 }
-
 
 
 export default {
@@ -100,10 +93,5 @@ export default {
 	isAdmin() {
 		return cache.user && cache.user.isAdmin
 	},
-
-	getProposalById(poll, proposalId) {
-		return poll.proposals.find((prop) => prop.id == proposalId)
-	},
-
 
 }
