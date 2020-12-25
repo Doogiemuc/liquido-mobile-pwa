@@ -12,7 +12,7 @@
 		"serve": "vue-cli-service serve",
 		"build": "vue-cli-service build",
 		"deploy": "D:\\Coding\\DevApps\\WinSCP\\WinSCP.exe \"IONOS doogie.de\"  /synchronize /defaults D:\\Coding\\liquido\\liquido-mobile-pwa\\dist\\ /liquido_mobile/",
-		"lint": "vue-cli-service lint --fix",
+		"lint": "vue-cli-service lint",
 		"unit-test": "cross-env NODE_ENV=test mocha --require @babel/register --recursive",
 		"cypress": "cypress open"
 	},

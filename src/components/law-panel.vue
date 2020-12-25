@@ -1,18 +1,25 @@
 <template>
-	<b-card :id="law.id" no-body class="law-panel">
+	<b-card
+		:id="law.id"
+		no-body
+		class="law-panel"
+	>
 		<div>
 			<h4 class="law-title">
-				<i :class="iconForLaw" class="title-icon"></i>
+				<i
+					:class="iconForLaw"
+					class="title-icon"
+				/>
 				&nbsp;{{ law.title }}
 			</h4>
 		</div>
 		<div class="law-subtitle d-flex">
 			<div class="createdAt flex-fixed-width">
-				<i class="far fa-clock"></i>
+				<i class="far fa-clock" />
 				&nbsp;{{ formatDate(law.createdAt) }}
 			</div>
 			<div class="user">
-				<i class="far fa-user"></i>
+				<i class="far fa-user" />
 				&nbsp;{{ law.createdBy.profile.name }}
 			</div>
 			<div
@@ -25,17 +32,28 @@
 						fas: law.supportedByCurrentUser,
 					}"
 					class="fa-thumbs-up"
-				></i>
+				/>
 				&nbsp;{{ law.numSupporters }}
 			</div>
 		</div>
 		<div class="d-flex">
 			<div class="flex-fixed-width">
-				<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Image" class="law-image" />
+				<img
+					:src="'https://picsum.photos/seed/' + law.id + '/100'"
+					alt="Image"
+					class="law-image"
+				>
 			</div>
-			<div class="law-description">{{ law.description }}</div>
-			<a v-if="!readOnly" class="collapse-icon" href="#" @click="toggleCollapse()">
-				<i class="fa"></i>
+			<div class="law-description">
+				{{ law.description }}
+			</div>
+			<a
+				v-if="!readOnly"
+				class="collapse-icon"
+				href="#"
+				@click="toggleCollapse()"
+			>
+				<i class="fa" />
 			</a>
 		</div>
 	</b-card>
@@ -47,20 +65,15 @@ import moment from "moment"
 export default {
 	name: "LawCard",
 	components: {},
+	filters: {},
+	mixins: [],
 	props: {
 		law: { type: Object, required: true },
 		readOnly: { type: Boolean, required: false, default: false },
 		collapsed: { type: Boolean, required: false, default: false },
 	},
-	mixins: [],
 	data() {
 		return {}
-	},
-	beforeCreate() {},
-	created() {},
-	beforeMount() {},
-	mounted() {
-		if (this.collapsed) this.toggleCollapse()
 	},
 	computed: {
 		iconForLaw() {
@@ -86,6 +99,15 @@ export default {
 			}
 		},
 	},
+	beforeCreate() {},
+	created() {},
+	beforeMount() {},
+	mounted() {
+		if (this.collapsed) this.toggleCollapse()
+	},
+	beforeUpdate() {},
+	updated() {},
+	beforeDestroy() {},
 	methods: {
 		formatDate(dateVal) {
 			return moment(dateVal).format("L")
@@ -95,10 +117,6 @@ export default {
 			$(".collapse-icon").toggleClass("collapsed")
 		},
 	},
-	filters: {},
-	beforeUpdate() {},
-	updated() {},
-	beforeDestroy() {},
 }
 </script>
 

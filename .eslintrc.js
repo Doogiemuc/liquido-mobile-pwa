@@ -10,11 +10,12 @@ module.exports = {
 		jquery: true,
 	},
 	rules: {
+		"max-len": ["warn", { "code": 140 }], // we do have 4K monitors nowadays!
 		"arrow-parens": 0,
 		"generator-star-spacing": 0,
 		"no-console": process.env.NODE_ENV === "production" ? "error" : "off",
 		"no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-		indent: ["warn", "tab", { SwitchCase: 1 }],
+		indent: ["error", "tab", { SwitchCase: 1 }],
 		eqeqeq: 1,
 		"no-var": 2,
 		quotes: [
@@ -25,13 +26,23 @@ module.exports = {
 				allowTemplateLiterals: true,
 			},
 		],
+
+		// Options for plugin:vue/recommended  https://eslint.vuejs.org
+		"vue/max-attributes-per-line": ["error", {
+			"singleline": 5,
+			"multiline": {
+				"max": 1,
+				"allowFirstLine": true
+			}
+		}],
 		"vue/html-indent": ["error", "tab"],
-		//"vue/html-self-closing": "error",
-		"vue/attributes-order": "error",
+		"vue/html-self-closing": "error",
+		"vue/attributes-order": "warn",
+		"vue/no-v-html": "off",
 	},
 	extends: [
-		"plugin:vue/strongly-recommended",
+		"plugin:vue/recommended",
 		"eslint:recommended",
-		"@vue/prettier",
+		//"@vue/prettier",
 	],
 }

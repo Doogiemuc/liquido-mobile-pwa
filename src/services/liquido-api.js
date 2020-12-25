@@ -4,14 +4,14 @@
  * It uses the awesome populating-cache to locally cache values that were fetched from the server.
  */
 
-import axios from 'axios'
-import config from 'config'
-import assert from 'assert'
-import PopulatingCache from 'populating-cache'
+import axios from "axios"
+import config from "config"
+import assert from "assert"
+import PopulatingCache from "populating-cache"
 
 // Console Logging
-const log = require('loglevel').getLogger('liquido-api');
-if (process.env.NODE_ENV === 'debug' || process.env.NODE_ENV === 'test') {
+const log = require("loglevel").getLogger("liquido-api");
+if (process.env.NODE_ENV === "debug" || process.env.NODE_ENV === "test") {
 	log.enableAll()
 }
 log.debug("Liquido-api pointing to", config.LIQUIDO_API_URL)
@@ -68,7 +68,7 @@ export default {
 		this.loginData = loginDataRes
 
 		// Set JWT header for all future REST requests
-		axios.defaults.headers.common['Authorization'] = "Bearer " + this.loginData.jwt;
+		axios.defaults.headers.common["Authorization"] = "Bearer " + this.loginData.jwt;
 
 		// Cache all current polls of the team in pollsCache by their poll.id
 		this.pollsCache.put("polls", this.loginData.polls)
@@ -111,7 +111,7 @@ export default {
 
 	/** Logout the current user. Remove JWT */
 	logout() {
-		axios.defaults.headers.common['Authorization'] = undefined
+		axios.defaults.headers.common["Authorization"] = undefined
 		this.pollsCache.emptyCache()
 		console.log("API: logout")
 	},
@@ -136,11 +136,11 @@ export default {
 
 	async joinTeam(joinTeamRequest) {
 		return axios.put("/team/join", joinTeamRequest)
-		.then(res => {
-			log.info("Joined team:", res.data)
-			this.login(res.data)
-			return res.data
-		})
+			.then(res => {
+				log.info("Joined team:", res.data)
+				this.login(res.data)
+				return res.data
+			})
 	},
 
 	async getTeam() {

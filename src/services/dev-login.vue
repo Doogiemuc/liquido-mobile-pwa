@@ -1,17 +1,44 @@
 <template>
 	<div>
-		<h1 class="page-title">LIQUIDO - DevLogin</h1>
-		<div class="alert alert-secondary">NODE_ENV="{{nodeEnv}}"</div>
-		<div v-if="successMessage" class="alert alert-success">
-			{{ successMessage }}
-			<router-link tag="button" class="btn btn-primary float-right" :to="{name: 'polls'}">Ok</router-link>
+		<h1 class="page-title">
+			LIQUIDO - DevLogin
+		</h1>
+		<div class="alert alert-secondary">
+			NODE_ENV="{{ nodeEnv }}"
 		</div>
-		<div class="clearfix"></div>
-		<div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+		<div
+			v-if="successMessage"
+			class="alert alert-success"
+		>
+			{{ successMessage }}
+			<router-link
+				tag="button"
+				class="btn btn-primary float-right"
+				:to="{name: 'polls'}"
+			>
+				Ok
+			</router-link>
+		</div>
+		<div class="clearfix" />
+		<div
+			v-if="errorMessage"
+			class="alert alert-danger"
+		>
+			{{ errorMessage }}
+		</div>
 		<div v-if="polls">
-			<router-link :to="{ name: 'polls'}"><h4>Polls of Team</h4></router-link>
+			<router-link :to="{ name: 'polls'}">
+				<h4>Polls of Team</h4>
+			</router-link>
 			<ul>
-				<li v-for="poll in polls" :key="poll.id"><router-link :to="{ name: 'showPoll', params: { pollId: ''+poll.id }}">{{poll.title}}</router-link></li>
+				<li
+					v-for="poll in polls"
+					:key="poll.id"
+				>
+					<router-link :to="{ name: 'showPoll', params: { pollId: ''+poll.id }}">
+						{{ poll.title }}
+					</router-link>
+				</li>
 			</ul>
 		</div>
 		<h4>LoginData</h4>
@@ -25,7 +52,7 @@
  * This component is only available in NODE_ENV=test or development!
  */
 export default {
-	name: "devLogin",
+	name: "DevLogin",
 	props: {
 		userEmail: String,
 		teamName: String
@@ -36,6 +63,10 @@ export default {
 			errorMessage: undefined,
 			polls: undefined
 		}
+	},
+	computed: {
+		nodeEnv() { return process.env.NODE_ENV },
+		showDetails() { return true },
 	},
 	created() {},
 	mounted() {
@@ -50,10 +81,6 @@ export default {
 				console.log("devLogin ERROR: ", err)
 				this.errorMessage = "ERROR: "+JSON.stringify(err) 
 			})
-	},
-	computed: {
-		nodeEnv() { return process.env.NODE_ENV },
-		showDetails() { return true },
 	},
 	methods: {},
 }

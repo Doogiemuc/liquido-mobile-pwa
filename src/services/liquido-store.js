@@ -7,7 +7,7 @@
  * See https://vuejs.org/v2/guide/state-management.html#Simple-State-Management-from-Scratch
  */
 
-import assert from 'assert'
+import assert from "assert"
 //import testPolls from "../../cypress/fixtures/testPolls"
 
 // Client side cache for data that was fetched from the server

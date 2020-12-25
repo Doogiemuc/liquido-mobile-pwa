@@ -1,8 +1,11 @@
 <template>
 	<div id="app">
-		<liquido-header :back-link="backLink"></liquido-header>
+		<liquido-header :back-link="backLink" />
 		<transition :name="transitionName">
-			<router-view id="appContent" class="router-view container-lg" />
+			<router-view
+				id="appContent"
+				class="router-view container-lg"
+			/>
 		</transition>
 	</div>
 </template>
@@ -15,22 +18,6 @@ export default {
 	name: "LiquidoApp",
 	components: { liquidoHeader },
 	mixins: [],
-	// all data properties are set in main.js !
-	created() {},
-	mounted() {},
-	// watch the `$route` to determine the transition to use
-	// https://router.vuejs.org/guide/advanced/transitions.html#per-route-transition
-	watch: {
-		$route(to, from) {
-			const fromDepth = from.path.split("/").length
-			const toDepth = to.path.split("/").length
-			this.transitionName = ""
-			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
-			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
-			if (from.path == "/team")  { this.transitionName = "slide-left" } else
-			if (fromDepth == toDepth) { this.transitionName = "fade" }
-		},
-	},
 	computed: {
 		/**
 		 * Show appropriate backlink in liquido-header
@@ -55,6 +42,22 @@ export default {
 			return this.$route.path === "/polls"
 		},
 	},
+	// watch the `$route` to determine the transition to use
+	// https://router.vuejs.org/guide/advanced/transitions.html#per-route-transition
+	watch: {
+		$route(to, from) {
+			const fromDepth = from.path.split("/").length
+			const toDepth = to.path.split("/").length
+			this.transitionName = ""
+			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
+			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
+			if (from.path == "/team")  { this.transitionName = "slide-left" } else
+			if (fromDepth == toDepth) { this.transitionName = "fade" }
+		},
+	},
+	// all data properties are set in main.js !
+	created() {},
+	mounted() {},
 	methods: {
 		//These methods are available to all sub components
 

@@ -18,20 +18,20 @@ export default {
 			},
 		},
 	},
+	filters: {},
 	mixins: [],
 	data() {
 		return {}
 	},
+	computed: {},
 	beforeCreate() {},
 	created() {},
 	beforeMount() {},
 	mounted() {},
-	computed: {},
-	methods: {},
-	filters: {},
 	beforeUpdate() {},
 	updated() {},
 	beforeDestroy() {},
+	methods: {},
 }
 </script>
 
