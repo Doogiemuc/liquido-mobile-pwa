@@ -1,11 +1,13 @@
 <template>
 	<div>
-		<h2 id="poll-show" class="page-title">{{ pageTitleLoc }}</h2>
+		<h2 id="poll-show" class="page-title">
+			{{ pageTitleLoc }}
+		</h2>
 
-		<poll-panel v-if="poll.id" :poll="poll" :key="poll.id" :read-only="true" class="shadow mb-3"></poll-panel>
+		<poll-panel v-if="poll.id" :key="poll.id" :poll="poll" :read-only="true" class="shadow mb-3" />
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
-			<div v-html="$t('cannotFindPoll', {pollId: pollId})"></div>
+			<div v-html="$t('cannotFindPoll', {pollId: pollId})" />
 			<b-button variant="primary" class="float-right" @click="$router.push({name: 'polls'})">
 				{{ $t("Back") }}
 			</b-button>
@@ -15,52 +17,50 @@
 			v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0"
 			class="alert alert-secondary mb-3"
 		>
-			<i class="fas fa-info-circle float-right"></i>
-			<p v-html="$t('pollInElaborationInfo')"></p>
+			<i class="fas fa-info-circle float-right" />
+			<p v-html="$t('pollInElaborationInfo')" />
 		</div>
 
 		<div v-if="showAddProposal" class="alert alert-secondary mb-3">
-			<p v-html="$t('addProposalInfo')"></p>
+			<p v-html="$t('addProposalInfo')" />
 			<b-button variant="primary" class="float-right" @click="clickAddProposal()">
 				{{ $t("addProposal") }}
-				<i class="fas fa-angle-double-right"></i>
+				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
-		<div class="clearfix mb-3"></div>
+		<div class="clearfix mb-3" />
 
 		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
-			<p v-html="$t('startVotingPhaseInfo')"></p>
+			<p v-html="$t('startVotingPhaseInfo')" />
 			<b-button variant="primary" class="float-right" @click="clickStartVote()">
-				<i class="fas fa-user-shield"></i>
+				<i class="fas fa-user-shield" />
 				{{ $t("startVotingPhase") }}
 			</b-button>
 		</div>
-		<div class="clearfix mb-3"></div>
+		<div class="clearfix mb-3" />
 
 		<div v-if="poll.status === 'VOTING' && !poll.usersBallot" class="alert alert-secondary mb-3">
-			<p v-html="$t('votingPhaseInfo')"></p>
+			<p v-html="$t('votingPhaseInfo')" />
 			<b-button variant="primary" class="float-right" @click="clickCastVote()">
-				<i class="fas fa-person-booth"></i>
+				<i class="fas fa-person-booth" />
 				{{ $t("castVote") }}
-				<i class="fas fa-angle-double-right"></i>
+				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
-		<div class="clearfix mb-3"></div>
+		<div class="clearfix mb-3" />
 
 		<div v-if="poll.status === 'VOTING' && poll.usersBallot" class="alert alert-secondary mb-3">
-			<p v-html="$t('alreadyVotedInfo')"></p>
+			<p v-html="$t('alreadyVotedInfo')" />
 			<b-button variant="primary" class="float-right" @click="clickCastVote()">
-				<i class="fas fa-person-booth"></i>
+				<i class="fas fa-person-booth" />
 				{{ $t("editOwnVote") }}
-				<i class="fas fa-angle-double-right"></i>
+				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
 	</div>
 </template>
 
 <script>
-import liquidoHeader from "../components/liquido-header"
-import liquidoInput from "../components/liquido-input"
 import pollPanel from "../components/poll-panel"
 
 export default {
@@ -86,7 +86,7 @@ export default {
 			},
 		},
 	},
-	components: { pollPanel, liquidoHeader, liquidoInput },
+	components: { pollPanel },
 	props: {
 		pollId: { type: String, required: true }, // url parameter is passed as String
 	},
@@ -96,18 +96,9 @@ export default {
 			showError: false
 		}
 	},
-	created() {
-		this.$api.getPollById(this.pollId, true)
-			.then(poll => this.poll = poll)
-			.catch(err => {
-				console.warn("Cannot find poll.id=" + this.pollId, err)
-				this.showError = true
-			})
-	},
-	mounted() {},
 	computed: {
 		pageTitleLoc() {
-			if (!this.poll.id) return this.$t('Poll')
+			if (!this.poll.id) return this.$t("Poll")
 			if (!this.poll.proposals || this.poll.proposals.length === 0) return this.$t("newPoll")
 			if (this.poll.status === "ELABORATION") return this.$t("pollInElaboration")
 			if (this.poll.status === "VOTING") return this.$t("pollInVoting")
@@ -121,11 +112,10 @@ export default {
 		showAddProposal() {
 			if (this.poll.status !== "ELABORATION") return false
 			if (!this.poll.proposals || this.poll.proposals.length === 0) {
-				this.poll.proposals = []
 				return true
 			}
-			let currentUserId = this.$root.store.get("user").id
-			return this.poll.proposals.filter((prop) => prop.createdBy === currentUserId).length === 0
+			let currentUserId = this.$api.getCurrentUser().id
+			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUserId).length === 0
 		},
 		showStartVotingPhase() {
 			return (
@@ -133,6 +123,15 @@ export default {
 			)
 		},
 	},
+	created() {
+		this.$api.getPollById(this.pollId, true)
+			.then(poll => this.poll = poll)
+			.catch(err => {
+				console.warn("Cannot find poll.id=" + this.pollId, err)
+				this.showError = true
+			})
+	},
+	mounted() {},
 	methods: {
 		clickAddProposal() {
 			this.$router.push("/polls/" + this.poll.id + "/add")

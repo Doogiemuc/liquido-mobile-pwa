@@ -22,7 +22,7 @@ Vue.use(VueI18n)
 
 /** This will install the liquido-api as a Vue plugin under this.$api for all Vue components */
 const liquidoApiPlugin = {
-	install(Vue, options) {
+	install(Vue /*, options*/) {
 		Vue.prototype.$api = liquidoApi
 	}
 }

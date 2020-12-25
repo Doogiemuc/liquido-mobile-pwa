@@ -81,7 +81,7 @@ export default {
 	},
 
 	isAdmin() {
-		return this.loginData.user && loginData.user.isAdmin
+		return this.loginData.user && this.loginData.user.isAdmin
 	},
 
 	getCurrentUser() {
@@ -168,7 +168,10 @@ export default {
 	 */
 	async getPollById(pollId, forceRefresh = false) {
 		let fetchFunc = axios.get("/polls/"+pollId)
-		return this.pollsCache.getOrFetch("polls/"+poll.id, fetchFunc)
+		return this.pollsCache.get("polls/"+pollId, {
+			fetchFunc: fetchFunc,
+			callBackend: forceRefresh ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
+		})
 	},
 
 	/**
@@ -178,7 +181,11 @@ export default {
 	 */
 	async getPolls(forceRefresh = false) {
 		let fetchFunc = axios.get("/polls")
-		return this.pollsCache.getOrFetch("polls", fetchFunc)
+		//TODO: populate polls (form cache if possible)
+		return this.pollsCache.getOrFetch("polls", {
+			fetchFunc: fetchFunc,
+			callBackend: forceRefresh ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
+		})
 	},
 
 	/**
@@ -208,6 +215,7 @@ export default {
 	},
 
 
+	/*
 	async startVotingPhase(pollId) {
 		return Promise.reject("Not yet implemented")
 	},
@@ -219,5 +227,6 @@ export default {
 	async endVotingPhase(pollId) {
 		return Promise.reject("not yet implemented")
 	},
+	*/
 
 }

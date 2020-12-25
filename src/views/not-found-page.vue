@@ -12,23 +12,23 @@
 export default {
 	name: "NotFound",
 	components: {},
+	filters: {},
 	// props: [],
 	mixins: [],
 	data() {
 		return {}
 	},
+	computed: {},
 	beforeCreate() {},
 	created() {
 		this.$router.push("/404")
 	},
 	beforeMount() {},
 	mounted() {},
-	computed: {},
-	methods: {},
-	filters: {},
 	beforeUpdate() {},
 	updated() {},
 	beforeDestroy() {},
+	methods: {},
 }
 </script>
 

@@ -2,7 +2,7 @@
 	<div class="liquido-input">
 		<label v-if="label" :for="id" :class="{ disabled: disabled }">
 			{{
-			label
+				label
 			}}
 		</label>
 		<input
@@ -18,11 +18,13 @@
 			@keyup="keyup"
 			@input="$emit('input', $event.target.value)"
 			@blur="blur"
-		/>
+		>
 		<div class="iconRight">
-			<slot name="iconRight"></slot>
+			<slot name="iconRight" />
 		</div>
-		<div v-if="invalidFeedback" class="invalid-feedback">{{ invalidFeedback }}</div>
+		<div v-if="invalidFeedback" class="invalid-feedback">
+			{{ invalidFeedback }}
+		</div>
 	</div>
 </template>
 
@@ -83,7 +85,6 @@ export default {
 			state: null,
 		}
 	},
-	mounted() {},
 	computed: {
 		/**
 		 * Compute wether to add the is-valid or is-invalid pseudo class depending on the input's "state"
@@ -97,6 +98,7 @@ export default {
 			}
 		},
 	},
+	mounted() {},
 	methods: {
 		keyup(evt) {
 			if (this.validateOn === "keyup") {

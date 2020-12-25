@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<h2 class="page-title" id="poll-create">
-			<i class="fas fa-poll"></i>
+		<h2 id="poll-create" class="page-title">
+			<i class="fas fa-poll" />
 			{{ $t("newPoll") }}
 		</h2>
 
@@ -10,10 +10,10 @@
 				id="pollTitleInput"
 				v-model="poll.title"
 				:label="$t('pollTitle')"
-				:validFunc="isPollTitleValid"
+				:valid-func="isPollTitleValid"
 				:invalid-feedback="$t('pollTitleInvalid')"
 				@blur="pollTitleValidated = true"
-			></liquido-input>
+			/>
 
 			<div class="d-flex justify-content-between align-items-center">
 				<small class="ml-1">
@@ -27,13 +27,13 @@
 					@click="clickCreateNewPoll()"
 				>
 					{{ $t("create") }}
-					<i class="fas fa-angle-double-right"></i>
+					<i class="fas fa-angle-double-right" />
 				</b-button>
 			</div>
 		</b-card>
 
 		<b-card class="chat-bubble shadow-sm my-3">
- 			<div v-html="$t('createPollInfo')"></div>
+			<div v-html="$t('createPollInfo')" />
 		</b-card>
 	</div>
 </template>
@@ -48,10 +48,10 @@ export default {
 			de: {
 				newPoll: "Neue Abstimmung",
 				createPollInfo:
-					'<p>Nur du als Admin kannst neue Abstimmungen erstellen.</p>'+
+					"<p>Nur du als Admin kannst neue Abstimmungen erstellen.</p>"+
 					'<p>(1) Während eine Abstimmung noch in Diskussion (<i class="fas fa-comments"></i>) ist, kann jeder aus deinem Team seinen eigenen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen.</p>' +
 					'<p>(2) Wenn du die Wahlphase der Abstimmung startest, kann jeder im Team seine Stimme anonym abgeben. (<i class="fas fa-person-booth"></i>)</p>' +
-					'<p>(3) Nachdem du die Wahlphase beendet hast, ist das Wahlergebnis für alle sichtbar.',
+					"<p>(3) Nachdem du die Wahlphase beendet hast, ist das Wahlergebnis für alle sichtbar.",
 				pollTitle: "Titel der Abstimmung",
 				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. 10 Zeichen.",
 				create: "Anlegen",
@@ -66,12 +66,12 @@ export default {
 			poll: {},
 		}
 	},
-	mounted() {
-	},
 	computed: {
 		createPollButtonDisabled() {
 			return !this.isPollTitleValid(this.poll.title)
 		},
+	},
+	mounted() {
 	},
 	methods: {
 		isPollTitleValid(val) {

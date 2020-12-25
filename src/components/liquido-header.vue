@@ -8,19 +8,19 @@
 							v-if="backLink"
 							class="fas fa-angle-double-left"
 							@click="goBack()"
-						></i>
+						/>
 					</div>
 					<div class="col-8 liquido-title">
-						<i class="fas fa-university"></i>&nbsp;
-						<span class="liquido" @click="clickLiquidoTitle()"></span>
+						<i class="fas fa-university" />&nbsp;
+						<span class="liquido" @click="clickLiquidoTitle()" />
 					</div>
 					<div class="col header-right">
-						<i v-if="$route.path !== '/welcome'" @click="gotoTeam()" class="fas fa-users"></i>
+						<i v-if="$route.path !== '/welcome'" class="fas fa-users" @click="gotoTeam()" />
 					</div>
 				</div>
 			</div>
 		</header>
-		<div id="behindHeader"></div>
+		<div id="behindHeader" />
 	</div>
 </template>
 
@@ -42,9 +42,19 @@ export default {
 			filterByStatus: "ELABORATION",
 		}
 	},
+
+	/**
+	 * Make the spacer div behind the fixed header the same hight as the header itself.
+	 * Next sibling element should add its own top margin.
+	 */
+	mounted() {
+		this.$root.headerHeight = parseInt($("#liquidoHeader").css("height"), 10) // jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
+		$("#behindHeader").css("height", this.$root.headerHeight)
+		$("#app").scroll(this.transitionHeader)
+	},
 	methods: {
 		transitionHeader() {
-			if (document.getElementById('app').scrollTop > 50) {
+			if (document.getElementById("app").scrollTop > 50) {
 				$(".liquido-header").addClass("scrolled")
 				$("#navArrows").addClass("scrolled")
 			} else {
@@ -74,16 +84,6 @@ export default {
 		isPathActive(pathPrefix) {
 			return this.$route.path.indexOf(pathPrefix) === 0
 		},
-	},
-
-	/**
-	 * Make the spacer div behind the fixed header the same hight as the header itself.
-	 * Next sibling element should add its own top margin.
-	 */
-	mounted() {
-		this.$root.headerHeight = parseInt($("#liquidoHeader").css("height"), 10) // jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
-		$("#behindHeader").css("height", this.$root.headerHeight)
-		$('#app').scroll(this.transitionHeader)
 	},
 }
 </script>

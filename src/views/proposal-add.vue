@@ -1,19 +1,24 @@
 <template>
 	<div>
-		<h2 class="page-title">{{ $t("addProposal") }}</h2>
+		<h2 class="page-title">
+			{{ $t("addProposal") }}
+		</h2>
 
 		<div class="card input-bubble mb-5">
-			<div class="card-header">{{ $t("yourProposal") }}</div>
+			<div class="card-header">
+				{{ $t("yourProposal") }}
+			</div>
 			<div class="card-body">
 				<liquido-input
 					id="propTitle"
-					:label="$t('title')"
 					v-model="proposal.title"
-					:validFunc="isProposalTitleValid"
+					:label="$t('title')"
+					:valid-func="isProposalTitleValid"
 					:invalid-feedback="$t('titleInvalid', {minChars: titleMinLength})"
 					:maxlength="500"
 					name="propTitle"
-				></liquido-input>
+				/>
+
 				<textarea
 					id="descriptionId"
 					v-model="proposal.description"
@@ -22,8 +27,10 @@
 					name="description"
 					class="form-control"
 					rows="3"
-					@blur="descriptionValidated = true"
-				></textarea>
+					@blur="validateDescription()"
+					@keyUp="validateDescription()"
+				/>
+
 				<div v-if="descriptionState === null" class="text-small">
 					{{ $t("descriptionInfo", { minChars: descriptionMinLength }) }}
 				</div>
@@ -37,14 +44,14 @@
 					@click="saveProposal()"
 				>
 					{{ $t("Save") }}
-					<i class="fas fa-angle-double-right"></i>
+					<i class="fas fa-angle-double-right" />
 				</button>
 			</div>
 		</div>
 
 		<div v-if="!poll.proposals || poll.proposals.length == 0" class="alert alert-secondary mb-3">
-			<i class="fas fa-info-circle float-right"></i>
-			<p v-html="$t('noProposalYet', {pollTitle: poll.title})"></p>
+			<i class="fas fa-info-circle float-right" />
+			<p v-html="$t('noProposalYet', {pollTitle: poll.title})" />
 		</div>
 
 		<div v-if="isOnlyProposal" class="card">
@@ -53,20 +60,18 @@
 			</div>
 		</div>
 
-		<div >
+		<div>
 			<poll-panel
 				:poll="poll"
 				:expanded="false"
 				:read-only="true"
 				class="shadow mb-3"
-			></poll-panel>
+			/>
 		</div>
-		
 	</div>
 </template>
 
 <script>
-import liquidoHeader from "../components/liquido-header"
 import pollPanel from "../components/poll-panel"
 import liquidoInput from "../components/liquido-input"
 
@@ -89,7 +94,7 @@ export default {
 			},
 		},
 	},
-	components: { pollPanel, liquidoHeader, liquidoInput },
+	components: { pollPanel, liquidoInput },
 	props: {
 		pollId: { type: String, required: true },
 	},
@@ -100,21 +105,10 @@ export default {
 			titleMinLength: 10,
 			descriptionValidated: false,
 			descriptionMinLength: 20,
+			descriptionState: null,
 		}
 	},
-	created() {
-		this.$api.getPollById(this.pollId, true).then(poll => this.poll = poll)
-	},
-	mounted() {},
 	computed: {
-		descriptionState() {
-			if (
-				this.proposal.description &&
-				this.proposal.description.trim().length >= this.descriptionMinLength
-			)
-				return (this.descriptionValidated = true)
-			return this.descriptionValidated ? false : null
-		},
 		descriptionValidClass() {
 			return {
 				"is-valid": this.descriptionState === true,
@@ -133,10 +127,25 @@ export default {
 			)
 		},
 	},
+	created() {
+		this.$api.getPollById(this.pollId, true).then(poll => this.poll = poll)
+	},
+	mounted() {},
 	methods: {
 		isProposalTitleValid(val) {
 			return val !== undefined && val !== null && val.trim().length >= this.titleMinLength
 		},
+
+		/** validate description. Only set to invalid, and show error message, if it description been valid before. */
+		validateDescription() {
+			if (this.proposal.description &&	this.proposal.description.trim().length >= this.descriptionMinLength) {
+				this.descriptionState = true
+			} else {
+				if(this.descriptionState !== null ) this.descriptionState = false
+			}
+			
+		},
+
 		saveProposal() {
 			this.$api.saveProposal(this.poll.id, this.proposal).then(() => {
 				this.$router.push("/polls/" + this.poll.id)

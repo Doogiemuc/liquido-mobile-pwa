@@ -2,12 +2,12 @@
 	<b-card :pollid="poll.id" no-body class="poll-panel shadow mb-3">
 		<template v-slot:header>
 			<h4 v-if="readOnly" class="read-only poll-panel-title">
-				<i class="fas fa-poll"></i>
+				<i class="fas fa-poll" />
 				&nbsp;{{ poll.title }}
 			</h4>
-			<h4 v-else @click="goToPoll(poll.id)" class="poll-panel-title">
-				<i class="fas fa-angle-double-right goto-poll-icon"></i>
-				<i class="fas fa-poll"></i>
+			<h4 v-else class="poll-panel-title" @click="goToPoll(poll.id)">
+				<i class="fas fa-angle-double-right goto-poll-icon" />
+				<i class="fas fa-poll" />
 				&nbsp;{{ poll.title }}
 			</h4>
 		</template>
@@ -15,28 +15,30 @@
 			v-if="!poll.proposals || poll.proposals.length === 0"
 			class="card-body"
 		>
-			<p class="text-secondary"><small>{{ $t("noProposalsInPollYet") }}</small></p>
+			<p class="text-secondary">
+				<small>{{ $t("noProposalsInPollYet") }}</small>
+			</p>
 			<div v-if="showAddProposalButton" class="mb-1 text-right">
 				<b-button variant="primary" @click="goToAddProposal(poll.id)">
 					{{ $t("addProposal") }}
-					<i class="fas fa-angle-double-right"></i>
+					<i class="fas fa-angle-double-right" />
 				</b-button>
 			</div>
 		</div>
 		<div v-for="law in poll.proposals" v-else :key="law.id" class="law-panel">
 			<div>
 				<h4 class="law-title">
-					<i class="title-icon far fa-lightbulb"></i>
+					<i class="title-icon far fa-lightbulb" />
 					&nbsp;{{ law.title }}
 				</h4>
 			</div>
 			<div class="law-subtitle d-flex">
 				<div class="createdAt flex-fixed-width">
-					<i class="far fa-clock"></i>
+					<i class="far fa-clock" />
 					&nbsp;{{ formatDate(law.createdAt) }}
 				</div>
 				<div class="user">
-					<i class="far fa-user"></i>
+					<i class="far fa-user" />
 					&nbsp;{{ law.createdBy.name }}
 				</div>
 				<div
@@ -49,7 +51,7 @@
 							fas: law.supportedByCurrentUser,
 						}"
 						class="fa-thumbs-up"
-					></i>
+					/>
 					&nbsp;{{ law.numSupporters }}
 				</div>
 			</div>
@@ -59,9 +61,11 @@
 						:src="'https://picsum.photos/seed/' + law.id + '/100'"
 						alt="Image"
 						class="law-image"
-					/>
+					>
 				</div>
-				<div class="law-description">{{ law.description }}</div>
+				<div class="law-description">
+					{{ law.description }}
+				</div>
 			</div>
 		</div>
 		<a
@@ -70,7 +74,7 @@
 			href="#"
 			@click="toggleCollapse()"
 		>
-			<i class="fa"></i>
+			<i class="fa" />
 		</a>
 	</b-card>
 </template>
@@ -99,10 +103,10 @@ export default {
 	data() {
 		return {}
 	},
+	computed: {},
 	mounted() {
 		if (!this.expanded) this.toggleCollapse() // collapse the proposal descriptions when initially not expanded. This is animated!
 	},
-	computed: {},
 	methods: {
 		addProposal() {},
 

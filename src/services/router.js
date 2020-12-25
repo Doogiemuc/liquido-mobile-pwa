@@ -12,7 +12,7 @@ const routes = [
 	{
 		path: "/devLogin",
 		name: "devLogin",
-		component: () => import('@/services/dev-login'),
+		component: () => import("@/services/dev-login"),
 		props: (route) => ({
 			userEmail: route.query.userEmail,
 			teamName: route.query.teamName

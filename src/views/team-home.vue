@@ -1,6 +1,8 @@
 <template>
 	<div>
-		<h2 id="team-home" class="page-title">{{ teamName }}</h2>
+		<h2 id="team-home" class="page-title">
+			{{ teamName }}
+		</h2>
 
 		<b-card class="chat-bubble shadow-sm">
 			<b-card-text>
@@ -9,28 +11,29 @@
 		</b-card>
 
 		<b-button
-				id="gotoPollsButton"
-				variant="primary"
-				size="m"
-				class="float-right mb-3"
-				@click="gotoPolls()"
-			>
-				{{ $t("gotoPolls") }}
-				<i class="fas fa-angle-double-right"></i>
-			</b-button>
+			id="gotoPollsButton"
+			variant="primary"
+			size="m"
+			class="float-right mb-3"
+			@click="gotoPolls()"
+		>
+			{{ $t("gotoPolls") }}
+			<i class="fas fa-angle-double-right" />
+		</b-button>
 
-		<div class="clearfix"></div>
+		<div class="clearfix" />
 
-		<h3 class="my-3">{{ $t('teamMembers') }}</h3>
+		<h3 class="my-3">
+			{{ $t('teamMembers') }}
+		</h3>
 
-		<b-card-group deck id="memberCards">
+		<b-card-group id="memberCards" deck>
 			<b-card v-for="member in members" :key="member.email" :img-src="member.avatarUrl" img-alt="Avatar" img-top>
 				<b-card-text class="text-center">
 					{{ member.name }}
 				</b-card-text>
 			</b-card>
 		</b-card-group>
-		
 	</div>
 </template>
 
@@ -54,11 +57,11 @@ export default {
 		return {}
 	},
 	computed: {
-		teamName() { return this.$root.store.get('team').name },
-		members()  { return this.$root.store.get('team').members },
+		teamName() { return this.$root.store.get("team").name },
+		members()  { return this.$root.store.get("team").members },
 	},
 	created() {
-		this.$root.store.put('team', {
+		this.$root.store.put("team", {
 			name: "Test Dummy Team",
 			members: [
 				{ name: "User1", email: "user1@liquiod.me", avatarUrl: "/img/avatars/Avatar1.png" },

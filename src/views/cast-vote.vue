@@ -1,14 +1,16 @@
 <template>
 	<div class="container">
 		<h2 class="page-title">
-			<i class="fas fa-person-booth"></i>
+			<i class="fas fa-person-booth" />
 			&nbsp;{{ $t("castVoteTitle") }}
 		</h2>
 
 		<p>{{ $t("castVoteInfo") }}</p>
 
 		<div id="ballot" class="ballot">
-			<h2 class="ballot-title">{{ $t("yourBallot") }}</h2>
+			<h2 class="ballot-title">
+				{{ $t("yourBallot") }}
+			</h2>
 			<draggable
 				v-model="ballot"
 				:swap-threshold="0.5"
@@ -18,9 +20,9 @@
 			>
 				<law-panel
 					v-for="prop in ballot"
+					:key="prop.id"
 					:law="prop"
 					:read-only="true"
-					:key="prop.id"
 					:collapsed="true"
 					class="mb-2 shadow-sm"
 				/>
@@ -28,9 +30,9 @@
 		</div>
 
 		<div class="text-right mb-3">
-			<b-button variant="primary" @click="clickCastVote()" :disabled="castVoteLoading">
-				<b-spinner v-if="castVoteLoading" small></b-spinner>
-				<i v-if="voteCastedSuccessfully" class="far fa-check-circle"></i>
+			<b-button variant="primary" :disabled="castVoteLoading" @click="clickCastVote()">
+				<b-spinner v-if="castVoteLoading" small />
+				<i v-if="voteCastedSuccessfully" class="far fa-check-circle" />
 				{{ $t("castVote") }}
 			</b-button>
 		</div>
@@ -39,20 +41,19 @@
 			v-if="voteCastedSuccessfully"
 			class="alert alert-success"
 			v-html="$t('voteCastedSuccessfully')"
-		></div>
-		<div v-if="voteCastedError" class="alert alert-danger" v-html="$t('voteCastedError')"></div>
+		/>
+		<div v-if="voteCastedError" class="alert alert-danger" v-html="$t('voteCastedError')" />
 
 		<div v-if="voteCastedSuccessfully" class="text-right mb-3">
 			<b-button variant="primary" @click="goToPoll()">
 				{{ $t("ok") }}
-				<i class="fas fa-angle-double-right"></i>
+				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
 	</div>
 </template>
 
 <script>
-import liquidoHeader from "../components/liquido-header"
 import lawPanel from "../components/law-panel"
 //import Sortable from 'sortablejs'
 import draggable from "vuedraggable"
@@ -82,7 +83,7 @@ export default {
 			},
 		},
 	},
-	components: { liquidoHeader, lawPanel, draggable },
+	components: { lawPanel, draggable },
 	props: {
 		pollId: { type: String, required: true },
 	},
@@ -95,13 +96,13 @@ export default {
 			voteCastedError: false,
 		}
 	},
+	computed: {},
 	created() {
 		this.poll = this.$api.getPollById(this.pollId)
 		if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
 		this.ballot = _.cloneDeep(this.poll.proposals)
 	},
 	mounted() {},
-	computed: {},
 	methods: {
 		clickCastVote() {
 			this.voteCastedError = false

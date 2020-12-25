@@ -2,18 +2,18 @@
 	<div>
 		<div class="mt-3">
 			<b-card id="welcomeBubble" :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm">
-				<b-card-text v-html="$t('welcome')"></b-card-text>
+				<b-card-text v-html="$t('welcome')" />
 			</b-card>
 
 			<b-card :class="{ 'hide-left': flowState < 2 }" class="chat-bubble shadow-sm">
-				<b-card-text v-html="$t('whatsYourName')"></b-card-text>
+				<b-card-text v-html="$t('whatsYourName')" />
 			</b-card>
 
 			<b-card :class="{ 'hide-right': flowState < 3 }" class="chat-bubble chat-right">
 				<liquido-input
-					v-model="user.name"
-					ref="userNameInput"
 					id="userNameInput"
+					ref="userNameInput"
+					v-model="user.name"
 					:label="$t('yourNickname')"
 					:valid-func="isUsernameValid"
 					:maxlength="100"
@@ -21,12 +21,12 @@
 					:disabled="flowState != 3"
 					@keyup.enter="userNameSubmit"
 					@blur="userNameSubmit"
-				></liquido-input>
+				/>
 			</b-card>
 
 			<div :class="{ 'collapse-max-height': flowState < 4 }" class="transition-all">
 				<b-card :class="{ 'hide-left': flowState < 4 }" class="chat-bubble shadow-sm">
-					<b-card-text v-html="$t('niceToMeetYou', { nickname: user.name })"></b-card-text>
+					<b-card-text v-html="$t('niceToMeetYou', { nickname: user.name })" />
 				</b-card>
 			</div>
 
@@ -36,7 +36,7 @@
 					:class="{ 'hide-left': flowState < 5 }"
 					class="chat-bubble shadow-sm"
 				>
-					<b-card-text v-html="$t('createOrJoin')"></b-card-text>
+					<b-card-text v-html="$t('createOrJoin')" />
 				</b-card>
 
 				<div
@@ -53,7 +53,9 @@
 						}"
 						class="btn"
 						@click="chooseJoinTeam()"
-					>{{ $t("joinTeamButton") }}</button>
+					>
+						{{ $t("joinTeamButton") }}
+					</button>
 					<button
 						id="createNewTeamButton"
 						:class="{
@@ -63,7 +65,9 @@
 						}"
 						class="btn"
 						@click="chooseCreateNewTeam()"
-					>{{ $t("createNewTeamButton") }}</button>
+					>
+						{{ $t("createNewTeamButton") }}
+					</button>
 				</div>
 			</div>
 
@@ -72,42 +76,42 @@
 			<b-card :class="{ 'collapse-max-height': ![10,11,12].includes(flowState) }" class="chat-bubble chat-right">
 				<form id="joinTeamForm">
 					<liquido-input
-						v-model="inviteCode"
-						ref="inviteCodeInput"
 						id="inviteCodeInput"
+						ref="inviteCodeInput"
+						v-model="inviteCode"
 						:label="$t('inviteCode')"
 						:valid-func="isInviteCodeValid"
 						:maxlength="100"
 						:invalid-feedback="$t('inviteCodeInvalid')"
 						:disabled="flowState !== 10"
 						tabindex="1"
-					></liquido-input>
+					/>
 
 					<liquido-input
-						v-model="user.email"
-						ref="emailInput"
 						id="emailInput"
+						ref="emailInput"
+						v-model="user.email"
 						:label="$t('yourEMail')"
 						:valid-func="isEmailValid"
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
 						:disabled="flowState !== 10"
 						tabindex="2"
-					></liquido-input>
+					/>
 
 					<div class="d-flex justify-content-between align-items-center">
 						<small :class="{ invisible: flowState !== 10 }" class="ml-1">
-							<a href="#" @click="cancelJoinTeam()" tabindex="4">{{ $t("Cancel") }}</a>
+							<a href="#" tabindex="4" @click="cancelJoinTeam()">{{ $t("Cancel") }}</a>
 						</small>
 						<b-button
-							:disabled="joinTeamOkButtonDisabled"
 							id="joinTeamOkButton"
+							:disabled="joinTeamOkButtonDisabled"
 							variant="primary"
-							@click="joinTeam()"
 							tabindex="3"
+							@click="joinTeam()"
 						>
 							{{ $t("Ok") }}
-							<i class="fas fa-angle-double-right"></i>
+							<i class="fas fa-angle-double-right" />
 						</b-button>
 					</div>
 				</form>
@@ -116,14 +120,14 @@
 			<!--Joined team successfully (flowState == 12) -->
 
 			<b-card	id="joinedTeamBubble"	:class="{ 'collapse-max-height': flowState !== 12 }" class="chat-bubble shadow-sm">
-				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.name })"></p>
+				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.name })" />
 				<b-button
 					variant="primary"
 					class="float-right mb-1"
 					@click="$router.push('/team')"
 				>
 					{{ $t("goToTeam") }}
-					<i class="fas fa-angle-double-right"></i>
+					<i class="fas fa-angle-double-right" />
 				</b-button>
 			</b-card>
 
@@ -137,45 +141,45 @@
 			<b-card :class="{ 'collapse-max-height': ![20,21,22].includes(flowState) }" class="chat-bubble chat-right">
 				<form id="createNewTeamForm">
 					<liquido-input
-						v-model="team.name"
-						ref="teamNameInput"
 						id="teamNameInput"
+						ref="teamNameInput"
+						v-model="team.name"
 						:label="$t('teamName')"
 						:valid-func="isTeamNameValid"
 						:maxlength="100"
 						:invalid-feedback="$t('teamNameInvalid')"
 						:disabled="flowState !== 20"
 						tabindex="1"
-					></liquido-input>
+					/>
 
 					<liquido-input
-						class="mb-0"
-						v-model="user.email"
-						ref="adminEmailInput"
 						id="adminEmailInput"
+						ref="adminEmailInput"
+						v-model="user.email"
+						class="mb-0"
 						:label="$t('adminEmail')"
 						:valid-func="isAdminEmailValid"
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
 						:disabled="flowState !== 20"
 						tabindex="2"
-					></liquido-input>
+					/>
 
 					<small class="ml-1 mb-1">{{ $t("youWillBecomeAdmin") }}</small>
 
 					<div class="d-flex justify-content-between align-items-center">
 						<small :class="{ invisible: flowState !== 20 }" class="ml-1">
-							<a href="#" @click="cancelCreateNewTeam()" tabindex="4">{{ $t("Cancel") }}</a>
+							<a href="#" tabindex="4" @click="cancelCreateNewTeam()">{{ $t("Cancel") }}</a>
 						</small>
 						<b-button
-							:disabled="createNewTeamOkButtonDisabled"
 							id="createNewTeamOkButton"
+							:disabled="createNewTeamOkButtonDisabled"
 							variant="primary"
-							@click="createNewTeam()"
 							tabindex="3"
+							@click="createNewTeam()"
 						>
 							{{ $t("Ok") }}
-							<i class="fas fa-angle-double-right"></i>
+							<i class="fas fa-angle-double-right" />
 						</b-button>
 					</div>
 				</form>
@@ -194,7 +198,7 @@
 						{{ $t("shareThisLink") }}
 						<a id="inviteLink" :href="team.inviteLink" @click.prevent="shareLink()">
 							{{ team.inviteLink }}
-							<i class="fas fa-external-link-alt"></i>
+							<i class="fas fa-external-link-alt" />
 						</a>
 					</li>
 					<li>
@@ -204,44 +208,52 @@
 					<li>{{ $t("scanQrCode") }}</li>
 				</ul>
 				<div class="text-center my-3">
-					<img :src="team.qrCodeUrl" class="qr-code" />
+					<img :src="team.qrCodeUrl" class="qr-code">
 				</div>
-				<p v-html="$t('teamInfo')"></p>
+				<p v-html="$t('teamInfo')" />
 			</b-card>
 
 			<b-card :class="{ 'collapse-max-height': flowState !== 22 }" class="chat-bubble shadow-sm">
-				<p v-html="$t('pollInfo')"></p>
+				<p v-html="$t('pollInfo')" />
 				<b-button
-				  id="gotoCreatePollButton"
+					id="gotoCreatePollButton"
 					variant="primary"
 					class="float-right mb-3"
 					@click="gotoCreatePoll()"
 				>
-					<i class="fas fa-user-shield"></i>
+					<i class="fas fa-user-shield" />
 					{{ $t("createPoll") }}
-					<i class="fas fa-angle-double-right"></i>
+					<i class="fas fa-angle-double-right" />
 				</b-button>
 			</b-card>
-		
 		</div> <!-- end of container -->
 
 		<!-- Error message modal popup -->
-		<div class="modal" id="errorMessage" tabindex="-1" role="dialog" aria-labelledby="errorMessage" aria-hidden="true">
+		<div id="errorMessage"
+			class="modal"
+			tabindex="-1"
+			role="dialog"
+			aria-labelledby="errorMessage"
+			aria-hidden="true"
+		>
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content bg-danger text-white">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLongTitle">{{$t('error')}}</h5>
+						<h5 id="exampleModalLongTitle" class="modal-title">
+							{{ $t('error') }}
+						</h5>
 					</div>
 					<div class="modal-body">
-						{{errorMessage}}
+						{{ errorMessage }}
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn bg-white text-black" data-dismiss="modal">{{$t("Ok")}}</button>
+						<button type="button" class="btn bg-white text-black" data-dismiss="modal">
+							{{ $t("Ok") }}
+						</button>
 					</div>
 				</div>
 			</div>
 		</div>
-
 	</div>
 </template>
 
@@ -359,6 +371,21 @@ export default {
 			errorMessage: "",
 		}
 	},
+	computed: {
+		joinTeamOkButtonDisabled() {
+			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 10
+		},
+		createNewTeamOkButtonDisabled() {
+			return !this.isTeamNameValid(this.team.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 20
+		},
+	},
+	watch: {
+		
+		"flowState": function(newVal, oldVal) {
+			console.log(" ====>>> flowState", oldVal, "=>", newVal)
+		}
+		
+	},
 	created() {
 		
 	},
@@ -381,21 +408,6 @@ export default {
 				}
 			})
 		}
-	},
-	computed: {
-		joinTeamOkButtonDisabled() {
-			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 10
-		},
-		createNewTeamOkButtonDisabled() {
-			return !this.isTeamNameValid(this.team.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 20
-		},
-	},
-	watch: {
-		
-		'flowState': function(newVal, oldVal) {
-			console.log(" ====>>> flowState", oldVal, "=>", newVal)
-		}
-		
 	},
 	methods: {
 		/* username must not be empty and contain at least 4 chars */
@@ -480,8 +492,8 @@ export default {
 				})
 				.catch((err) => {			// on error show modal
 					console.error("Cannot create new team", err)
-					this.errorMessage = this.$t('cannotCreateNewTeam')
-					$('#errorMessage').modal({show: true})
+					this.errorMessage = this.$t("cannotCreateNewTeam")
+					$("#errorMessage").modal({show: true})
 					this.flowState = 20
 				})
 		},
@@ -509,8 +521,8 @@ export default {
 				})
 				.catch(err => {
 					console.error("Cannot join team", err)
-					this.errorMessage = this.$t('cannotJoinTeam', {errorDetails: err.err })
-					$('#errorMessage').modal({show: true})
+					this.errorMessage = this.$t("cannotJoinTeam", {errorDetails: err.err })
+					$("#errorMessage").modal({show: true})
 					this.flowState = 10
 				})
 		},

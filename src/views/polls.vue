@@ -1,80 +1,83 @@
 <template>
-<div>
-	<h2 class="page-title">{{ pageTitleLoc }}</h2>
+	<div>
+		<h2 class="page-title">
+			{{ pageTitleLoc }}
+		</h2>
 
-	<liquido-input
-		v-if="polls.length > 3"
-		id="searchInput"
-		v-model="searchQuery"
-		:label="$t('Search')"
-		:status="null"
-		class="mb-4"
-	>
-		<template v-slot:iconRight>
-			<i class="fas fa-times mr-1" @click="searchQuery = undefined"></i>
-		</template>
-	</liquido-input>
+		<liquido-input
+			v-if="polls.length > 3"
+			id="searchInput"
+			v-model="searchQuery"
+			:label="$t('Search')"
+			:status="null"
+			class="mb-4"
+		>
+			<template v-slot:iconRight>
+				<i class="fas fa-times mr-1" @click="searchQuery = undefined" />
+			</template>
+		</liquido-input>
 
-	<poll-panel v-for="poll in filteredPolls" :poll="poll" :key="poll.id" class="shadow mb-3"></poll-panel>
+		<poll-panel v-for="poll in filteredPolls" :key="poll.id" :poll="poll" class="shadow mb-3" />
 
-	<div v-if="polls.length === 0" class="alert alert-secondary">
-		<p v-html="$t('noPollsYet')"></p>
-		<p v-if="userIsAdmin" v-html="$t('noPollsYetAdmin')"></p>
+		<div v-if="polls.length === 0" class="alert alert-secondary">
+			<p v-html="$t('noPollsYet')" />
+			<p v-if="userIsAdmin" v-html="$t('noPollsYetAdmin')" />
+		</div>
+
+		<div v-if="
+				filteredPolls.length === 0 &&
+					searchQuery &&
+					searchQuery.trim().length > 0
+			"
+			class="alert alert-secondary"
+		>
+			<p v-html="$t('noPollsMatchSearch')" />
+		</div>
+		<div
+			v-if="
+				filteredPolls.length === 0 &&
+					!searchQuery &&
+					pollStatusFilter === 'ELABORATION'
+			"
+			class="alert alert-secondary"
+		>
+			<p v-html="$t('noPollsInElaboration')" />
+			<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
+		</div>
+		<div
+			v-if="
+				filteredPolls.length === 0 &&
+					!searchQuery &&
+					pollStatusFilter === 'VOTING'
+			"
+			class="alert alert-secondary"
+		>
+			<p v-html="$t('noPollsInVoting')" />
+			<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')" />
+		</div>
+		<div
+			v-if="
+				filteredPolls.length === 0 &&
+					!searchQuery &&
+					pollStatusFilter === 'FINISHED'
+			"
+			class="alert alert-secondary"
+		>
+			<p v-html="$t('noFinishedPolls')" />
+			<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
+		</div>
+
+
+		<div v-if="userIsAdmin" class="my-5 text-right">
+			<b-button variant="primary" @click="createPoll()">
+				<i class="fas fa-poll" />
+				{{ $t("createPoll") }}
+				<i class="fas fa-angle-double-right" />
+			</b-button>
+		</div>
+
+		<pollsFooter />
 	</div>
-
-	<div v-if="
-			filteredPolls.length === 0 &&
-				searchQuery &&
-				searchQuery.trim().length > 0
-		"
-		class="alert alert-secondary">
-		<p v-html="$t('noPollsMatchSearch')"></p>
-	</div>
-	<div
-		v-if="
-			filteredPolls.length === 0 &&
-				!searchQuery &&
-				pollStatusFilter === 'ELABORATION'
-		"
-		class="alert alert-secondary"
-	>
-		<p v-html="$t('noPollsInElaboration')"></p>
-		<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
-	</div>
-	<div
-		v-if="
-			filteredPolls.length === 0 &&
-				!searchQuery &&
-				pollStatusFilter === 'VOTING'
-		"
-		class="alert alert-secondary"
-	>
-		<p v-html="$t('noPollsInVoting')"></p>
-		<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')"></p>
-	</div>
-	<div
-		v-if="
-			filteredPolls.length === 0 &&
-				!searchQuery &&
-				pollStatusFilter === 'FINISHED'
-		"
-		class="alert alert-secondary"
-	>
-		<p v-html="$t('noFinishedPolls')"></p>
-		<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')"></p>
-	</div>
-
-
-	<div v-if="userIsAdmin" class="my-5 text-right">
-		<b-button variant="primary" @click="createPoll()">
-			<i class="fas fa-poll"></i>
-			{{ $t("createPoll") }}
-			<i class="fas fa-angle-double-right"></i>
-		</b-button>
-	</div>
-
-	<pollsFooter></pollsFooter>
-</div>
 </template>
 
 <script>
@@ -116,16 +119,6 @@ export default {
 			searchQuery: "",
 		}
 	},
-	created() {
-		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
-			this.$root.store.state.pollStatusFilter = this.status
-		}
-		this.$root.$api.getPolls().then(polls => {
-			this.polls = polls
-			console.log("polls", polls)
-		})
-	},
-	mounted() {},
 	computed: {
 		pageTitleLoc() {
 			switch (this.pollStatusFilter) {
@@ -163,6 +156,16 @@ export default {
 			return this.$root.store.state.pollStatusFilter
 		},
 	},
+	created() {
+		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
+			this.$root.store.state.pollStatusFilter = this.status
+		}
+		this.$root.$api.getPolls().then(polls => {
+			this.polls = polls
+			console.log("polls", polls)
+		})
+	},
+	mounted() {},
 	methods: {
 		createPoll() {
 			this.$router.push("/polls/create")
