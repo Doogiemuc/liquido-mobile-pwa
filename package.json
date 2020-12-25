@@ -31,7 +31,7 @@
 		"moment": "^2.24.0",
 		"node-cache": "^5.1.2",
 		"path": "^0.12.7",
-		"populating-cache": "^3.0.0",
+		"populating-cache": "^3.1.0",
 		"purgecss-webpack-plugin": "^1.6.0",
 		"regenerator-runtime": "^0.13.7",
 		"register-service-worker": "^1.6.2",

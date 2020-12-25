@@ -75,7 +75,11 @@
 			</b-button>
 		</div>
 
-		<pollsFooter v-on:setPollFilter="setPollFilter"/>
+		<pollsFooter 
+			v-on:setPollFilter="setPollFilter"
+			v-bind:activeStatus="pollStatusFilter"
+		>
+		</pollsFooter>
 	</div>
 </template>
 

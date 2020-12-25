@@ -116,7 +116,7 @@ export default {
 
 // Slide animation between pages
 .router-view {
-	transition: all 5s ease-in-out;
+	transition: all 0.5s ease-in-out;
 }
 .fade-enter,
 .fade-leave-to {

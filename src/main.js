@@ -1,7 +1,9 @@
 console.log("%cLIQUIDO Mobile", "font-size: 40px; color:blue; font-face: Baskerville, serif; font-weight: bold; border: 1px solid blue; padding: 20px;")
 
 const log = require("loglevel").getLogger("liquido-main");
-log.enableAll()
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+	log.enableAll()
+}
 
 import config from "config"  // automatically mapped to environment specific config file vue.config.js as a webpack alias
 log.debug("NODE_ENV="+process.env.NODE_ENV+"   configuration:\n", config)
@@ -92,7 +94,7 @@ const rootApp = new Vue({
 	i18n,
 	router,
 	data: {
- 		headerHeight: 0, 			// will be set to height of header in liquido-header.vue
+		headerHeight: 0, 			// will be set to height of header in liquido-header.vue
 		transitionName: "", 	// CSS sliding transition between page components
 	},
 	...RootApp, // merge these attributes into root-app.vue

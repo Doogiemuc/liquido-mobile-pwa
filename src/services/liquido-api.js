@@ -11,10 +11,9 @@ import PopulatingCache from "populating-cache"
 
 // Console Logging
 const log = require("loglevel").getLogger("liquido-api");
-if (process.env.NODE_ENV === "debug" || process.env.NODE_ENV === "test") {
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	log.enableAll()
 }
-log.debug("Liquido-api pointing to", config.LIQUIDO_API_URL)
 
 // Configure axios HTTP REST client
 axios.defaults.baseURL = config.LIQUIDO_API_URL
@@ -38,6 +37,8 @@ const cacheConfig = {
 		log.debug("Call to global fetchFunc: ", path)
 	},
 	ttl: 10*60*1000,
+	referencedPathAttr: "$ref",
+	idAttr: "id",
 }
 
 
@@ -72,6 +73,8 @@ export default {
 
 		// Cache all current polls of the team in pollsCache by their poll.id
 		this.pollsCache.put("polls", this.loginData.polls)
+		// Cache all known users in this team, so that we can use them for population
+		this.pollsCache.put("users", this.loginData.team.members)
 
 		console.log("Login <"+this.loginData.user.email+"> in "+this.loginData.team.name)
 	},
@@ -92,6 +95,14 @@ export default {
 	async devLogin(userEmail, teamName) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
+
+		let devLoginData = require('../../cypress/fixtures/loginData')
+
+		console.log(devLoginData)
+
+		this.login(devLoginData)
+		return devLoginData
+		/*
 		return axios({
 			method: "GET", 
 			url: "/devLogin", 
@@ -107,6 +118,7 @@ export default {
 			console.error(err.response ? err.response : err)
 			return Promise.reject(err.response ? err.response : err)
 		})
+		*/
 	},
 
 	/** Logout the current user. Remove JWT */
@@ -167,11 +179,8 @@ export default {
 	 * @returns A Promise that will resolve to the poll if it exists.
 	 */
 	async getPollById(pollId, forceRefresh = false) {
-		let fetchFunc = axios.get("/polls/"+pollId)
-		return this.pollsCache.get("polls/"+pollId, {
-			fetchFunc: fetchFunc,
-			callBackend: forceRefresh ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
-		})
+		let fetchFunc = () => axios.get("/polls/"+pollId)
+		return this.pollsCache.remember("polls/"+pollId, fetchFunc)
 	},
 
 	/**
@@ -180,11 +189,13 @@ export default {
 	 * @returns A Promise that will resolve to the list of polls in this team
 	 */
 	async getPolls(forceRefresh = false) {
-		let fetchFunc = axios.get("/polls")
+		let fetchFunc = () => axios.get("/polls")
 		//TODO: populate polls (form cache if possible)
-		return this.pollsCache.getOrFetch("polls", {
-			fetchFunc: fetchFunc,
-			callBackend: forceRefresh ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
+		return this.pollsCache.get("polls", {
+			"fetchFunc": fetchFunc,
+			"callBackend": forceRefresh ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
+		}).then(polls => {
+			return this.pollsCache.populate(polls, "createdBy")
 		})
 	},
 
