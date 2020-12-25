@@ -105,15 +105,18 @@ export default {
 	overflow-x: hidden;
 }
 
-/** no horizintal scrolling */
+/** 
+ * Main app content below the header
+ * no horizintal scrolling 
+ */
 #appContent {
-	margin-bottom: 50px; // for footer
+	margin-bottom: 50px;
 	overflow-x: hidden;
 }
 
 // Slide animation between pages
 .router-view {
-	transition: all 0.5s ease-in-out;
+	transition: all 5s ease-in-out;
 }
 .fade-enter,
 .fade-leave-to {
@@ -133,6 +136,7 @@ export default {
 .slide-right-leave-active {
 	position: absolute;
 	width: 100%;
+	//height: 100%;
 }
 .slide-left-leave-to,
 .slide-right-enter {

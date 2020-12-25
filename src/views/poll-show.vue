@@ -106,7 +106,7 @@ export default {
 			return this.$t("poll")
 		},
 		userIsAdmin() {
-			return this.$root.store.isAdmin()
+			return this.$api.isAdmin()
 		},
 		/** User can add his own proposal if the poll is in status ELABORATION and he did not add a proposal to this poll yet. */
 		showAddProposal() {

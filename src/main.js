@@ -92,9 +92,7 @@ const rootApp = new Vue({
 	i18n,
 	router,
 	data: {
-		//DEPRECATED: store: liquidoStore, 	// this is available to all sub components as this.$root.store
-
-		headerHeight: 0, 			// will be set to height of header in liquido-header.vue
+ 		headerHeight: 0, 			// will be set to height of header in liquido-header.vue
 		transitionName: "", 	// CSS sliding transition between page components
 	},
 	...RootApp, // merge these attributes into root-app.vue

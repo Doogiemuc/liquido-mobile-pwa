@@ -98,7 +98,7 @@ router.beforeEach((routeTo, routeFrom, next) => {
 	// If auth isn't required for the route, just continue.
 	if (!requiresAuth && !redirectIfAuthenticated) return next()
 
-	let isAuthenticated = false // TODO: api.isAuthenticated()
+	let isAuthenticated = Vue.$api.isAuthenticated()
 
 	if (requiresAuth && !isAuthenticated) return next("/login")
 

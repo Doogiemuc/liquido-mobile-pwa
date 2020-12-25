@@ -21,7 +21,6 @@
 
 		<div v-if="polls.length === 0" class="alert alert-secondary">
 			<p v-html="$t('noPollsYet')" />
-			<p v-if="userIsAdmin" v-html="$t('noPollsYetAdmin')" />
 		</div>
 
 		<div v-if="
@@ -76,7 +75,7 @@
 			</b-button>
 		</div>
 
-		<pollsFooter />
+		<pollsFooter v-on:setPollFilter="setPollFilter"/>
 	</div>
 </template>
 
@@ -96,8 +95,7 @@ export default {
 				butPollInVoting: "However there is a poll in which you can vote.",
 			},
 			de: {
-				noPollsYet: "Euer Teamadmin hat bisher noch keine Abstimmung erstellt.",
-				noPollsYetAdmin: 'Möchstest du eine <a href="/polls/create">Abstimmung erstellen</a>?',
+				noPollsYet: "Euer Admin hat bisher noch keine Abstimmung erstellt.",
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es gibt gerade keine laufenden Abstimmungen.",
@@ -117,9 +115,12 @@ export default {
 		return {
 			polls: [],
 			searchQuery: "",
+			/**current filter for poll status, undefined|ELABORATION|VOTING|FINISHED */
+			pollStatusFilter: undefined
 		}
 	},
 	computed: {
+		
 		pageTitleLoc() {
 			switch (this.pollStatusFilter) {
 				case "ELABORATION":
@@ -133,7 +134,7 @@ export default {
 			}
 		},
 		userIsAdmin() {
-			return this.$root.store.get("user", {}).isAdmin
+			return this.$api.isAdmin()
 		},
 		filteredPolls() {
 			return this.polls
@@ -151,22 +152,27 @@ export default {
 		pollsFinished() {
 			return this.polls.filter((poll) => poll.status === "FINISHED").length
 		},
-		/** current filter for poll status, undefined|ELABORATION|VOTING|FINISHED */
-		pollStatusFilter() {
-			return this.$root.store.state.pollStatusFilter
-		},
 	},
 	created() {
 		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
-			this.$root.store.state.pollStatusFilter = this.status
+			this.pollStatusFilter = this.status
 		}
 		this.$root.$api.getPolls().then(polls => {
 			this.polls = polls
-			console.log("polls", polls)
+			//console.log("polls", polls)
 		})
 	},
 	mounted() {},
 	methods: {
+
+		setPollFilter(newFilterValue) {
+			if (this.pollStatusFilter === newFilterValue) {
+				this.pollStatusFilter = undefined
+			} else {
+				this.pollStatusFilter = newFilterValue
+			}
+		},
+
 		createPoll() {
 			this.$router.push("/polls/create")
 		},

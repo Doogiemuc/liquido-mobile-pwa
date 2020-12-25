@@ -43,22 +43,17 @@
 <script>
 export default {
 	name: "LiquidoFooter",
-	data() {
-		return {
-			activeStatus: undefined
-		}
+	props: {
+		activeStatus: undefined
 	},
+	data() { return {} },
 	methods: {
 		/**
 		 * When user clicks on a status, then this becomes the current activeStatus that we filte for.
 		 * When user clicks on the active Status again, then the filter is cleared.
 		 */
 		clickFooter(newFilterValue) {
-			if (this.activeStatus === newFilterValue) {
-				this.activeStatus = undefined
-			} else {
-				this.activeStatus = newFilterValue
-			}
+			this.$emit("setPollFilter", newFilterValue)
 		},
 	},
 }

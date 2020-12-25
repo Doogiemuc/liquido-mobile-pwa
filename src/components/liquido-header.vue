@@ -48,7 +48,8 @@ export default {
 	 * Next sibling element should add its own top margin.
 	 */
 	mounted() {
-		this.$root.headerHeight = parseInt($("#liquidoHeader").css("height"), 10) // jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
+		// jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
+		this.$root.headerHeight = parseInt($("#liquidoHeader").css("height"), 10) 
 		$("#behindHeader").css("height", this.$root.headerHeight)
 		$("#app").scroll(this.transitionHeader)
 	},

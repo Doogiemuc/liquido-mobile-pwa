@@ -64,7 +64,7 @@ export default {
 		assert(loginDataRes.user, "Need user to login")
 		assert(loginDataRes.jwt, "Need jwt to login")
 		assert(loginDataRes.voterToken, "Need voterToken to login")
-		assert(loginDataRes.polls, "Need polls array in loginData")
+		loginDataRes.polls = loginDataRes.polls || []
 		this.loginData = loginDataRes
 
 		// Set JWT header for all future REST requests

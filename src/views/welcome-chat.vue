@@ -30,20 +30,14 @@
 				</b-card>
 			</div>
 
+
+			<!-- create or join a team buttons -->
 			<div :class="{ 'collapse-max-height': flowState < 5 }" class="transition-all">
-				<b-card
-					id="createOrJoinBubble"
-					:class="{ 'hide-left': flowState < 5 }"
-					class="chat-bubble shadow-sm"
-				>
+				<b-card	id="createOrJoinBubble"	:class="{ 'hide-left': flowState < 5 }"	class="chat-bubble shadow-sm">
 					<b-card-text v-html="$t('createOrJoin')" />
 				</b-card>
 
-				<div
-					id="joinOrCreateButtons"
-					:class="{ 'hide-left': flowState < 6 }"
-					class="mb-3 transition-all"
-				>
+				<div id="joinOrCreateButtons" :class="{ 'hide-left': flowState < 6 }" class="mb-3 transition-all">
 					<button
 						id="joinTeamButton"
 						:class="{
@@ -72,7 +66,6 @@
 			</div>
 
 			<!-- Join a team - form (flowState == 10) -->
-
 			<b-card :class="{ 'collapse-max-height': ![10,11,12].includes(flowState) }" class="chat-bubble chat-right">
 				<form id="joinTeamForm">
 					<liquido-input
@@ -118,7 +111,6 @@
 			</b-card>
 
 			<!--Joined team successfully (flowState == 12) -->
-
 			<b-card	id="joinedTeamBubble"	:class="{ 'collapse-max-height': flowState !== 12 }" class="chat-bubble shadow-sm">
 				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.name })" />
 				<b-button
@@ -163,6 +155,7 @@
 						:invalid-feedback="$t('emailInvalid')"
 						:disabled="flowState !== 20"
 						tabindex="2"
+						@keyup.enter="createNewTeam()"
 					/>
 
 					<small class="ml-1 mb-1">{{ $t("youWillBecomeAdmin") }}</small>
@@ -315,7 +308,7 @@ export default {
 				teamInfo:
 					'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) oben rechts.',
 				pollInfo:
-					'Jetzt kannst du die erste Abstimung (<i class="fas fa-poll"></i>) erstellen, zu der jedes Teammitglied dann seinen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen kann.',
+					'Erstelle jetzt die erste Abstimung (<i class="fas fa-poll"></i>) für dein Team. Jedes Teammitglied kann dann seinen eigenen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen.',
 				createPoll: "Abstimmung anlegen",
 
 				error: "Fehler",
