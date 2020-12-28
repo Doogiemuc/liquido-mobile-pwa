@@ -1,3 +1,8 @@
+/**
+ * Demo data that can locally be imported to mock a backend.
+ * Used in liquido-api.js
+ */
+
 module.exports = {
 	"team": {
 		"name": "Team Doogie",

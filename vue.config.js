@@ -60,7 +60,7 @@ const vueConfig = {
 	css: {
 		loaderOptions: {
 			sass: {
-				prependData: fs.readFileSync("./src/styles/_variables.scss", "utf-8"),
+				additionalData: fs.readFileSync("./src/styles/_variables.scss", "utf-8"),
 			},
 		},
 	},

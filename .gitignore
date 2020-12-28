@@ -118,3 +118,6 @@ dist
 .env
 
 .DS_Store
+
+# Visual Studio Plugin - Vetur
+jsconfig.json
