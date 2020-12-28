@@ -2,7 +2,7 @@
 	<b-card :id="law.id" no-body class="law-panel">
 		<div>
 			<h4 class="law-title">
-				<i :class="iconForLaw" class="title-icon"/>
+				<i :class="iconForLaw" class="title-icon" />
 				&nbsp;{{ law.title }}
 			</h4>
 		</div>

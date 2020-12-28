@@ -1,6 +1,6 @@
 <template>
 	<b-card :pollid="poll.id" no-body class="poll-panel shadow mb-3">
-		<template v-slot:header>
+		<template #header>
 			<h4 v-if="readOnly" class="read-only poll-panel-title">
 				<i class="fas fa-poll" />
 				&nbsp;{{ poll.title }}

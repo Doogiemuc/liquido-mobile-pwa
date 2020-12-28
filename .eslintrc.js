@@ -10,7 +10,7 @@ module.exports = {
 		jquery: true,
 	},
 	rules: {
-		"max-len": ["warn", { "code": 140 }], // we do have 4K monitors nowadays!
+		"max-len": ["warn", { "code": 200 }], // we do have 4K monitors nowadays!
 		"arrow-parens": 0,
 		"generator-star-spacing": 0,
 		"no-console": process.env.NODE_ENV === "production" ? "error" : "off",

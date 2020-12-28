@@ -54,8 +54,8 @@
 export default {
 	name: "DevLogin",
 	props: {
-		userEmail: String,
-		teamName: String
+		userEmail: { type: String, required: true, default: undefined },
+		teamName:  { type: String, required: true, default: undefined },
 	},
 	data() {
 		return { 

@@ -61,15 +61,15 @@
 export default {
 	name: "LiquidoInput",
 	props: {
-		id: String,
-		name: String,
-		value: String,
-		label: String,
-		placeholder: String,
+		id: { type: String, required: true },
+		name: { type: String, default: "" },
+		value: { type: String, default: "" },
+		label: { type: String, default: undefined },
+		placeholder: { type: String, default: undefined },
 		type: { type: String, required: false, default: "Text" },
-		disabled: Boolean,
-		maxlength: Number,
-		invalidFeedback: String,
+		disabled: { type: Boolean, default: false },
+		maxlength: { type: Number, default: 1024 },
+		invalidFeedback: { type: String, default: undefined },
 		validFunc: { type: Function, required: false, default: () => true },
 		validateOn: { type: String, required: false, default: "keyup" }, //TODO: these could be arrays, e.g. validateOn: ["keyup", "blur"]
 		forceValidateOn: { type: String, required: false, default: "blur" },

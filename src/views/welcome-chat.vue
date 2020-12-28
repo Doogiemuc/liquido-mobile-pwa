@@ -55,7 +55,7 @@
 						:class="{
 							'btn-primary': true,
 							'moveToCenterFromRight active': flowState >= 8,
-							opacity0: flowState == 7,
+							opacity0: flowState === 7,
 						}"
 						class="btn"
 						@click="chooseCreateNewTeam()"
@@ -260,11 +260,11 @@ export default {
 	i18n: {
 		messages: {
 			en: {
-				welcome:
-					"Welcome to  - the free, secure and liquid eVoting platform. With this mobile app you can create polls and then take votes with your team.",
+				welcome: 
+					"Welcome to <span class='liquido'></span> - the free, secure and liquid eVoting platform. "+
+					"With this mobile app you can create polls and then take votes with your team.",
 				whatsYourName: "How shall I call you?",
-				createOrJoin:
-					"Do you want to <em>join an existing team</em> with an invitation code or <em>create a new team</em>?",
+				createOrJoin: "Do you want to <em>join an existing team</em> with an invitation code or <em>create a new team</em>?",
 				joinTeamButton: "Join a team",
 				createNewTeamButton: "Create new team",
 
@@ -276,14 +276,14 @@ export default {
 			},
 			de: {
 				welcome:
-					'<p>Willkommen bei <span class="liquido"></span>, der freien, sicheren und liquiden e-voting App für euer Team.</p>' +
-					"In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag oder Kandidaten, sondern jeder im Team sortiert Wahlvorschläge nach seiner eigenen Priorität und Liquido berechnet daraus dann mit einem cleveren Algorithmus den Sieger der Wahl.</p>",
+					"<p>Willkommen bei <span class='liquido'></span>, der freien, sicheren und liquiden e-voting App für euer Team.</p>"+
+					"In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag oder Kandidaten, sondern jeder im Team sortiert "+
+					"Wahlvorschläge nach seiner eigenen Priorität und Liquido berechnet daraus dann mit einem cleveren Algorithmus den Sieger der Wahl.</p>",
 				whatsYourName: "Darf ich fragen wie du heißt?",
 				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
 				niceToMeetYou: "Hallo <b>{nickname}</b>! Schön dich kennen zu lernen.",
-				createOrJoin:
-					"Möchtest du <ul><li>einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team</b> gründen?</li></ul>",
+				createOrJoin: "Möchtest du <ul><li>einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team</b> gründen?</li></ul>",
 
 				joinTeamButton: "Team beitreten",
 				inviteCode: "Einladungscode",
@@ -292,7 +292,9 @@ export default {
 				eMailPlaceholder: "info@domain.de",
 				emailInvalid: "E-Mail ungültig",
 
-				joinedTeamSuccessfully: "Herzlich willkommen im Team <b>{teamName}</b>. Du kannst nun deine Wahlvorschläge zu den Abstimmungen im Team hinzufügen. Viel Spaß beim wählen!",
+				joinedTeamSuccessfully: 
+					"Herzlich willkommen im Team <b>{teamName}</b>. Du kannst nun deine Wahlvorschläge zu den Abstimmungen "+
+					"im Team hinzufügen. Viel Spaß beim wählen!",
 				goToTeam: "Zum Team",
 
 				createNewTeamButton: "Neues Team",
@@ -305,10 +307,10 @@ export default {
 				shareThisLink: "Teile diesen Link",
 				tellInvitationCode: "Sage ihnen deinen Einadungscode:",
 				scanQrCode: "Oder lass sie diesen QR code scannen:",
-				teamInfo:
-					'Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class="fas fa-users"></i>) oben rechts.',
-				pollInfo:
-					'Erstelle jetzt die erste Abstimung (<i class="fas fa-poll"></i>) für dein Team. Jedes Teammitglied kann dann seinen eigenen Wahlvorschlag (<i class="fas fa-vote-yea"></i>) hinzufügen.',
+				teamInfo: "Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class='fas fa-users'></i>) oben rechts.",
+				pollInfo: 
+					"Erstelle jetzt die erste Abstimung (<i class='fas fa-poll'></i>) für dein Team. Jedes Teammitglied kann dann seinen eigenen "+
+					"Wahlvorschlag (<i class='fas fa-vote-yea'></i>) hinzufügen.",
 				createPoll: "Abstimmung anlegen",
 
 				error: "Fehler",
@@ -411,7 +413,7 @@ export default {
 		/* username can be submitted by pressing ENTER or by blurring the field or by clicking on "done" on the iOS keyboard */
 		userNameSubmit() {
 			this.$refs.userNameInput.validateField(true)
-			if (this.isUsernameValid(this.user.name) && this.flowState == 3) {
+			if (this.isUsernameValid(this.user.name) && this.flowState === 3) {
 				this.flowState = 4
 				$("#userNameInput").blur()
 				this.scrollToBottom()
