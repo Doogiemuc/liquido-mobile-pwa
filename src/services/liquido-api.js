@@ -11,9 +11,6 @@ import PopulatingCache from "populating-cache"
 
 // Console Logging
 const log = require("loglevel").getLogger("liquido-api");
-if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-	log.enableAll()
-}
 
 // Configure axios HTTP REST client
 axios.defaults.baseURL = config.LIQUIDO_API_URL
@@ -30,6 +27,40 @@ const HTTP = () => {
 	})
 }
 */
+
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+	log.enableAll()
+	
+	// mock HTTP REST requests to axios
+	log.debug("Liquido API: Mocking REST requests.")
+
+	// Manually log requests to console.
+	axios.interceptors.request.use(function (config) {
+		log.debug("AXIOS: "+config.method.toUpperCase()+" "+config.url, config)
+		return config;
+	}, function (error) {
+		// Do something with request error
+		return Promise.reject(error);
+	})
+
+	let MockAdapter = require("axios-mock-adapter");
+	let mock = new MockAdapter(axios);
+	let mockData = require("../../cypress/fixtures/loginData")
+	let pollById = {}
+	mockData.polls.forEach(poll => pollById[poll.id] = poll) // poll.id are Strings!
+
+	mock.onGet("/polls").reply(200, mockData.polls)
+
+	mock.onGet(/\/polls\/\d+/).reply(config => {
+		let pollId = config.url.substring(7) // pollId is a String!
+		return [200, pollById[pollId]]
+	})
+
+
+}
+
+
+
 
 /* Configuration for populating-cache */
 const cacheConfig = {
@@ -96,9 +127,9 @@ export default {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
 
-		let devLoginData = require('../../cypress/fixtures/loginData')
+		let devLoginData = require("../../cypress/fixtures/loginData")
 
-		console.log(devLoginData)
+		console.log("devLogin", userEmail, teamName, devLoginData)
 
 		this.login(devLoginData)
 		return devLoginData
@@ -173,13 +204,12 @@ export default {
 	},
 
 	/**
-	 * Get one poll by ID
+	 * Get one poll by ID from backend.
 	 * @param {Number} pollId poll.id
-	 * @param {Boolean} forceRefresh by default cache from liquido-store will be used. Set this to true to force an API call to the backend
 	 * @returns A Promise that will resolve to the poll if it exists.
 	 */
-	async getPollById(pollId, forceRefresh = false) {
-		let fetchFunc = () => axios.get("/polls/"+pollId)
+	async getPollById(pollId) {
+		let fetchFunc = () => axios.get("/polls/"+pollId).then (res => res.data)
 		return this.pollsCache.remember("polls/"+pollId, fetchFunc)
 	},
 
@@ -189,8 +219,7 @@ export default {
 	 * @returns A Promise that will resolve to the list of polls in this team
 	 */
 	async getPolls(forceRefresh = false) {
-		let fetchFunc = () => axios.get("/polls")
-		//TODO: populate polls (form cache if possible)
+		let fetchFunc = () => axios.get("/polls").then (res => res.data)
 		return this.pollsCache.get("polls", {
 			"fetchFunc": fetchFunc,
 			"callBackend": forceRefresh ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED

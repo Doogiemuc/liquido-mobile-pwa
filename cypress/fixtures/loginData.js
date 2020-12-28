@@ -29,7 +29,7 @@ module.exports = {
 	},
 	"polls": [
 		{
-			"id": 1,
+			"id": "1",
 			"teamId": 1,
 			"title": "Das ist meine Abstimmung",
 			"status": "ELABORATION",
@@ -58,7 +58,7 @@ module.exports = {
 
 		},
 		{
-			"id": 3,
+			"id": "3",
 			"teamId": 1,
 			"title": "Das ist die zweite Abstimmung",
 			"status": "ELABORATION",

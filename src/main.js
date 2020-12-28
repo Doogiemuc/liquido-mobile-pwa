@@ -1,3 +1,6 @@
+/**
+ * Main entry point for LIQUIDO mobile app.
+ */
 console.log("%cLIQUIDO Mobile", "font-size: 40px; color:blue; font-face: Baskerville, serif; font-weight: bold; border: 1px solid blue; padding: 20px;")
 
 const log = require("loglevel").getLogger("liquido-main");

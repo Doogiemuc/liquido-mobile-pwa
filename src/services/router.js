@@ -27,13 +27,16 @@ const routes = [
 		name: "teamHome",
 		component: () => import("@/views/team-home"),
 		meta: {
-			requiresAuth: false,
+			requiresAuth: true,
 		},
 	},
 	{
 		path: "/polls",
 		name: "polls",
 		component: () => import("@/views/polls"),
+		meta: {
+			requiresAuth: true,
+		},
 	},
 	{
 		path: "/polls/create",
@@ -45,6 +48,9 @@ const routes = [
 		name: "showPoll",
 		component: () => import("@/views/poll-show"),
 		props: true,
+		meta: {
+			requiresAuth: true,
+		},
 	}, 
 	{
 		path: "/polls/:pollId/add",
@@ -98,7 +104,7 @@ router.beforeEach((routeTo, routeFrom, next) => {
 	// If auth isn't required for the route, just continue.
 	if (!requiresAuth && !redirectIfAuthenticated) return next()
 
-	let isAuthenticated = Vue.$api.isAuthenticated()
+	let isAuthenticated = router.app.$api.isAuthenticated()
 
 	if (requiresAuth && !isAuthenticated) return next("/login")
 

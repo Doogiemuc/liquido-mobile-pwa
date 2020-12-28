@@ -12,7 +12,7 @@
 			:status="null"
 			class="mb-4"
 		>
-			<template v-slot:iconRight>
+			<template #iconRight>
 				<i class="fas fa-times mr-1" @click="searchQuery = undefined" />
 			</template>
 		</liquido-input>
@@ -76,10 +76,9 @@
 		</div>
 
 		<pollsFooter 
-			v-on:setPollFilter="setPollFilter"
-			v-bind:activeStatus="pollStatusFilter"
-		>
-		</pollsFooter>
+			:active-status="pollStatusFilter"
+			@setPollFilter="setPollFilter"
+		/>
 	</div>
 </template>
 
