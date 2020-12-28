@@ -13,10 +13,7 @@
 			</b-button>
 		</div>
 
-		<div
-			v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0"
-			class="alert alert-secondary mb-3"
-		>
+		<div v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert alert-secondary mb-3">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('pollInElaborationInfo')" />
 		</div>

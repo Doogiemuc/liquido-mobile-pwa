@@ -160,7 +160,7 @@ export default {
 		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
 			this.pollStatusFilter = this.status
 		}
-		this.$root.$api.getPolls().then(polls => {
+		this.$api.getPolls().then(polls => {
 			this.polls = polls
 			//console.log("polls", polls)
 		})

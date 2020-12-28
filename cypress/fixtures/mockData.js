@@ -62,6 +62,7 @@ module.exports = {
 			"teamId": 1,
 			"title": "Wer soll Präsident werden?",
 			"status": "ELABORATION",
+			"proposals": []
 		}
 	],
 	"user": {

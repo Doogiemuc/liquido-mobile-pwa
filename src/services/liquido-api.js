@@ -36,31 +36,57 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 
 	// Manually log requests to console.
 	axios.interceptors.request.use(function (config) {
-		log.debug("AXIOS: "+config.method.toUpperCase()+" "+config.url, config)
+		log.debug("[MOCK AXIOS] "+config.method.toUpperCase()+" "+config.url, config)
 		return config;
 	}, function (error) {
 		// Do something with request error
 		return Promise.reject(error);
 	})
 
+	const { v4: uuidv4 } = require("uuid");
 	let MockAdapter = require("axios-mock-adapter");
 	let mock = new MockAdapter(axios);
 	let mockData = require("../../cypress/fixtures/mockData")
 	let pollById = {}
 	mockData.polls.forEach(poll => pollById[poll.id] = poll) // poll.id are Strings!
 
+	// Super simple micro MOCK BACKEND
+
 	mock.onGet("/polls").reply(200, mockData.polls)
 
-	mock.onGet(/\/polls\/\d+/).reply(config => {
-		let pollId = config.url.substring(7) // pollId is a String!
-		return [200, pollById[pollId]]
+	mock.onGet(/\/polls\/\w+/).reply(config => {
+		let pollId = config.url.substring(7) // pollId is an alphanumeric String!
+		let poll = pollById[pollId]
+		if (!poll.proposals) poll.proposals = []
+		return [200, poll]
 	})
 
+	mock.onPost("/polls").reply(config => {
+		let newPoll = JSON.parse(config.data)
+		newPoll.id = uuidv4()
+		newPoll.proposals = []
+		newPoll.status = "ELABORATION"
+		newPoll.createdBy = { $refPath: "users/"+mockData.team.admin.id }
+		mockData.polls.push(newPoll)
+		pollById[newPoll.id] = newPoll
+		return [201, newPoll]
+	})
+
+	let createProposalRegEx = /\/polls\/([\w-]+)\/proposals/
+	mock.onPost(createProposalRegEx).reply(config => {
+		let newProposal = JSON.parse(config.data)
+		log.debug("MOCK BACKEND: create Proposal", newProposal)
+		let match = config.url.match(createProposalRegEx) 
+		let pollId = match[1]
+		let poll = pollById[pollId]
+		if (!poll) return [400, "cannot find poll with id="+pollId]
+		newProposal.id = uuidv4()
+		newProposal.createdBy = { $refPath: "users/"+mockData.team.admin.id }
+		poll.proposals.push(newProposal)
+		return [200, poll]
+	})
 
 }
-
-
-
 
 /* Configuration for populating-cache */
 const cacheConfig = {

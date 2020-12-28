@@ -32,9 +32,11 @@
 			</div>
 		</b-card>
 
-		<b-card class="chat-bubble shadow-sm my-3">
+		<div class="alert alert-admin my-3">
 			<div v-html="$t('createPollInfo')" />
-		</b-card>
+		</div>
+
+	
 	</div>
 </template>
 
@@ -55,7 +57,6 @@ export default {
 				pollTitle: "Titel der Abstimmung",
 				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. 10 Zeichen.",
 				create: "Anlegen",
-				createdSuccessfully: " erfolgreich angelegt",
 			},
 		},
 	},

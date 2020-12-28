@@ -28,11 +28,11 @@
 					class="form-control"
 					rows="3"
 					@blur="validateDescription()"
-					@keyUp="validateDescription()"
+					@keyup="validateDescription()"
 				/>
 
-				<div v-if="descriptionState === null" class="text-small">
-					{{ $t("descriptionInfo", { minChars: descriptionMinLength }) }}
+				<div class="text-small">
+					{{ descriptionCharCounter }}
 				</div>
 				<div v-if="descriptionState === false" class="invalid-feedback">
 					{{ $t("descriptionTooShort") }}
@@ -44,7 +44,6 @@
 					@click="saveProposal()"
 				>
 					{{ $t("Save") }}
-					<i class="fas fa-angle-double-right" />
 				</button>
 			</div>
 		</div>
@@ -60,7 +59,7 @@
 			</div>
 		</div>
 
-		<div>
+		<div v-if="poll && poll.proposals && poll.proposals.length > 0">
 			<poll-panel
 				:poll="poll"
 				:expanded="false"
@@ -68,6 +67,20 @@
 				class="shadow mb-3"
 			/>
 		</div>
+
+		<b-modal id="successModal" 
+			title="Danke"
+			hide-header-close
+			no-close-on-esc
+			no-close-on-backdrop
+		>
+			{{ $t('createdSuccessfully') }}
+			<template #modal-footer="{}">
+				<b-button variant="primary" @click="gotoPoll()">
+					{{ $t('gotoPoll') }}&nbsp;<i class="fas fa-angle-double-right"></i>
+				</b-button>
+			</template>
+		</b-modal>
 	</div>
 </template>
 
@@ -86,11 +99,11 @@ export default {
 				titleInvalid: "Titel zu kurz. Mindestens {minChars} Zeichen!",
 				describeYourProposal: "Beschreibe deinen Wahlvorschlag ...",
 				descriptionInfo: "(Mindestes {minChars} Zeichen)",
-				descriptionTooShort:
-					"Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
-				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Deine Vorschlag wird der erste sein.",
-				yoursIsOnlyProposal:
-					"Dein Vorschlag ist bisher der einzige Wahlvorschlag in dieser Abstimmung.",
+				descriptionTooShort: "Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
+				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Deine Vorschlag wird der Erste sein.",
+				yoursIsOnlyProposal: "Dein Vorschlag ist bisher der einzige Wahlvorschlag in dieser Abstimmung.",
+				createdSuccessfully: "Dein Vorschlag wurde zur Abstimmung mit aufgenommen",
+				gotoPoll: "Zur Abstimmung",
 			},
 		},
 	},
@@ -109,6 +122,13 @@ export default {
 		}
 	},
 	computed: {
+		descriptionCharCounter() {
+			if (this.proposal.description) {
+				return this.proposal.description.length + "/" + this.descriptionMinLength
+			} else {
+				return ""
+			}
+		},		
 		descriptionValidClass() {
 			return {
 				"is-valid": this.descriptionState === true,
@@ -147,11 +167,18 @@ export default {
 		},
 
 		saveProposal() {
-			this.$api.saveProposal(this.poll.id, this.proposal).then(() => {
-				this.$router.push("/polls/" + this.poll.id)
-			})
+			this.$api.saveProposal(this.poll.id, this.proposal)
+				.then(() => this.$bvModal.show("successModal"))
+				.catch(err => {
+					console.error("Cannot add proposal", err)
+				})
 		},
-	},
+
+		gotoPoll() {
+			this.$router.push("/polls/" + this.poll.id)
+		}
+	}
+
 }
 </script>
 
