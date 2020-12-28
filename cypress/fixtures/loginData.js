@@ -28,6 +28,7 @@ module.exports = {
 		]
 	},
 	"polls": [
+		/*
 		{
 			"id": "1",
 			"teamId": 1,
@@ -63,6 +64,7 @@ module.exports = {
 			"title": "Das ist die zweite Abstimmung",
 			"status": "ELABORATION",
 		}
+		*/
 	],
 	"user": {
 		"id": "5fddedda8e4d175ffc4ab6a3",

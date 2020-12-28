@@ -1,27 +1,24 @@
 <template>
-	<div>
-		<header id="liquidoHeader" class="liquido-header shadow-sm">
-			<div class="container">
-				<div class="row no-gutters align-items-center">
-					<div class="col header-left">
-						<i
-							v-if="backLink"
-							class="fas fa-angle-double-left"
-							@click="goBack()"
-						/>
-					</div>
-					<div class="col-8 liquido-title">
-						<i class="fas fa-university" />&nbsp;
-						<span class="liquido" @click="clickLiquidoTitle()" />
-					</div>
-					<div class="col header-right">
-						<i v-if="$route.path !== '/welcome'" class="fas fa-users" @click="gotoTeam()" />
-					</div>
+	<header id="liquidoHeader" class="liquido-header shadow-sm">
+		<div class="container">
+			<div class="row no-gutters align-items-center">
+				<div class="col header-left">
+					<i
+						v-if="backLink"
+						class="fas fa-angle-double-left"
+						@click="goBack()"
+					/>
+				</div>
+				<div class="col-8 liquido-title">
+					<i class="fas fa-university" />&nbsp;
+					<span class="liquido" @click="clickLiquidoTitle()" />
+				</div>
+				<div class="col header-right">
+					<i v-if="$route.path !== '/welcome'" class="fas fa-users" @click="gotoTeam()" />
 				</div>
 			</div>
-		</header>
-		<div id="behindHeader" />
-	</div>
+		</div>
+	</header>
 </template>
 
 <script>
@@ -42,15 +39,8 @@ export default {
 			filterByStatus: "ELABORATION",
 		}
 	},
-
-	/**
-	 * Make the spacer div behind the fixed header the same hight as the header itself.
-	 * Next sibling element should add its own top margin.
-	 */
 	mounted() {
-		// jQuery returns "125px" which we must parse back to an integer number (base 10) without "px" suffix
-		this.$root.headerHeight = parseInt($("#liquidoHeader").css("height"), 10) 
-		$("#behindHeader").css("height", this.$root.headerHeight)
+		// make header smaller when user scrolls down
 		$("#app").scroll(this.transitionHeader)
 	},
 	methods: {

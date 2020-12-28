@@ -59,36 +59,6 @@ export default {
 	created() {},
 	mounted() {},
 	methods: {
-		//These methods are available to all sub components
-
-		/** scroll to the very bottom of the content. Show last chat message */
-		scrollToBottom() {
-			this.$nextTick(() => {
-				$("#app").animate({ scrollTop: $("#app").height() }, 1000)
-			})
-		},
-
-		/**
-		 * scroll an HTML elemant right under the header
-		 * (as far up as possible, depending on content below the elem)
-		 * @param {String} elem JQuery selector for dom elem
-		 * @param {Number} margin margin below headerHeight in pixels (default 0)
-		 */
-		scrollElemToTop(elem, margin = 0) {
-			let scrollTop = $("#app").scrollTop() + $(elem).offset().top - this.$root.headerHeight - margin
-			this.$nextTick(() => {
-				$("#app").animate({ scrollTop: scrollTop }, 1000)
-			})
-		},
-
-		/** Check if the bottom of elem is scrolled into view */
-		isBottomInView(elem) {
-			let docViewTop = $(window).scrollTop()
-			let docViewBottom = docViewTop + $(window).height()
-			let elemTop = $(elem).offset().top
-			let elemBottom = elemTop + $(elem).height()
-			return elemBottom <= docViewBottom
-		},
 	},
 }
 </script>
@@ -110,8 +80,10 @@ export default {
  * no horizintal scrolling 
  */
 #appContent {
-	margin-bottom: 50px;
+	padding-top: 50px;   // behind header. MUTS be padding!
+	padding-bottom: 50px;
 	overflow-x: hidden;
+	height: 100%;
 }
 
 // Slide animation between pages
@@ -136,7 +108,6 @@ export default {
 .slide-right-leave-active {
 	position: absolute;
 	width: 100%;
-	//height: 100%;
 }
 .slide-left-leave-to,
 .slide-right-enter {

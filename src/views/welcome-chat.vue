@@ -525,6 +525,7 @@ export default {
 
 		// Here comes some UX magic :-)
 
+		
 		/** scroll to the very bottom of the content. Show last chat message */
 		scrollToBottom() {
 			this.$nextTick(() => {
@@ -539,7 +540,7 @@ export default {
 		 * @param {Number} margin margin below headerHeight in pixels (default 0)
 		 */
 		scrollElemToTop(elem, margin = 0) {
-			let scrollTop = $("#app").scrollTop() + $(elem).offset().top - this.$root.headerHeight - margin
+			let scrollTop = $("#app").scrollTop() + $(elem).offset().top - margin
 			this.$nextTick(() => {
 				$("#app").animate({ scrollTop: scrollTop }, 1000)
 			})
@@ -553,6 +554,8 @@ export default {
 			let elemBottom = elemTop + $(elem).height()
 			return elemBottom <= docViewBottom
 		},
+
+		
 
 		startChatAnimation() {
 			if (this.chatAnimationStarted) return  // start chat animation only once
