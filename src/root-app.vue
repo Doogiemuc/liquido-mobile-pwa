@@ -51,8 +51,8 @@ export default {
 			this.transitionName = ""
 			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
 			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
-			if (from.path == "/team")  { this.transitionName = "slide-left" } else
-			if (fromDepth == toDepth) { this.transitionName = "fade" }
+			if (from.path === "/team")  { this.transitionName = "slide-left" } else
+			if (fromDepth === toDepth) { this.transitionName = "fade" }
 		},
 	},
 	// all data properties are set in main.js !
@@ -82,6 +82,8 @@ export default {
 #appContent {
 	padding-top: 50px;   // behind header. MUTS be padding!
 	padding-bottom: 50px;
+	padding-left: 10px;  // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
+	padding-right: 10px;
 	overflow-x: hidden;
 	height: 100%;
 }

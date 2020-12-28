@@ -28,11 +28,10 @@ module.exports = {
 		]
 	},
 	"polls": [
-		/*
 		{
 			"id": "1",
 			"teamId": 1,
-			"title": "Das ist meine Abstimmung",
+			"title": "Was ist das beste Tool?",
 			"status": "ELABORATION",
 			"proposals": [
 				{
@@ -61,10 +60,9 @@ module.exports = {
 		{
 			"id": "3",
 			"teamId": 1,
-			"title": "Das ist die zweite Abstimmung",
+			"title": "Wer soll Präsident werden?",
 			"status": "ELABORATION",
 		}
-		*/
 	],
 	"user": {
 		"id": "5fddedda8e4d175ffc4ab6a3",

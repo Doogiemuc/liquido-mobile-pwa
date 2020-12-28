@@ -25,52 +25,38 @@
 				</b-button>
 			</div>
 		</div>
-		<div v-for="law in poll.proposals" v-else :key="law.id" class="law-panel">
-			<div>
-				<h4 class="law-title">
-					<i class="title-icon far fa-lightbulb" />
-					&nbsp;{{ law.title }}
-				</h4>
-			</div>
-			<div class="law-subtitle d-flex">
-				<div class="createdAt flex-fixed-width">
-					<i class="far fa-clock" />
-					&nbsp;{{ formatDate(law.createdAt) }}
+
+		<b-list-group v-else flush>
+			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item">
+				<div class="d-flex">
+					<div>
+						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
+					</div>
+					<div class="d-flex flex-column">
+						<h4 class="law-title">
+							{{ law.title }}
+						</h4>
+						<div class="law-subtitle">
+							<i class="far fa-clock" />&nbsp;{{ formatDate(law.createdAt) }}
+							<i class="far fa-user" />&nbsp;{{ law.createdBy.name }}
+							<div :class="{ supported: law.supportedByCurrentUser }" class="like-button">
+								<i :class="{
+										far: !law.supportedByCurrentUser,
+										fas: law.supportedByCurrentUser,
+									}"
+									class="fa-thumbs-up"
+								/>
+								&nbsp;{{ law.numSupporters }}
+							</div>
+						</div>
+					</div>
 				</div>
-				<div class="user">
-					<i class="far fa-user" />
-					&nbsp;{{ law.createdBy.name }}
-				</div>
-				<div
-					:class="{ supported: law.supportedByCurrentUser }"
-					class="like-button flex-grow-1 text-right"
-				>
-					<i
-						:class="{
-							far: !law.supportedByCurrentUser,
-							fas: law.supportedByCurrentUser,
-						}"
-						class="fa-thumbs-up"
-					/>
-					&nbsp;{{ law.numSupporters }}
-				</div>
-			</div>
-			<div class="d-flex">
-				<div class="law-image flex-fixed-width">
-					<img
-						:src="'https://picsum.photos/seed/' + law.id + '/100'"
-						alt="Image"
-						class="law-image"
-					>
-				</div>
-				<div class="law-description">
-					{{ law.description }}
-				</div>
-			</div>
-		</div>
+				<div class="law-description" v-html="law.description"></div>
+			</b-list-group-item>
+		</b-list-group>
 		<a
 			v-if="poll.proposals && poll.proposals.length > 0"
-			class="text-right collapse-icon"
+			class="collapse-icon"
 			href="#"
 			@click="toggleCollapse()"
 		>
@@ -140,7 +126,7 @@ export default {
 		*/
 
 		toggleCollapse() {
-			$(".law-panel").toggleClass("collapse-law-panel")
+			$(".proposal-list-group-item").toggleClass("collapse-law-panel")
 			$(".collapse-icon").toggleClass("collapsed")
 		},
 
@@ -156,8 +142,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* size of proposal image */
-$avatar_size: 70px;
+/* size of law proposal image */
+$avatar_size: 32px;
 
 .poll-panel {
 	.card-header {
@@ -166,7 +152,7 @@ $avatar_size: 70px;
 		h4 {
 			// same as .law-title
 			color: $primary;
-			margin: 5px 10px;
+			margin: 8px 10px;
 			font-size: 18px;
 			white-space: nowrap;
 			overflow: hidden;
@@ -188,7 +174,10 @@ $avatar_size: 70px;
 		float: right;
 	}
 	.collapse-icon {
-		padding-right: 10px;
+		position: absolute;
+		bottom: 5px;
+		right: 10px;
+		opacity: 0.5;
 	}
 
 	.card-body {
@@ -196,8 +185,8 @@ $avatar_size: 70px;
 	}
 
 	// law-panel inside poll panel - list of proposals in poll
-	.law-panel {
-		height: 30px + 25px + $avatar_size + 15px; // title + subtitle + avatar_img + padding
+	.proposal-list-group-item {
+		height: 8rem;  // 30px + 25px + $avatar_size + 15px; // title + subtitle + avatar_img + padding
 		overflow: hidden;
 		padding: 10px;
 		transition: height 0.5s;
@@ -205,7 +194,7 @@ $avatar_size: 70px;
 			height: 55px;
 		}
 		.law-title {
-			margin-bottom: 5px;
+			margin-bottom: 0px;
 			padding: 0;
 			font-size: 18px;
 			white-space: nowrap;
@@ -238,9 +227,19 @@ $avatar_size: 70px;
 			max-height: $avatar_size;
 			overflow: hidden;
 		}
+		.like-button {
+			display: inline;
+			margin-left: 0.5rem;
+		}
 		.supported {
 			color: green;
 		}
+	}
+
+	.proposal-separator {
+		width: 100%;
+		margin: 5px auto;
+		border-top: 1px solid lightgrey;
 	}
 }
 

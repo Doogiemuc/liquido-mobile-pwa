@@ -45,7 +45,7 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 
 	let MockAdapter = require("axios-mock-adapter");
 	let mock = new MockAdapter(axios);
-	let mockData = require("../../cypress/fixtures/loginData")
+	let mockData = require("../../cypress/fixtures/mockData")
 	let pollById = {}
 	mockData.polls.forEach(poll => pollById[poll.id] = poll) // poll.id are Strings!
 
@@ -127,7 +127,7 @@ export default {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
 
-		let devLoginData = require("../../cypress/fixtures/loginData")
+		let devLoginData = require("../../cypress/fixtures/mockData")
 
 		console.log("devLogin", userEmail, teamName, devLoginData)
 
