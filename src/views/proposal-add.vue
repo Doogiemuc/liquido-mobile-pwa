@@ -31,32 +31,32 @@
 					@keyup="validateDescription()"
 				/>
 
-				<div class="text-small">
+				<div class="text-small ml-2">
 					{{ descriptionCharCounter }}
 				</div>
 				<div v-if="descriptionState === false" class="invalid-feedback">
 					{{ $t("descriptionTooShort") }}
 				</div>
-				<button
-					:disabled="saveButtonDisabled"
-					type="button"
-					class="btn btn-primary mt-3 float-right"
-					@click="saveProposal()"
-				>
-					{{ $t("Save") }}
-				</button>
+
+				<div class="d-flex justify-content-between align-items-center">
+					<small class="ml-1">
+						<a href="#" @click="cancelAddProposal()">{{ $t("Cancel") }}</a>
+					</small>
+					<button
+						:disabled="saveButtonDisabled"
+						type="button"
+						class="btn btn-primary"
+						@click="saveProposal()"
+					>
+						{{ $t("Save") }}
+					</button>
+				</div>
 			</div>
 		</div>
 
 		<div v-if="!poll.proposals || poll.proposals.length == 0" class="alert alert-secondary mb-3">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('noProposalYet', {pollTitle: poll.title})" />
-		</div>
-
-		<div v-if="isOnlyProposal" class="card">
-			<div class="card-body">
-				<p>{{ $t("yoursIsOnlyProposal") }}</p>
-			</div>
 		</div>
 
 		<div v-if="poll && poll.proposals && poll.proposals.length > 0">
@@ -72,7 +72,13 @@
 			title="Danke"
 			hide-header-close
 			no-close-on-esc
-			no-close-on-backdrop
+			no-close-on-backdrop 
+			header-bg-variant="success"
+			header-text-variant="light"
+			body-bg-variant="success"
+			body-text-variant="light"
+			footer-bg-variant="success"
+			footer-text-variant="light"
 		>
 			{{ $t('createdSuccessfully') }}
 			<template #modal-footer="{}">
@@ -93,15 +99,14 @@ export default {
 		messages: {
 			en: {},
 			de: {
-				addProposal: "Vorschlag zu Abstimmung hinzufügen",
+				addProposal: "Vorschlag zur Abstimmung hinzufügen",
 				yourProposal: "Dein neuer Vorschlag",
 				title: "Titel",
-				titleInvalid: "Titel zu kurz. Mindestens {minChars} Zeichen!",
+				titleInvalid: "Titel zu kurz: Bitte mindestens {minChars} Zeichen!",
 				describeYourProposal: "Beschreibe deinen Wahlvorschlag ...",
 				descriptionInfo: "(Mindestes {minChars} Zeichen)",
 				descriptionTooShort: "Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
 				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Deine Vorschlag wird der Erste sein.",
-				yoursIsOnlyProposal: "Dein Vorschlag ist bisher der einzige Wahlvorschlag in dieser Abstimmung.",
 				createdSuccessfully: "Dein Vorschlag wurde zur Abstimmung mit aufgenommen",
 				gotoPoll: "Zur Abstimmung",
 			},
@@ -126,7 +131,7 @@ export default {
 			if (this.proposal.description) {
 				return this.proposal.description.length + "/" + this.descriptionMinLength
 			} else {
-				return ""
+				return "0/"+this.descriptionMinLength
 			}
 		},		
 		descriptionValidClass() {
@@ -137,14 +142,6 @@ export default {
 		},
 		saveButtonDisabled() {
 			return !this.isProposalTitleValid(this.proposal.title) || !this.descriptionState
-		},
-		/** Is the user's proposal the only proposal in the poll. (This can only be true when editing an existing proposal.) */
-		isOnlyProposal() {
-			return (
-				this.poll.proposals &&
-				this.poll.proposals.length === 1 &&
-				this.poll.proposals[0].createdBy.email === this.$root.store.user.email
-			)
 		},
 	},
 	created() {
@@ -166,6 +163,10 @@ export default {
 			
 		},
 
+		cancelAddProposal() {
+			this.$router.push("/polls")
+		},
+
 		saveProposal() {
 			this.$api.saveProposal(this.poll.id, this.proposal)
 				.then(() => this.$bvModal.show("successModal"))
@@ -183,5 +184,4 @@ export default {
 </script>
 
 <style lang="scss">
-
 </style>

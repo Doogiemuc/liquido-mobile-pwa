@@ -108,14 +108,15 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	})
 
 	// Create a new proposal in a poll
-	let createProposalRegEx = /\/polls\/([\w-]+)\/proposals/
-	mock.onPost(createProposalRegEx).reply(config => {
+	let upsertProposalRegEx = /\/polls\/([\w-]+)\/proposals/
+	mock.onPost(upsertProposalRegEx).reply(config => {
 		let newProposal = JSON.parse(config.data)
 		log.debug("MOCK BACKEND: create Proposal", newProposal)
-		let match = config.url.match(createProposalRegEx) 
+		let match = config.url.match(upsertProposalRegEx) 
 		let pollId = match[1]
 		let poll = pollById[pollId]
 		if (!poll) return [400, "cannot find poll with id="+pollId]
+		//TODO: mock update existing proposal
 		newProposal.id = uuidv4()
 		newProposal.createdBy = { $refPath: "users/"+mockData.team.admin.id }
 		poll.proposals.push(newProposal)
@@ -280,6 +281,9 @@ export default {
 			"fetchFunc": fetchFunc,
 			"callBackend": forceRefresh ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
 		}).then(polls => {
+			// When the server returns a poll, it contains ObjectIds for Users
+			// Here we resolve these IDs to the actual User objects.
+			// We try to use the local cache as much as possible.
 			return this.pollsCache.populate(polls, "createdBy")
 		})
 	},
@@ -298,17 +302,7 @@ export default {
 	},
 
 
-	/**
-	 * When the server returns a poll, it contains ObjectIds for Users
-	 * Here we resolve these IDs to the actual User objects.
-	 * We try to use the local cache as much as possible.
-	 * @param {Object} poll a poll as fetched from the server
-	 */
-	populateProposalData(poll) {
-		if (!poll) throw new Error("Cannot populate undefined. poll")
-		if (!poll.proposals) return  // nothing todo, when poll has no proposals yet
-		return this.pollsCache.populate(poll, "createdBy")
-	},
+
 
 
 	/*

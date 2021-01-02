@@ -5,7 +5,7 @@
 			{{ $t("newPoll") }}
 		</h2>
 
-		<b-card class="chat-bubble form-bubble">
+		<b-card class="chat-bubble input-bubble">
 			<liquido-input
 				id="pollTitleInput"
 				v-model="poll.title"
@@ -46,7 +46,7 @@ export default {
 		messages: {
 			en: {},
 			de: {
-				newPoll: "Neue Abstimmung",
+				newPoll: "Neue Abstimmung anlegen",
 				createPollInfo:
 					"<p>Nur du als Admin kannst neue Abstimmungen erstellen. Abstimmung laufen durch drei Phasen:</p>"+
 					"<p>(1) Eine Abstimmung wird erst einmal diskutiert (<i class='fas fa-comments'></i>). Jeder aus deinem Team "+
@@ -90,34 +90,5 @@ export default {
 </script>
 
 <style lang="scss">
-.chat-bubble {
-	position: relative;
-	margin-bottom: 1rem;
-	opacity: 1;
-	transform: none;
-	-webkit-transition: all 0.5s ease;
-	-moz-transition: all 0.5s ease;
-	-o-transition: all 0.5s ease;
-	transition: all 0.5s ease;
-	.card-body {
-		padding: 0.5rem;
-		ul {
-			padding-inline-start: 25px;
-		}
-		input {
-			width: 100%;
-		}
-		p:last-child {
-			margin-bottom: 0;
-		}
-	}
-}
-.hide-left {
-	opacity: 0;
-	transform: translateX(-20px);
-}
 
-.form-bubble {
-	background-color: $input-bg;
-}
 </style>
