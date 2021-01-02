@@ -277,12 +277,12 @@ export default {
 			de: {
 				welcome:
 					"<p>Willkommen bei <span class='liquido'></span>, der freien, sicheren und liquiden e-voting App für euer Team.</p>"+
-					"In Liquido wählt man mit seiner Stimme nicht nur einen Vorschlag oder Kandidaten, sondern jeder im Team sortiert "+
-					"Wahlvorschläge nach seiner eigenen Priorität und Liquido berechnet daraus dann mit einem cleveren Algorithmus den Sieger der Wahl.</p>",
+					"In Liquido wählst du nicht einfach nur einen Vorschlag oder stimmst nur für einen Kandidaten. Stattdessen sortiert jeder im Team "+
+					"Wahlvorschläge nach seiner eigenen Priorität. Liquido berechnet daraus dann mit einem cleveren Algorithmus den Sieger der Wahl.</p>",
 				whatsYourName: "Darf ich fragen wie du heißt?",
 				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
-				niceToMeetYou: "Hallo <b>{nickname}</b>! Schön dich kennen zu lernen.",
+				niceToMeetYou: "Hallo <b>{nickname}</b> ! Schön dich kennen zu lernen.",
 				createOrJoin: "Möchtest du <ul><li>einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team</b> gründen?</li></ul>",
 
 				joinTeamButton: "Team beitreten",

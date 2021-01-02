@@ -65,7 +65,9 @@ const globalTranslations = {
 		Ideas: "Ideen",
 		Proposal: "Vorschlag",
 		Proposals: "Vorschläge",
-		Poll: "Abstimmung", 					// Entscheidung von Robert: nein nicht "Wahl" oder "Wahlen"!! Deutsche Übersetzung von poll ist Abstimmung! Wir stimmen ab in LIQUIDO. Der Begriff "Wahl" passt eher zu einer Wahl von Kandidaten, also Personen.
+		// Entscheidung zur detuschen Übersetzung von Poll von Robert: "Abstimmung".
+		// Nein nicht "Wahl". Wir stimmen ab in LIQUIDO. Der Begriff "Wahl" passt eher zu einer Wahl von Kandidaten, also Personen.
+		Poll: "Abstimmung",
 		Polls: "Abstimmungen",
 		Law: "Regel",
 		Laws: "Regeln",

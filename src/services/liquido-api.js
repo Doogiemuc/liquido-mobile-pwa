@@ -7,6 +7,7 @@
 import axios from "axios"
 import config from "config"
 import assert from "assert"
+import crypto from "crypto-js"
 import PopulatingCache from "populating-cache"
 
 // Console Logging
@@ -52,8 +53,41 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 
 	// Super simple micro MOCK BACKEND
 
+	// Create a new team
+	mock.onPost("/team").reply(config => {
+		let newTeamReq = JSON.parse(config.data)
+		let inviteCode = crypto.enc.Base64.stringify(crypto.MD5(newTeamReq.teamName)).substring(0,6).toUpperCase()
+		let jwt = "dummyMockJWT"
+		let voterToken = crypto.enc.Base64.stringify(crypto.MD5(newTeamReq.adminEmail + newTeamReq.teamName + "mockSecret"))
+		let admin = { 
+			id: uuidv4(),
+			name: newTeamReq.adminName,
+			email: newTeamReq.adminEmail,
+			isAdmin: true
+		}
+		let newTeam = {
+			id: uuidv4(),
+			name: newTeamReq.teamName,
+			inviteCode: inviteCode,
+			inviteLink: "http://localhost:3001/invite/" + inviteCode,
+			qrCodeUrl: "/img/qrcode.svg",
+			members: [admin],
+		}
+		let res = {
+			msg: "New team created successfully",
+			team: newTeam,
+			polls: [],
+			user: admin,
+			jwt: jwt,
+			voterToken: voterToken,
+		}
+		return [201, res]
+	})
+
+	// Get all polls
 	mock.onGet("/polls").reply(200, mockData.polls)
 
+	// Get on poll by its ID
 	mock.onGet(/\/polls\/\w+/).reply(config => {
 		let pollId = config.url.substring(7) // pollId is an alphanumeric String!
 		let poll = pollById[pollId]
@@ -61,6 +95,7 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 		return [200, poll]
 	})
 
+	// Create a new poll
 	mock.onPost("/polls").reply(config => {
 		let newPoll = JSON.parse(config.data)
 		newPoll.id = uuidv4()
@@ -72,6 +107,7 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 		return [201, newPoll]
 	})
 
+	// Create a new proposal in a poll
 	let createProposalRegEx = /\/polls\/([\w-]+)\/proposals/
 	mock.onPost(createProposalRegEx).reply(config => {
 		let newProposal = JSON.parse(config.data)
@@ -85,6 +121,9 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 		poll.proposals.push(newProposal)
 		return [200, poll]
 	})
+
+	// mock development login
+	mock.onGet("/devLogin").reply(200, mockData)
 
 }
 
@@ -152,14 +191,6 @@ export default {
 	async devLogin(userEmail, teamName) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
-
-		let devLoginData = require("../../cypress/fixtures/mockData")
-
-		console.log("devLogin", userEmail, teamName, devLoginData)
-
-		this.login(devLoginData)
-		return devLoginData
-		/*
 		return axios({
 			method: "GET", 
 			url: "/devLogin", 
@@ -175,7 +206,6 @@ export default {
 			console.error(err.response ? err.response : err)
 			return Promise.reject(err.response ? err.response : err)
 		})
-		*/
 	},
 
 	/** Logout the current user. Remove JWT */

@@ -76,7 +76,8 @@ export default {
 				castVote: "Diese Stimme abgeben",
 				yourBallot: "Dein Stimmzettel",
 				voteCastedSuccessfully:
-					"<p>Deine Stimme wurde erfolgreich gezählt.</p><p>In <span class='liquido'></span> kannst du deinen Stimmzettel auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.</p>" +
+					"<p>Deine Stimme wurde erfolgreich gezählt.</p><p>In <span class='liquido'></span> kannst du deinen Stimmzettel "+
+					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.</p>" +
 					"<p>Du erhälst eine Benachrichtigung, sobald die Abstimmung abgeschlossen ist. Dann kannst du das Ergebnis der Wahl sehen.</p>",
 				voteCastedError:
 					"Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",

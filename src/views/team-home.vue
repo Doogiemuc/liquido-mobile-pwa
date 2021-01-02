@@ -46,7 +46,9 @@ export default {
 				introYourTeam: "",
 			},
 			de: {
-				introYourTeam: "Willkommen in deinem Team! Wenn euer Admin eine Abstimmung erstellt, kann jeder im Team seinen Wahlvorschlag hinzufügen. Nachdem der Admin dann die Wahlphase gestartet hat, kann jeder seine Stimme abgeben. Bis am Ende das Wahlergebnis feststeht.",
+				introYourTeam: 
+					"Willkommen in deinem Team! Wenn euer Admin eine Abstimmung erstellt, kann jeder im Team seinen Wahlvorschlag hinzufügen. "+
+					"Nachdem der Admin dann die Wahlphase gestartet hat, kann jeder seine Stimme abgeben. Bis am Ende das Wahlergebnis feststeht.",
 				teamMembers: "Teammitglieder",
 				gotoPolls: "Eure Abstimmungen"
 			},
