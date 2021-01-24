@@ -9,8 +9,8 @@ const vueConfig = {
 	devServer: {
 		port: 3001,   // Port for frontend when developing.
 		proxy: {      // Problems with CORS? Vue Dev serve can proxy API requests for your: https://cli.vuejs.org/config/#devserver-proxy
-			"^/liquido-api": {
-				target: "http://localhost:8080/",    // the matched path will be appended to this!
+			"/liquido/v2": {
+				target: "http://localhost:8080",    // the matched path will be appended to this!
 				//ws: true,
 				//changeOrigin: true
 			}
