@@ -4,5 +4,6 @@
  */
 
 export default {
-	inviteCodeLength: 6			// used for validating inviteCodes in welcome-chat.vue
+	mockBackend: false,
+	inviteCodeLength: 6,			// used for validating inviteCodes in welcome-chat.vue
 }

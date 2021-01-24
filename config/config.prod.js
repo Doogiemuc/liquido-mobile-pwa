@@ -5,7 +5,7 @@ import _ from "lodash"
 import commonConfig from "./config.common.js"
 
 let config = {
-	LIQUIDO_API_URL: 'http://liquido.me:8080/liquido-api',  // will be proxied by Vue devServer. See vue.config.js
+	LIQUIDO_API_URL: 'http://liquido.me:8080/liquido-api/v2',  // will be proxied by Vue devServer. See vue.config.js
 }
 
 _.merge(config, commonConfig)

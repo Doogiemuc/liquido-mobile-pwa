@@ -488,6 +488,7 @@ export default {
 				.catch((err) => {			// on error show modal
 					console.error("Cannot create new team", err)
 					this.errorMessage = this.$t("cannotCreateNewTeam")
+					//TODO: handle liquido error codes, e.g. a team with that name already exists
 					$("#errorMessage").modal({show: true})
 					this.flowState = 20
 				})

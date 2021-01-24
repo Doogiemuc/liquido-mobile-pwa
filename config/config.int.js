@@ -1,10 +1,13 @@
 //
 // Configuration for LIQUIDO mobile PWA in INT environment
 //
+import _ from "lodash"
+import commonConfig from "./config.common.js"
 
-module.exports = {
-	LIQUIDO_API_URL: 'http://localhost:8080',
-
-	// used in TESTS only
-	//DB_URI: "mongodb+srv://" + DB_USER + ":" + DB_PASS + "@" + DB_HOST // + DB_NAME + "?retryWrites=true&w=majority",
+let config = {
+	LIQUIDO_API_URL: 'http://liquido-int-env.aws:8080/liquido-api/',  // will be proxied by Vue devServer. See vue.config.js
 }
+
+_.merge(config, commonConfig)
+
+export default config

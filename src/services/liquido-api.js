@@ -12,10 +12,15 @@ import PopulatingCache from "populating-cache"
 
 // Console Logging
 const log = require("loglevel").getLogger("liquido-api");
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+	log.enableAll()
+}
 
 // Configure axios HTTP REST client
 axios.defaults.baseURL = config.LIQUIDO_API_URL
 //axios.defaults.headers.common['Authorization'] = "Bearer " + JWT;   // Will be set in login()
+
+log.info("Liqudo-api pointing to: "+config.LIQUIDO_API_URL)
 
 /*
 // alternative way to configre a specific AXIOS HTTP client instanace
@@ -30,7 +35,7 @@ const HTTP = () => {
 */
 
 // mock HTTP REST requests to axios in dev and test
-if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+if (config.mockBackend) {
 	log.enableAll()
 	log.debug("Liquido API: Mocking REST requests.")
 
@@ -50,7 +55,15 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	let pollById = {}
 	mockData.polls.forEach(poll => pollById[poll.id] = poll) // poll.id are Strings!
 
-	/** 
+	/*  
+	 * @DEPRECATED
+
+
+	 This is really a nice learning. Mocking your backend is tempting. Because it makes local testing easy.
+	 But after a short while you will always find yourself in a situation where you realize that you actually
+	 alreay RE-implement your backend.  => So test against your real backend wherever possible!
+
+
 	 * Super simple micro MOCK BACKEND
 	 * This mock tries to be as small and simple as possible. 
 	 * Main differences to real backend:
@@ -266,11 +279,24 @@ export default {
 	 * @returns {Object} response from the server with { team, jwt, voterToken}
 	 */
 	createNewTeam(newTeam) {
-		return axios.post("/team", newTeam)
+		newTeam.adminMobilephone = "+495551234567"
+		let graphQL = `mutation {
+			createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}", adminEmail: "${newTeam.adminEmail}", adminMobilephone: "${newTeam.adminMobilephone}") {
+					id
+					teamName
+					inviteCode
+					members {
+							id
+							email
+					}
+			}
+		}`
+		return axios.post("http://localhost:3001/liquido/v2/graphql", {query: graphQL})
 			.then(res => {
-				log.info("Created new team:", res.data)
-				this.login(res.data)
-				return res.data
+				let createdTeam = res.data.createNewTeam
+				log.info("Created new team:", createdTeam)
+				this.login(createdTeam)
+				return createdTeam
 			})
 			// There is deliberately no error handling here, because we can't handle the error in this method :-)
 			// Only catch errors if you can do something about it. Otherwise simply let the rejection bubble up the call chain.

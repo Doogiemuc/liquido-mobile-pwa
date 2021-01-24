@@ -21,6 +21,9 @@ import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
 import VueI18n from "vue-i18n"
 
+//import liquidoGraphQL from "@/services/liquido-graqhql-client"
+//liquidoGraphQL.createNewTeam()
+
 
 Vue.use(BootstrapVue)
 Vue.use(VueI18n)
