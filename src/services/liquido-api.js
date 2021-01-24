@@ -229,7 +229,7 @@ export default {
 		// Cache all known users in this team, so that we can use them for population
 		this.pollsCache.put("users", this.loginData.team.members)
 
-		console.log("Login <"+this.loginData.user.email+"> in "+this.loginData.team.name)
+		console.log("Login <"+this.loginData.user.email+"> in "+this.loginData.team.teamName)
 	},
 
 	isAuthenticated() {
@@ -270,54 +270,6 @@ export default {
 		axios.defaults.headers.common["Authorization"] = undefined
 		this.pollsCache.emptyCache()
 		console.log("API: logout")
-	},
-
-	/**
-	 * Create a new team.
-	 * This method will also save the current user, jwt and voterToken to the local cache.
-	 * @param {Object} newTeam data for new Team: teamName, adminName and adminEmail
-	 * @returns {Object} response from the server with { team, jwt, voterToken}
-	 */
-	createNewTeam(newTeam) {
-		newTeam.adminMobilephone = "+495551234567"
-		let graphQL = `mutation {
-			createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}", adminEmail: "${newTeam.adminEmail}", adminMobilephone: "${newTeam.adminMobilephone}") {
-					id
-					teamName
-					inviteCode
-					members {
-							id
-							email
-					}
-			}
-		}`
-		return axios.post("http://localhost:3001/liquido/v2/graphql", {query: graphQL})
-			.then(res => {
-				let createdTeam = res.data.createNewTeam
-				log.info("Created new team:", createdTeam)
-				this.login(createdTeam)
-				return createdTeam
-			})
-			// There is deliberately no error handling here, because we can't handle the error in this method :-)
-			// Only catch errors if you can do something about it. Otherwise simply let the rejection bubble up the call chain.
-			// Further up some UI method will do something about the error, e.g. show an meaningful error message to the user.
-	},
-
-	/**
-	 * Join an already existing team via invite code.
-	 * @param {Object} joinTeamRequest userName, userEmail and inviteCode for team you want to join
-	 */
-	async joinTeam(joinTeamRequest) {
-		return axios.put("/team/join", joinTeamRequest)
-			.then(res => {
-				log.info("Joined team:", res.data)
-				this.login(res.data)
-				return res.data
-			})
-	},
-
-	async getTeam() {
-		return Promise.reject("not yet implemented")
 	},
 
 	/**

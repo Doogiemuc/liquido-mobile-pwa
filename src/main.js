@@ -13,7 +13,7 @@ log.debug("NODE_ENV="+process.env.NODE_ENV+"   configuration:\n", config)
 
 import Vue from "vue"
 import RootApp from "@/root-app.vue"
-import liquidoApi from "@/services/liquido-api"
+//import liquidoApi from "@/services/liquido-api"
 import router from "@/services/router"
 import "@/registerServiceWorker"
 import { BootstrapVue } from "bootstrap-vue"
@@ -21,8 +21,8 @@ import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue/dist/bootstrap-vue.css"
 import VueI18n from "vue-i18n"
 
-//import liquidoGraphQL from "@/services/liquido-graqhql-client"
-//liquidoGraphQL.createNewTeam()
+import liquidoGraphQLApi from "@/services/liquido-graphql-client"
+
 
 
 Vue.use(BootstrapVue)
@@ -31,7 +31,7 @@ Vue.use(VueI18n)
 /** This will install the liquido-api as a Vue plugin under this.$api for all Vue components */
 const liquidoApiPlugin = {
 	install(Vue /*, options*/) {
-		Vue.prototype.$api = liquidoApi
+		Vue.prototype.$api = liquidoGraphQLApi
 	}
 }
 Vue.use(liquidoApiPlugin)

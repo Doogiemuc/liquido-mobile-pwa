@@ -112,7 +112,7 @@
 
 			<!--Joined team successfully (flowState == 12) -->
 			<b-card	id="joinedTeamBubble"	:class="{ 'collapse-max-height': flowState !== 12 }" class="chat-bubble shadow-sm">
-				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.name })" />
+				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.teamName })" />
 				<b-button
 					variant="primary"
 					class="float-right mb-1"
@@ -135,7 +135,7 @@
 					<liquido-input
 						id="teamNameInput"
 						ref="teamNameInput"
-						v-model="team.name"
+						v-model="team.teamName"
 						:label="$t('teamName')"
 						:valid-func="isTeamNameValid"
 						:maxlength="100"
@@ -371,7 +371,7 @@ export default {
 			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 10
 		},
 		createNewTeamOkButtonDisabled() {
-			return !this.isTeamNameValid(this.team.name) || !this.isAdminEmailValid(this.user.email) || this.flowState > 20
+			return !this.isTeamNameValid(this.team.teamName) || !this.isAdminEmailValid(this.user.email) || this.flowState > 20
 		},
 	},
 	watch: {
@@ -471,16 +471,16 @@ export default {
 		createNewTeam() {
 			if (this.createNewTeamOkButtonDisabled) return
 			this.flowState = 21
-			//console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.name)
+			//console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.teamName)
 			let newTeamRequest = {
-				teamName: this.team.name,
+				teamName: this.team.teamName,
 				adminName: this.user.name,
 				adminEmail: this.user.email,
 			}
 			this.$api.createNewTeam(newTeamRequest)
-				.then((res) => {
+				.then((team) => {
+					this.team = team
 					this.flowState = 22
-					this.team = res.team
 					this.$nextTick(() => {
 						this.scrollElemToTop("#newTeamCreatedBubble", 0)
 					})
@@ -530,7 +530,7 @@ export default {
 		/** scroll to the very bottom of the content. Show last chat message */
 		scrollToBottom() {
 			this.$nextTick(() => {
-				$("#app").animate({ scrollTop: $("#app").height() }, 1000)
+				$("#appContent").animate({ scrollTop: $("#app").height() }, 1000)
 			})
 		},
 
@@ -541,9 +541,9 @@ export default {
 		 * @param {Number} margin margin below headerHeight in pixels (default 0)
 		 */
 		scrollElemToTop(elem, margin = 0) {
-			let scrollTop = $("#app").scrollTop() + $(elem).offset().top - margin
+			let scrollTop = $("#appContent").scrollTop() + $(elem).offset().top - margin
 			this.$nextTick(() => {
-				$("#app").animate({ scrollTop: scrollTop }, 1000)
+				$("#appContent").animate({ scrollTop: scrollTop }, 1000)
 			})
 		},
 
