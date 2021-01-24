@@ -1,9 +1,13 @@
 //
 // Configuration for LIQUIDO mobile PWA in PROD environment
 //
+import _ from "lodash"
+import commonConfig from "./config.common.js"
 
-module.exports = {
+let config = {
 	LIQUIDO_API_URL: 'http://liquido.me:8080/liquido-api',  // will be proxied by Vue devServer. See vue.config.js
-
-	
 }
+
+_.merge(config, commonConfig)
+
+export default config

@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	log.enableAll()
 }
 
-import config from "config"  // automatically mapped to environment specific config file vue.config.js as a webpack alias
+import config from "config"  // automatically mapped to environment specific config file config/config.<env>.jsin vue.config.js as a webpack alias
 log.debug("NODE_ENV="+process.env.NODE_ENV+"   configuration:\n", config)
 
 import Vue from "vue"
@@ -93,6 +93,9 @@ const i18n = new VueI18n({
 	silentFallbackWarn: true,
 	messages: globalTranslations,
 })
+
+//TODO: sanity check config for required attributes
+
 
 // Vue Root App
 const rootApp = new Vue({

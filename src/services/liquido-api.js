@@ -29,13 +29,12 @@ const HTTP = () => {
 }
 */
 
+// mock HTTP REST requests to axios in dev and test
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	log.enableAll()
-	
-	// mock HTTP REST requests to axios
 	log.debug("Liquido API: Mocking REST requests.")
 
-	// Manually log requests to console.
+	// Log mocked requests to console
 	axios.interceptors.request.use(function (config) {
 		log.debug("[MOCK AXIOS] "+config.method.toUpperCase()+" "+config.url, config)
 		return config;
@@ -51,13 +50,22 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	let pollById = {}
 	mockData.polls.forEach(poll => pollById[poll.id] = poll) // poll.id are Strings!
 
-	// Super simple micro MOCK BACKEND
+	/** 
+	 * Super simple micro MOCK BACKEND
+	 * This mock tries to be as small and simple as possible. 
+	 * Main differences to real backend:
+	 *  - only static data from "cypress/fixtures/mockData.js"
+	 *  - no authentication or security at all
+	 */
 
 	// Create a new team
 	mock.onPost("/team").reply(config => {
 		let newTeamReq = JSON.parse(config.data)
+		assert(newTeamReq.adminName, "createNewTeam: Need adminName")
+		assert(newTeamReq.adminEmail, "createNewTeam: Need adminEmail")
+		assert(newTeamReq.teamName, "createNewTeam: Need teamName")
 		let inviteCode = crypto.enc.Base64.stringify(crypto.MD5(newTeamReq.teamName)).substring(0,6).toUpperCase()
-		let jwt = "dummyMockJWT"
+		let jwt = "dummyAdminJWT"
 		let voterToken = crypto.enc.Base64.stringify(crypto.MD5(newTeamReq.adminEmail + newTeamReq.teamName + "mockSecret"))
 		let admin = { 
 			id: uuidv4(),
@@ -68,20 +76,56 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 		let newTeam = {
 			id: uuidv4(),
 			name: newTeamReq.teamName,
+			admin: admin,
+			members: [admin],
 			inviteCode: inviteCode,
 			inviteLink: "http://localhost:3001/invite/" + inviteCode,
 			qrCodeUrl: "/img/qrcode.svg",
-			members: [admin],
 		}
+		mockData.team = newTeam
+		mockData.polls = []
 		let res = {
 			msg: "New team created successfully",
-			team: newTeam,
-			polls: [],
+			team: mockData.team,
+			polls: mockData.polls,
 			user: admin,
 			jwt: jwt,
 			voterToken: voterToken,
 		}
 		return [201, res]
+	})
+
+	//Join team
+	mock.onPut("/team/join").reply(config => {
+		let joinTeamReq = JSON.parse(config.data)
+		assert(joinTeamReq.userName, "joinTeam: Need userName")
+		assert(joinTeamReq.userEmail, "joinTeam: Need userEmail")
+		assert(joinTeamReq.inviteCode, "joinTeam: Need inviteCode")
+		let jwt = "dummyUserJWT"
+		let team = mockData.team
+		if (joinTeamReq.inviteCode !== team.inviteCode) 
+			throw new Error("Cannot mock joinTeam. InviteCodes do not match. Team's inviteCode would be "+team.inviteCode+". But you sent "+joinTeamReq.inviteCode)
+		let voterToken = crypto.enc.Base64.stringify(crypto.MD5(joinTeamReq.userEmail + team.teamName + "mockSecret"))
+		// Add user to team (if not already a member of the team)
+		let user = team.members.find(member => member.email === joinTeamReq.userEmail)
+		if (user === undefined){
+			user = { 
+				id: uuidv4(),
+				name: joinTeamReq.userName,
+				email: joinTeamReq.userEmail,
+				isAdmin: false
+			}
+			team.members.push(user)
+		}
+		let joinedTeamRes = {
+			msg: "Successfully joined team",
+			team: team,
+			polls: mockData.polls,
+			user: user,
+			jwt: jwt,
+			voterToken: voterToken,
+		}
+		return [200, joinedTeamRes]
 	})
 
 	// Get all polls
@@ -111,7 +155,6 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	let upsertProposalRegEx = /\/polls\/([\w-]+)\/proposals/
 	mock.onPost(upsertProposalRegEx).reply(config => {
 		let newProposal = JSON.parse(config.data)
-		log.debug("MOCK BACKEND: create Proposal", newProposal)
 		let match = config.url.match(upsertProposalRegEx) 
 		let pollId = match[1]
 		let poll = pollById[pollId]
@@ -234,6 +277,10 @@ export default {
 			// Further up some UI method will do something about the error, e.g. show an meaningful error message to the user.
 	},
 
+	/**
+	 * Join an already existing team via invite code.
+	 * @param {Object} joinTeamRequest userName, userEmail and inviteCode for team you want to join
+	 */
 	async joinTeam(joinTeamRequest) {
 		return axios.put("/team/join", joinTeamRequest)
 			.then(res => {
@@ -261,7 +308,7 @@ export default {
 	},
 
 	/**
-	 * Get one poll by ID from backend.
+	 * Get one poll by ID. This will always trigger a call to the backend.
 	 * @param {Number} pollId poll.id
 	 * @returns A Promise that will resolve to the poll if it exists.
 	 */

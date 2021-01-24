@@ -6,13 +6,17 @@
 
 //import { inspect } from 'util'  // better than JSON.stringify
 
-let fix = {}
+import config from '../../config/config.test'
 let now = Date.now() % 10000
+
+console.log("Running Cypress HAPPY CASE test (test_uuid="+now+")", config)
+
+let fix = {}
 
 context('Happy Case', () => {
 	before(() => {
 		fix.userName   = 'Cypress User-'+now
-		fix.userEmail  = 'cypress-'+now+'@liquido.me'
+		fix.userEmail  = 'cypressUser-'+now+'@liquido.me'
 		fix.adminName  = 'Cypress Admin-'+now
 		fix.adminEmail = 'cypressAdmin-'+now+'@liquido.me'
 		fix.teamName   = 'Cypress Team '+now
@@ -26,6 +30,7 @@ context('Happy Case', () => {
 		console.log("===================================================")
 	})
 
+	/*
 	it('Liquido mobile backend API is available', () => {
 		cy.request({
 			url: Cypress.env("LIQUIDO_API"),   // This URL is configured in /cypress.json
@@ -40,6 +45,7 @@ context('Happy Case', () => {
 			}
 		})
 	})
+	*/
 
 	it('Create new team', function() {
 		//GIVEN
@@ -58,7 +64,7 @@ context('Happy Case', () => {
 		//THEN
 		cy.get('#newTeamCreatedBubble')
 		cy.get("#inviteLink").should('contain', 'http')
-		cy.get('#newTeamInviteCode').invoke('text').should('have.length.of.at.least', 5)
+		cy.get('#newTeamInviteCode').invoke('text').should('have.length.of.at.least', 6)
 		cy.get('#newTeamInviteCode').then(inviteCodeElem => {
 			fix.inviteCode = inviteCodeElem.text()
 			console.log("New team inviteCode=", fix.inviteCode)

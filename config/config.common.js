@@ -4,5 +4,5 @@
  */
 
 export default {
-	inviteCodeLength: 8			// used for validating inviteCodes in welcome-chat.vue
+	inviteCodeLength: 6			// used for validating inviteCodes in welcome-chat.vue
 }
