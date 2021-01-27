@@ -68,7 +68,7 @@ const routes = [
 		path: "/404",
 		name: "pageNotFound",
 		component: () => import("@/views/not-found-page"),
-		props: true,
+		//props: true,  //MAYBE: where to go "back" ?
 	},
 	{
 		path: "*",
@@ -95,7 +95,7 @@ const router = new Router({
 // route checks for authentication and redirects
 router.beforeEach((routeTo, routeFrom, next) => {
 
-	//TODO: every route except welcome requires auth
+	//TODO: every route except welcome requires auth. Forward to login if not authenticated.
 
 	const requiresAuth = routeTo.matched.some((route) => route.meta.requiresAuth)
 	const redirectIfAuthenticated = routeTo.matched.some(

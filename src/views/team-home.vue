@@ -44,6 +44,7 @@ export default {
 		messages: {
 			en: {
 				introYourTeam: "",
+				teamMembers: "Team members",
 			},
 			de: {
 				introYourTeam: 

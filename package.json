@@ -30,7 +30,7 @@
 		"loglevel": "^1.7.1",
 		"moment": "^2.29.1",
 		"path": "^0.12.7",
-		"populating-cache": "^3.2.1",
+		"populating-cache": "^4.0.0",
 		"purgecss-webpack-plugin": "^3.1.3",
 		"regenerator-runtime": "^0.13.7",
 		"register-service-worker": "^1.7.2",

@@ -221,7 +221,7 @@
 			</b-card>
 		</div> <!-- end of container -->
 
-		<!-- Error message modal popup -->
+		<!-- Error message modal popup    //TODO: Refactor this into its own component that every page can use! -->
 		<div id="errorMessage"
 			class="modal"
 			tabindex="-1"
@@ -460,6 +460,7 @@ export default {
 			if (this.flowState === 6) {
 				this.flowState = 20
 				this.scrollToBottom()
+				$("#teamNameInput").focus()
 			}
 		},
 		cancelCreateNewTeam() {
@@ -470,6 +471,7 @@ export default {
 		/** Create a new team */
 		createNewTeam() {
 			if (this.createNewTeamOkButtonDisabled) return
+			//TODO: show loading icon
 			this.flowState = 21
 			//console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.teamName)
 			let newTeamRequest = {

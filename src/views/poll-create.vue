@@ -8,7 +8,7 @@
 		<b-card class="chat-bubble input-bubble">
 			<liquido-input
 				id="pollTitleInput"
-				v-model="poll.title"
+				v-model="pollTitle"
 				:label="$t('pollTitle')"
 				:valid-func="isPollTitleValid"
 				:invalid-feedback="$t('pollTitleInvalid')"
@@ -63,12 +63,12 @@ export default {
 	components: { liquidoInput },
 	data() {
 		return {
-			poll: {},
+			pollTitle: "",
 		}
 	},
 	computed: {
 		createPollButtonDisabled() {
-			return !this.isPollTitleValid(this.poll.title)
+			return !this.isPollTitleValid(this.pollTitle)
 		},
 	},
 	mounted() {
@@ -81,7 +81,7 @@ export default {
 			this.$router.push("/polls")
 		},
 		clickCreateNewPoll() {
-			return this.$api.createPoll(this.poll)
+			return this.$api.createPoll(this.pollTitle)
 				.then(createdPoll => this.$router.push("/polls/" + createdPoll.id))
 				.catch(err => console.warn("Error", err))
 		},

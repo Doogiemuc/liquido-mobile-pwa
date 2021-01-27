@@ -1,33 +1,32 @@
 <template>
-	<div class="hero-body">
-		<div class="container">
-			<h1 class="title">
-				404 Not Found
-			</h1>
-		</div>
+	<div class="container">
+		<h1>
+			Uuupss!
+		</h1>
+		<p>{{$t('NotFound')}}</p>
+		<a href="/" class="btn btn-primary">{{$t('StartOver')}}</a>
 	</div>
 </template>
 
 <script>
 export default {
 	name: "NotFound",
+	i18n: {
+		messages: {
+			de: {
+				NotFound: "Something could not be found. Sorry.",
+				StartOver: "Start over"
+			}
+		}
+	},
 	components: {},
-	filters: {},
-	// props: [],
-	mixins: [],
 	data() {
 		return {}
 	},
 	computed: {},
-	beforeCreate() {},
 	created() {
 		this.$router.push("/404")
 	},
-	beforeMount() {},
-	mounted() {},
-	beforeUpdate() {},
-	updated() {},
-	beforeDestroy() {},
 	methods: {},
 }
 </script>
