@@ -22,6 +22,8 @@ context('Happy Case', () => {
 		fix.teamName   = 'Cypress Team '+now
 		fix.inviteCode = undefined
 		fix.pollTitle  = 'Cypress Poll '+now
+		fix.proposalTitle  = 'Cypress Proposal '+now
+		fix.proposalDescription = now + ' lorem ipsum best description ever that needs to be a bit longer because we want to test things like clipping and many more useless UX magic'
 	})
 
 	beforeEach(() => {
@@ -47,7 +49,7 @@ context('Happy Case', () => {
 	})
 	*/
 
-	it.only('Create new team', function() {
+	it.only('Create new team, poll and add first proposal', function() {
 		//GIVEN
 		assert.isString(fix.adminName)
 		assert.isString(fix.teamName)
@@ -75,15 +77,25 @@ context('Happy Case', () => {
 		// ============= create poll
 		//GIVEN
 		cy.get('#poll-create')
-		//WHEN
+		//WHEN adding a poll
 		cy.get('#pollTitleInput').type(fix.pollTitle)
 		cy.get('#createPollButton').click()
-		//THEN
+		//THEN newly created poll should be shown
 		cy.get('#poll-show')
 		cy.get('.poll-panel-title').should('contain.text', fix.pollTitle)
+		cy.get('#addProposalButton').should('be.visible')
 
 		// ============ add first proposal
-		
+		//GIVEN a newly created poll
+		cy.get('#addProposalButton').click()
+		//WHEN adding a proposal
+		cy.get('#propTitle').type(fix.proposalTitle)
+		cy.get('#propDescription').type(fix.proposalDescription)
+		cy.get('#saveProposalButton').click()
+		cy.get('#createdSuccessfullyButton').click()
+		//THEN the poll is shown with that proposal
+		cy.get('#poll-show')
+		cy.get('.law-title').should('contain.text', fix.proposalTitle)
 	})
 
 	//TODO: create test with mocked error response to check error modal

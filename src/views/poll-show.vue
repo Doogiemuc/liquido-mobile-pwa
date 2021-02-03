@@ -4,7 +4,7 @@
 			{{ pageTitleLoc }}
 		</h2>
 
-		<poll-panel v-if="poll.id" :key="poll.id" :poll="poll" :read-only="true" class="shadow mb-3" />
+		<poll-panel v-if="poll.id" id="pollPanel" :poll="poll" :read-only="true" class="shadow mb-3" />
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
 			<div v-html="$t('cannotFindPoll', {pollId: pollId})" />
@@ -20,7 +20,7 @@
 
 		<div v-if="showAddProposal" class="alert alert-secondary mb-3">
 			<p v-html="$t('addProposalInfo')" />
-			<b-button variant="primary" class="float-right" @click="clickAddProposal()">
+			<b-button id="addProposalButton" variant="primary" class="float-right" @click="clickAddProposal()">
 				{{ $t("addProposal") }}
 				<i class="fas fa-angle-double-right" />
 			</b-button>

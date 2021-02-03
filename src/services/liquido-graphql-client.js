@@ -230,8 +230,9 @@ export default {
 		})
 	},
 
-	async addProposalToPoll(pollId, propTitle, propDescription) {
-		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") { id, title, proposals { id, title, description } } }`
+	async addProposal(pollId, propTitle, propDescription) {
+		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") ` +
+			`{ id, title, status, proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let poll = res.data.addProposal

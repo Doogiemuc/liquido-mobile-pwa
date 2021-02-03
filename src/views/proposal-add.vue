@@ -20,7 +20,7 @@
 				/>
 
 				<textarea
-					id="descriptionId"
+					id="propDescription"
 					v-model="proposal.description"
 					:class="descriptionValidClass"
 					:placeholder="$t('describeYourProposal')"
@@ -43,6 +43,7 @@
 						<a href="#" @click="cancelAddProposal()">{{ $t("Cancel") }}</a>
 					</small>
 					<button
+						id="saveProposalButton"
 						:disabled="saveButtonDisabled"
 						type="button"
 						class="btn btn-primary"
@@ -82,7 +83,7 @@
 		>
 			{{ $t('createdSuccessfully') }}
 			<template #modal-footer="{}">
-				<b-button variant="primary" @click="gotoPoll()">
+				<b-button id="createdSuccessfullyButton" variant="primary" @click="gotoPoll()">
 					{{ $t('gotoPoll') }}&nbsp;<i class="fas fa-angle-double-right"></i>
 				</b-button>
 			</template>
@@ -168,7 +169,7 @@ export default {
 		},
 
 		saveProposal() {
-			this.$api.saveProposal(this.poll.id, this.proposal)
+			this.$api.addProposal(this.poll.id, this.proposal.title, this.proposal.description)
 				.then(() => this.$bvModal.show("successModal"))
 				.catch(err => {
 					console.error("Cannot add proposal", err)
