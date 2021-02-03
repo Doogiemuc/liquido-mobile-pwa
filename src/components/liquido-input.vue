@@ -14,6 +14,7 @@
 			:placeholder="placeholder"
 			:disabled="disabled"
 			:maxlength="maxlength"
+			:pattern="pattern"
 			class="form-control"
 			@keyup="keyup"
 			@input="$emit('input', $event.target.value)"
@@ -60,6 +61,9 @@
  */
 export default {
 	name: "LiquidoInput",
+
+	//TODO: show character counter at the right.  (e.g for fixed length imputs  "3/6")
+
 	props: {
 		id: { type: String, required: true },
 		name: { type: String, default: "" },
@@ -68,6 +72,7 @@ export default {
 		placeholder: { type: String, default: undefined },
 		type: { type: String, required: false, default: "Text" },
 		disabled: { type: Boolean, default: false },
+		pattern: { type: String, default: undefined },
 		maxlength: { type: Number, default: 1024 },
 		invalidFeedback: { type: String, default: undefined },
 		validFunc: { type: Function, required: false, default: () => true },

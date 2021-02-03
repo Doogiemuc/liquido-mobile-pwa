@@ -1,0 +1,71 @@
+@startuml
+
+' LIQUIDO Mobile - Screen Flow
+
+object "Welcome" as Welcome {
+  username
+}
+object "Join Team" as JoinTeam {
+  inviteCode
+  userEmail
+}
+object "Create new team" as CreateNewTeam {
+  teamName
+  adminEmail
+}
+object "Create new poll" as CreatePoll {
+  poll.title
+}
+object "Add proposal to poll" as AddProposalToPoll {
+  title
+  description
+  creator, upvotes
+}
+object "<size:18><b>Show one Poll</b></size>" as ShowPoll {
+  title
+  status
+  proposals[]
+}
+object "<size:18><b>Cast Vote</b></size>" as CastVote {
+  voterToken
+  voteOrder
+}
+object "Logged in" as Login {
+  jwt
+}
+object "<size:18><b>Team Home</b></size>" as TeamHome {
+  members
+}
+map "<size:18><b>List of Polls</b></size>" as Polls {
+ 1 => Poll1
+ 2 => Poll2
+ 3 => Poll3
+}
+note bottom of Polls: With search
+
+
+Welcome -right-> CreateNewTeam
+CreateNewTeam .right.> CreatePoll
+CreatePoll .right.> AddProposalToPoll
+note top of AddProposalToPoll: <size:8>Admin can set</size>\n<size:8>the first proposals</size>
+note right of AddProposalToPoll: <size:8>Users can add</size>\n<size:8>their proposal</size>
+AddProposalToPoll -down-> ShowPoll
+AddProposalToPoll <-- ShowPoll
+
+
+Welcome -down-> JoinTeam
+JoinTeam -right-> TeamHome
+TeamHome -right-> Polls
+TeamHome <- Polls
+
+Polls .up.> CreatePoll: admin
+Polls -right-> ShowPoll
+Polls <-- ShowPoll
+ShowPoll -down-> CastVote
+ShowPoll <-- CastVote
+ShowPoll .> ShowPoll: Admin starts\nvoting phase
+
+Login -up-> TeamHome
+
+
+@enduml

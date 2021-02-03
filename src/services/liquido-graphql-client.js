@@ -9,7 +9,9 @@ import PopulatingCache from "populating-cache"
 const log = require("loglevel").getLogger("liquido-api");
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	log.enableAll()
+	log.info("liquido-graphql-client => " + config.LIQUIDO_GRAPHQL_URL)
 }
+
 
 // Configure axios HTTP REST client to point to our graphQL backend
 axios.defaults.baseURL = config.LIQUIDO_GRAPHQL_URL
@@ -28,6 +30,7 @@ const teamsCacheConfig = {
 	idAttr: "id",
 }
 const teamCache  = new PopulatingCache(teamsCacheConfig)
+const CURRENT_USER_KEY = "currentUser"   // key for current user object in teamCache
 
 /**
  * fetch function for polls or one pollByID
@@ -46,77 +49,78 @@ const fetchPollFunc = function(path) {
 	}
 }
 
+/**
+ * Cache for polls
+ */
 const pollsCacheConfig = {
 	fetchFunc: fetchPollFunc,
 	ttl: 10*60*1000,
 	referencedPathAttr: "$ref",
 	idAttr: "id",
 }
-
 const pollsCache = new PopulatingCache(pollsCacheConfig)
 
+/**
+ * Nice logging of HTTP error messages
+ */
+axios.interceptors.response.use(function (response) {
+	// Any status code that lie within the range of 2xx cause this function to trigger
+	return response;
+}, function (error) {
+	// Any status codes that falls outside the range of 2xx cause this function to trigger
+	if (error.response.status >= 500) log.error("liquido-graphql-api ERROR:", error)
+	if (error.response && error.response.data) log.debug("liquido-graphql-api: "+error.response.data.message, error.response.data)
+	return Promise.reject(error);
+});
+
+
+/**
+ * export API methods
+ */
 export default {
 	async pingApi() {
-		return axios.get("/")
+		return axios.post("", {query: "query { ping }"})
 	},
 
 	/**
-	 * Create a new team. 
-	 * @param {Object} newTeam teamName, adminName, adminEmail and adminMobilephone
+	 * Login user into team. Store JWT for future requests.
+	 * Will also put currentUser, team and jwt into the `teamCache`
+	 * @param {Object} team Team with members[]
+	 * @param {Object} user currently logged in user
+	 * @param {String} jwt JsonWebToken
 	 */
-	async createNewTeam(newTeam) {
-		let graphQL = `mutation {
-			createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}", adminEmail: "${newTeam.adminEmail}") {
-				team {
-					id
-					teamName
-					inviteCode
-					members {
-						id
-						email
-						profile { name }
-					}
-				}
-				jwt
-			}
-		}`
-		return axios.post("", {query: graphQL})
-			.then(res => {
-				let team = res.data.createNewTeam.team
-				teamCache.put("team", team)
-				teamCache.put("currentUser", team.members[0])
-				teamCache.put("jwt", res.data.createNewTeam.jwt)
-				this.loginJWT(res.data.createNewTeam.jwt)
-				log.info("Created new team:", team)
-				return team
-			})
-			// There is deliberately no error handling here, because we can't handle the error in this method :-)
-			// Only catch errors if you can do something about it. Otherwise simply let the rejection bubble up the call chain.
-			// Further up some UI method will do something about the error, e.g. show an meaningful error message to the user.
-	},
-
-	loginJWT(jwt) {
+	login(team, user, jwt) {
+		teamCache.put("team", team)
+		teamCache.put(CURRENT_USER_KEY, user)
+		teamCache.put("jwt", jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
-		log.debug("Login with JWT")
+		log.debug("Login: <"+user.email+"> into team '" + team.name  + "'")
 	},
 
 	logout() {
 		axios.defaults.headers.common["Authorization"] = undefined
-		log.debug("Logout")
+		log.debug("Logout: "+teamCache.getSync(CURRENT_USER_KEY))
+		teamCache.emptyCache()
 	},
 
 	isAuthenticated() {
-		return axios.defaults.headers.common["Authorization"] !== undefined
+		return axios.defaults.headers.common["Authorization"] !== undefined && teamCache.getSync(CURRENT_USER_KEY) !== undefined
 	},
 
+	/** Get the currently logged in user. Will throw Error, if no one is logged in! */
 	getCurrentUser() {
-		let currentUser = teamCache.getSync("currentUser")  // get from cache, without calling the backend
+		let currentUser = teamCache.getSync(CURRENT_USER_KEY)  // get from cache, without calling the backend
 		if (!currentUser) throw new Error("No current user. Not logged in!")
 		return currentUser
 	},
 
+	/** 
+	 * Check if currently logged in user is the admin of his team. 
+	 * @return false if no one is logged in or currently logged in user is not the admin
+	 */
 	isAdmin() {
-		return this.getCurrentUser().isAdmin
+		let currentUser = teamCache.getSync(CURRENT_USER_KEY)
+		return currentUser && currentUser.isAdmin
 	},
 
 	async devLogin(userEmail, teamName) {
@@ -140,8 +144,67 @@ export default {
 		})
 	},
 
+	/**
+	 * Create a new team. 
+	 * @param {Object} newTeam teamName, adminName, adminEmail and adminMobilephone
+	 */
+	async createNewTeam(newTeam) {
+		let graphQL = `mutation {
+			createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}", adminEmail: "${newTeam.adminEmail}") {
+				team {
+					id
+					teamName
+					inviteCode
+					members { id, email, name, website, picture, mobilephone }
+				}
+				user { id, email, name, website, picture, mobilephone }
+				jwt
+			}
+		}`
+		return axios.post("", {query: graphQL})
+			.then(res => {
+				let team = res.data.createNewTeam.team
+				this.login(
+					team,
+					res.data.createNewTeam.user,  // admin
+					res.data.createNewTeam.jwt
+				)
+				log.info("Created new team:", team)
+				return team
+			})
+			// There is deliberately no error handling here, because we can't handle the error in this method :-)
+			// Only catch errors if you can do something about it. Otherwise simply let the rejection bubble up the call chain.
+			// Further up some UI method will do something about the error, e.g. show an meaningful error message to the user.
+	},
+
+	async joinTeam(inviteCode, userName, userEmail, userMobilephone) {
+		let graphQL = `mutation {	
+			joinTeam(inviteCode: "${inviteCode}", userName: "${userName}", userEmail: "${userEmail}", userMobilephone: "${userMobilephone}") {
+				team {
+					id
+					teamName
+					inviteCode
+					members { id, email, name, website, picture, mobilephone }
+				}
+				user { id, email, name, website, picture, mobilephone }
+				jwt
+			}
+		}`
+		return axios.post("", {query: graphQL})
+			.then(res => {
+				let team = res.data.joinTeam.team
+				this.login(
+					team,
+					res.data.joinTeam.user,
+					res.data.joinTeam.jwt
+				)
+				log.info("Joined team:", team)
+				return team
+			})
+	},
+
 	async createPoll(pollTitle) {
-		let graphQL = `mutation {	createPoll(title: "${pollTitle}") {	id, title }	}`
+		let graphQL = `mutation {	createPoll(title: "${pollTitle}") {	id, title, status, proposals { id } }	}`
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let poll = res.data.createPoll
@@ -152,6 +215,7 @@ export default {
 	},
 
 	async getPollById(pollId, force = false) {
+		console.log("getPollById(id="+pollId+", force="+force+")")
 		return pollsCache.get("polls/"+pollId, {
 			callBackend: force ? pollsCache.FORCE_BACKEND_CALL : pollsCache.CALL_BACKEND_WHEN_EXPIRED
 		})
@@ -166,6 +230,12 @@ export default {
 				log.info("Added proposal to poll:", poll)
 				return poll
 			})
+	},
+
+	/** Liquido backend error codes */
+	err: {
+		CANNOT_CREATE_NEW_TEAM: 1,
+		TEAM_WITH_SAME_NAME_EXISTS: 2,
 	}
 
 }

@@ -73,6 +73,7 @@
 						ref="inviteCodeInput"
 						v-model="inviteCode"
 						:label="$t('inviteCode')"
+						placeholder="ABC123"
 						:valid-func="isInviteCodeValid"
 						:maxlength="100"
 						:invalid-feedback="$t('inviteCodeInvalid')"
@@ -80,11 +81,29 @@
 						tabindex="1"
 					/>
 
+					<!-- eslint-disable -->
+					<liquido-input
+						id="mobilephoneInput"
+						ref="mobilephoneInput"
+						v-model="user.mobilephone"
+						:label="$t('yourMobilephone')"
+						:placeholder="$t('mobilephonePlaceholder')"
+						:valid-func="isMobilephoneValid"
+						type="tel"
+						pattern="[\+0-9 -/]{3,50}"
+						:maxlength="100"
+						:invalid-feedback="$t('mobilephoneInvalid')"
+						:disabled="flowState !== 10"
+						tabindex="2"
+					/>
+					<!-- eslint-enable -->
+
 					<liquido-input
 						id="emailInput"
 						ref="emailInput"
 						v-model="user.email"
 						:label="$t('yourEMail')"
+						:placeholder="$t('emailPlaceholder')"
 						:valid-func="isEmailValid"
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
@@ -253,8 +272,12 @@
 <script>
 import liquidoInput from "@/components/liquido-input"
 import config from "config"
+const log = require("loglevel").getLogger("welcome-chat");
 
-const eMailRegEx = /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}\b/
+const eMailRegEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}$/
+
+// but see https://github.com/google/libphonenumber/blob/master/FALSEHOODS.md    :-)
+const mobilephoneRegEx = /^(\+[1-9]{1}[0-9]{1,14})|(0[0-9]{3} *[-/][0-9 ]{1,50})$/
 
 export default {
 	i18n: {
@@ -287,9 +310,12 @@ export default {
 
 				joinTeamButton: "Team beitreten",
 				inviteCode: "Einladungscode",
-				inviteCodeInvalid: "Code muss genau 6 Zeichen lang sein.",
+				inviteCodeInvalid: "Einladungscode muss genau 6 Zeichen lang sein.",
+				yourMobilephone: "Deine Handynummer",
+				mobilephonePlaceholder: "+49 151 1234567",
+				mobilephoneInvalid: "Keine gültige Handynummer",
 				yourEMail: "Deine E-Mail",
-				eMailPlaceholder: "info@domain.de",
+				emailPlaceholder: "info@domain.de",
 				emailInvalid: "E-Mail ungültig",
 
 				joinedTeamSuccessfully: 
@@ -314,6 +340,7 @@ export default {
 				createPoll: "Abstimmung anlegen",
 
 				error: "Fehler",
+				teamWithSameNameExists: "Ein Teamm mit diesem Namen existiert bereits. Bitte wählen einen anderen Namen für dein Team.",
 				cannotCreateNewTeam: "Es tut uns sehr leid, das neue Team konnt nicht angelegt werden. Bitte versuche es später noch einmal.",
 				cannotJoinTeam: "Du kannst diesem Team nicht beitreten. {errorDetails}"
 			},
@@ -326,6 +353,7 @@ export default {
 			user: {
 				name: undefined,
 				email: undefined,
+				mobilephone: undefined
 			},
 
 			inviteCode: undefined,    // inviteCode when joining an existing team
@@ -377,7 +405,7 @@ export default {
 	watch: {
 		
 		"flowState": function(newVal, oldVal) {
-			console.log(" ====>>> flowState", oldVal, "=>", newVal)
+			log.debug(" ====>>> flowState", oldVal, "=>", newVal)
 		}
 		
 	},
@@ -429,6 +457,10 @@ export default {
 			return val !== undefined && val !== null && val.trim().length === config.inviteCodeLength
 		},
 
+		isMobilephoneValid(val) {
+			return val !== undefined && val !== null && mobilephoneRegEx.test(val)
+		},
+
 		/* user's email must match regex */
 		isEmailValid(val) {
 			return val !== undefined && val !== null && eMailRegEx.test(val)
@@ -473,7 +505,6 @@ export default {
 			if (this.createNewTeamOkButtonDisabled) return
 			//TODO: show loading icon
 			this.flowState = 21
-			//console.log(this.user.name + "<" + this.user.email + "> creates new team: " + this.newTeam.teamName)
 			let newTeamRequest = {
 				teamName: this.team.teamName,
 				adminName: this.user.name,
@@ -488,9 +519,13 @@ export default {
 					})
 				})
 				.catch((err) => {			// on error show modal
-					console.error("Cannot create new team", err)
-					this.errorMessage = this.$t("cannotCreateNewTeam")
-					//TODO: handle liquido error codes, e.g. a team with that name already exists
+					let errCode = err.response.data.liquidoErrorCode
+					if (errCode === this.$api.err.TEAM_WITH_SAME_NAME_EXISTS) {
+						this.errorMessage = this.$t("teamWithSameNameExists")
+					} else {
+						this.errorMessage = this.$t("cannotCreateNewTeam")
+						log.error("Cannot create new team", err)
+					}
 					$("#errorMessage").modal({show: true})
 					this.flowState = 20
 				})
@@ -503,11 +538,12 @@ export default {
 		/** Join an existing team */
 		joinTeam() {
 			this.flowState = 11
-			console.log(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
+			log.info(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
 			let joinTeamRequest = {
 				inviteCode: this.inviteCode,
 				userName: this.user.name,
-				userEmail: this.user.email
+				userEmail: this.user.email,
+				userMobilephone: this.user.mobilephone
 			}
 			this.$api.joinTeam(joinTeamRequest)
 				.then(res => {
@@ -518,7 +554,7 @@ export default {
 					})
 				})
 				.catch(err => {
-					console.error("Cannot join team", err)
+					log.error("Cannot join team", err)
 					this.errorMessage = this.$t("cannotJoinTeam", {errorDetails: err.err })
 					$("#errorMessage").modal({show: true})
 					this.flowState = 10
@@ -586,12 +622,11 @@ export default {
 						url: this.team.inviteLink,
 					})
 					.then(() => {
-						console.log("Invite has been sent!")
+						log.debug("Invite has been sent!")
 					})
 					.catch(console.error)
 			} else {
-				console.log("No native support")
-				//shareDialog.classList.add('is-open');
+				log.debug("No native support")
 			}
 		},
 	},

@@ -189,7 +189,7 @@ export default {
 				poll.proposals.forEach((prop) => {
 					if (prop.title.toUpperCase().includes(Q)) return true
 					if (prop.description.toUpperCase().includes(Q)) return true
-					if (prop.createdBy.profile.name.toUpperCase().includes(Q)) return true
+					if (prop.createdBy.name.toUpperCase().includes(Q)) return true
 					if (prop.createdBy.email.toUpperCase().includes(Q)) return true
 				})
 			}

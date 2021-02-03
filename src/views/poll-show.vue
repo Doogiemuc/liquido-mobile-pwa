@@ -112,18 +112,20 @@ export default {
 			if (!this.poll.proposals || this.poll.proposals.length === 0) {
 				return true
 			}
-			let currentUserId = this.$api.getCurrentUser().id
-			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUserId).length === 0
+			let currentUser = this.$api.getCurrentUser()
+			if (currentUser.isAdmin) return true
+			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUser.id).length === 0
 		},
 		showStartVotingPhase() {
-			return (
-				this.userIsAdmin && this.poll.status === "ELABORATION" && this.poll.proposals && this.poll.proposals.length > 0
-			)
+			return this.userIsAdmin && this.poll.status === "ELABORATION" && this.poll.proposals && this.poll.proposals.length > 0
 		},
 	},
 	created() {
 		this.$api.getPollById(this.pollId, true)
-			.then(poll => this.poll = poll)
+			.then(rpoll => {
+				console.log("Received poll", rpoll, JSON.stringify(rpoll))
+				this.poll = rpoll
+			})
 			.catch(err => {
 				console.warn("Cannot find poll.id=" + this.pollId, err)
 				this.showError = true

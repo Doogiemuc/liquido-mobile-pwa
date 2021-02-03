@@ -98,7 +98,7 @@ const i18n = new VueI18n({
 })
 
 //TODO: sanity check config for required attributes
-liquidoGraphQLApi.pingApi ()
+liquidoGraphQLApi.pingApi()
 	.catch(err => console.error("Backend not reachable.", err))
 	//TODO: Show message: You are offline. Incremental backoff retry to get back online.
 

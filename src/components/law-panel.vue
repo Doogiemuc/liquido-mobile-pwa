@@ -13,7 +13,7 @@
 			</div>
 			<div class="user">
 				<i class="far fa-user" />
-				&nbsp;{{ law.createdBy.profile.name }}
+				&nbsp;{{ law.createdBy.name }}
 			</div>
 			<div
 				:class="{ supported: law.supportedByCurrentUser }"
