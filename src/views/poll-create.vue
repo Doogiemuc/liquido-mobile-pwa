@@ -11,9 +11,10 @@
 				v-model="pollTitle"
 				:label="$t('pollTitle')"
 				:valid-func="isPollTitleValid"
-				:invalid-feedback="$t('pollTitleInvalid')"
+				:invalid-feedback="pollTitleInvalidFeedback"
 				@blur="pollTitleValidated = true"
-			/>
+			>
+			</liquido-input>
 
 			<div class="d-flex justify-content-between align-items-center">
 				<small class="ml-1">
@@ -39,7 +40,9 @@
 </template>
 
 <script>
+import config from "config"
 import liquidoInput from "../components/liquido-input"
+const log = require("loglevel").getLogger("poll-create");
 
 export default {
 	i18n: {
@@ -54,7 +57,7 @@ export default {
 					"<p>(2) Wenn du die Wahlphase der Abstimmung startest, kann jeder im Team seine Stimme anonym abgeben. (<i class='fas fa-person-booth'></i>)</p>" +
 					"<p>(3) Nachdem du die Wahlphase beendet hast, ist das Wahlergebnis für alle sichtbar.",
 				pollTitle: "Titel der Abstimmung",
-				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. 10 Zeichen.",
+				pollTitleInvalid: "Titel ist zu kurz. Bitte mind. {minLen} Zeichen.",
 				create: "Anlegen",
 			},
 		},
@@ -70,19 +73,25 @@ export default {
 		createPollButtonDisabled() {
 			return !this.isPollTitleValid(this.pollTitle)
 		},
+		pollTitleInvalidFeedback() {
+			return this.$t("pollTitleInvalid", {minLen: config.pollTitleMinLength})
+		}
 	},
 	mounted() {
 	},
 	methods: {
 		isPollTitleValid(val) {
-			return val !== undefined && val !== null && val.trim().length >= 10
+			return val !== undefined && val !== null && val.trim().length >= config.pollTitleMinLength
 		},
 		cancelCreatePoll() {
 			this.$router.push("/polls")
 		},
 		clickCreateNewPoll() {
 			return this.$api.createPoll(this.pollTitle)
-				.then(createdPoll => this.$router.push("/polls/" + createdPoll.id))
+				.then(createdPoll => {
+					log.info("New poll created", createdPoll)
+					this.$router.push("/polls/" + createdPoll.id)
+				})
 				.catch(err => console.warn("Error", err))
 		},
 	},

@@ -36,13 +36,14 @@ const CURRENT_USER_KEY = "currentUser"   // key for current user object in teamC
  * fetch function for polls or one pollByID
  */
 const fetchPollFunc = function(path) {
-	log.debug("Fetch Poll: "+JSON.stringify(path))
 	if (path[0] === "polls") {
-		let graphQL = `query { polls { id, title, proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
+		log.debug("Fetch all poll of team from backend: "+JSON.stringify(path))
+		let graphQL = `query { polls { id, title, status, proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
 		return axios.post("/", {query: graphQL}).then(res => res.data.polls)
 	} else if (path[0].polls) {
+		log.debug("Fetch Poll from backend: "+JSON.stringify(path))
 		let pollId = path[0].polls
-		let graphQL = `query { poll(pollId:${pollId}) { id, title, proposals { id, title, description,  } } }`
+		let graphQL = `query { poll(pollId:${pollId}) { id, title, status proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
 		return axios.post("/", {query: graphQL}).then(res => res.data.poll)
 	} else {
 		return Promise.reject(new Error("Cannot fetch poll(s) at path: "+JSON.stringify(path)))
@@ -123,6 +124,7 @@ export default {
 		return currentUser && currentUser.isAdmin
 	},
 
+	/*  DEPRECATED.   Use REST for devLogin!
 	async devLogin(userEmail, teamName) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
@@ -143,6 +145,7 @@ export default {
 			return Promise.reject(err.response ? err.response : err)
 		})
 	},
+	*/
 
 	/**
 	 * Create a new team. 
@@ -215,8 +218,14 @@ export default {
 	},
 
 	async getPollById(pollId, force = false) {
-		console.log("getPollById(id="+pollId+", force="+force+")")
+		//log.debug("getPollById(id="+pollId+", force="+force+")")
 		return pollsCache.get("polls/"+pollId, {
+			callBackend: force ? pollsCache.FORCE_BACKEND_CALL : pollsCache.CALL_BACKEND_WHEN_EXPIRED
+		})
+	},
+
+	async getPolls(force = false) {
+		return pollsCache.get("polls", {
 			callBackend: force ? pollsCache.FORCE_BACKEND_CALL : pollsCache.CALL_BACKEND_WHEN_EXPIRED
 		})
 	},

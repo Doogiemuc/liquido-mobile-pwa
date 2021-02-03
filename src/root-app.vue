@@ -52,6 +52,7 @@ export default {
 			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
 			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
 			if (from.path === "/team")  { this.transitionName = "slide-left" } else
+			if (from.name === "createPoll" && to.name === "showPoll") { this.transitionName = "slide-left" } else
 			if (fromDepth === toDepth) { this.transitionName = "fade" }
 		},
 	},

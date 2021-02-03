@@ -81,7 +81,7 @@
 						tabindex="1"
 					/>
 
-					<!-- eslint-disable -->
+					<!-- TODO: ask for mobile phone already here or later?
 					<liquido-input
 						id="mobilephoneInput"
 						ref="mobilephoneInput"
@@ -96,7 +96,7 @@
 						:disabled="flowState !== 10"
 						tabindex="2"
 					/>
-					<!-- eslint-enable -->
+					-->
 
 					<liquido-input
 						id="emailInput"
@@ -240,39 +240,26 @@
 			</b-card>
 		</div> <!-- end of container -->
 
-		<!-- Error message modal popup    //TODO: Refactor this into its own component that every page can use! -->
-		<div id="errorMessage"
-			class="modal"
-			tabindex="-1"
-			role="dialog"
-			aria-labelledby="errorMessage"
-			aria-hidden="true"
+		<!-- Error modal -->
+		<b-modal 
+			id="welcomeChatErrorModal"
+			ref="errorModal"
+			:title="errorTitle"
+			centered
+			ok-only
+			no-close-on-esc
+			no-close-on-backdrop
+			hide-header-close
 		>
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content bg-danger text-white">
-					<div class="modal-header">
-						<h5 id="exampleModalLongTitle" class="modal-title">
-							{{ $t('error') }}
-						</h5>
-					</div>
-					<div class="modal-body">
-						{{ errorMessage }}
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn bg-white text-black" data-dismiss="modal">
-							{{ $t("Ok") }}
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
+			{{ errorMessage }}
+		</b-modal>
 	</div>
 </template>
 
 <script>
-import liquidoInput from "@/components/liquido-input"
 import config from "config"
-const log = require("loglevel").getLogger("welcome-chat");
+import liquidoInput from "@/components/liquido-input"
+const log = require("loglevel").getLogger("welcome-chat")
 
 const eMailRegEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}$/
 
@@ -340,6 +327,7 @@ export default {
 				createPoll: "Abstimmung anlegen",
 
 				error: "Fehler",
+				areYouOffline: "Der Liquido Server ist nicht erreichbar. Bist du offline? Bitte schalte dein WLAN ein.",
 				teamWithSameNameExists: "Ein Teamm mit diesem Namen existiert bereits. Bitte wählen einen anderen Namen für dein Team.",
 				cannotCreateNewTeam: "Es tut uns sehr leid, das neue Team konnt nicht angelegt werden. Bitte versuche es später noch einmal.",
 				cannotJoinTeam: "Du kannst diesem Team nicht beitreten. {errorDetails}"
@@ -391,6 +379,7 @@ export default {
 			chatAnimationStarted: false,
 
 			// localized message in the error modal popup
+			errorTitle: this.$t("Error"),
 			errorMessage: "",
 		}
 	},
@@ -418,10 +407,14 @@ export default {
 	 * then start the chat animation ONCE
 	 */
 	mounted() {
-		//$("html, body").animate({ scrollTop: 0 }, 500);
 		$("html, body").scrollTop(0)
 		this.flowState = 0
-		//this.chatAnimationStarted = false
+		this.$api.pingApi().catch(() => {
+			this.errorTitle = undefined // this.$t("Attention")
+			this.errorMessage = this.$t("areYouOffline")
+			this.$refs["errorModal"].show()
+		})
+
 		if (this.isBottomInView("#welcomeBubble")) {
 			this.startChatAnimation()
 		} else {
@@ -435,7 +428,7 @@ export default {
 	methods: {
 		/* username must not be empty and contain at least 4 chars */
 		isUsernameValid(val) {
-			return val !== undefined && val !== null && val.trim().length >= 4
+			return val !== undefined && val !== null && val.trim().length >= config.usernameMinLength
 		},
 
 		/* username can be submitted by pressing ENTER or by blurring the field or by clicking on "done" on the iOS keyboard */
@@ -556,7 +549,7 @@ export default {
 				.catch(err => {
 					log.error("Cannot join team", err)
 					this.errorMessage = this.$t("cannotJoinTeam", {errorDetails: err.err })
-					$("#errorMessage").modal({show: true})
+					this.$bvModal.show("errorModal")
 					this.flowState = 10
 				})
 		},
@@ -593,8 +586,6 @@ export default {
 			let elemBottom = elemTop + $(elem).height()
 			return elemBottom <= docViewBottom
 		},
-
-		
 
 		startChatAnimation() {
 			if (this.chatAnimationStarted) return  // start chat animation only once

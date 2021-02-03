@@ -10,7 +10,7 @@
 
 <script>
 export default {
-	name: "NotFound",
+	name: "NotFoundPage",
 	i18n: {
 		messages: {
 			de: {
@@ -24,9 +24,7 @@ export default {
 		return {}
 	},
 	computed: {},
-	created() {
-		this.$router.push("/404")
-	},
+	created() {},
 	methods: {},
 }
 </script>

@@ -14,7 +14,7 @@
 					<span class="liquido" @click="clickLiquidoTitle()" />
 				</div>
 				<div class="col header-right">
-					<i v-if="$route.path !== '/welcome'" class="fas fa-users" @click="gotoTeam()" />
+					<i v-if="isLoggedIn" class="fas fa-users" @click="gotoTeam()" />
 				</div>
 			</div>
 		</div>
@@ -37,6 +37,11 @@ export default {
 	data() {
 		return {
 			filterByStatus: "ELABORATION",
+		}
+	},
+	computed: {
+		isLoggedIn() {
+			return this.$api.isAuthenticated()
 		}
 	},
 	mounted() {

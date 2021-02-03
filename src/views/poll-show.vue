@@ -8,7 +8,7 @@
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
 			<div v-html="$t('cannotFindPoll', {pollId: pollId})" />
-			<b-button variant="primary" class="float-right" @click="$router.push({name: 'polls'})">
+			<b-button variant="primary" class="float-right" @click="gotoPolls()">
 				{{ $t("Back") }}
 			</b-button>
 		</div>
@@ -122,9 +122,9 @@ export default {
 	},
 	created() {
 		this.$api.getPollById(this.pollId, true)
-			.then(rpoll => {
-				console.log("Received poll", rpoll, JSON.stringify(rpoll))
-				this.poll = rpoll
+			.then(receivedPoll => {
+				this.poll = receivedPoll
+				this.showError = false
 			})
 			.catch(err => {
 				console.warn("Cannot find poll.id=" + this.pollId, err)
@@ -133,6 +133,9 @@ export default {
 	},
 	mounted() {},
 	methods: {
+		goToPolls() {
+			this.$router.push({name: "polls"})
+		},
 		clickAddProposal() {
 			this.$router.push("/polls/" + this.poll.id + "/add")
 		},
