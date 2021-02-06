@@ -60,20 +60,10 @@ export default {
 		return {}
 	},
 	computed: {
-		teamName() { return this.$root.store.get("team").name },
-		members()  { return this.$root.store.get("team").members },
+		teamName() { return this.$api.teamCache.getSync("team").teamName },
+		members()  { return this.$api.teamCache.getSync("team").members },
 	},
 	created() {
-		this.$root.store.put("team", {
-			name: "Test Dummy Team",
-			members: [
-				{ name: "User1", email: "user1@liquiod.me", avatarUrl: "/img/avatars/Avatar1.png" },
-				{ name: "User2", email: "user2@liquiod.me", avatarUrl: "/img/avatars/Avatar2.png" },
-				{ name: "User3", email: "user3@liquiod.me", avatarUrl: "/img/avatars/Avatar3.png" },
-				{ name: "User4", email: "user4@liquiod.me", avatarUrl: "/img/avatars/Avatar4.png" },
-				{ name: "User5", email: "user5@liquiod.me", avatarUrl: "/img/avatars/Avatar5.png" },
-			]
-		})
 	},
 	mounted() {},
 	

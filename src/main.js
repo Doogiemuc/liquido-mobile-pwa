@@ -13,7 +13,6 @@ log.debug("NODE_ENV="+process.env.NODE_ENV+"   configuration:\n", config)
 
 import Vue from "vue"
 import RootApp from "@/root-app.vue"
-//import liquidoApi from "@/services/liquido-api"
 import router from "@/services/router"
 import "@/registerServiceWorker"
 import { BootstrapVue } from "bootstrap-vue"
@@ -63,7 +62,8 @@ const globalTranslations = {
 		Search: "Suche",
 		Warning: "Warnung",
 		Attention: "Achtung",
-		Error: "Fehler",		
+		Error: "Fehler",
+		Login: "Login",
 
 		// Singular and plural form
 		Idea: "Idee",

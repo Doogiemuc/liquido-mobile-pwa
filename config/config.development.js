@@ -7,11 +7,15 @@ import commonConfig from "./config.common.js"
 let config = {
 	LIQUIDO_API_URL: "/liquido/v2",  // will be proxied by Vue devServer. See vue.config.js
 	LIQUIDO_GRAPHQL_URL: "/liquido/v2/graphql",
-	DEV_GET_JWT_URL: "http://localhost:3001/liquido/v2/dev/getJWT",
 	DEV_LOGIN_TOKEN: 998877,  // must be same as in backend for development login
 	devLogin: {
-		username: "DevLogin User",
-		email: "devlogin_user@liquido.org"
+		getJWTURL: "http://localhost:3001/liquido/v2/dev/getJWT",
+		adminEmail: "teamadmin0@TestTeam0.org",
+		adminTeamname: "TestTeam0",
+		memberEmail: "member0@TestTeam0.org",
+		memberTeamname: "TestTeam0",
+		token: 998877,
+		
 	}
 }
 

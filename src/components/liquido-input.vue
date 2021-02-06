@@ -60,7 +60,13 @@
  *   <liquido-input v-model="idea.title" id="ideaTitleInput" :label="$t('ideaTitle')" :validFunc="isTitleValid" validateOn="blur"></liquido-input>
  */
 export default {
+
+
 	name: "LiquidoInput",
+	eMailRegEx: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}$/,
+
+	// but see https://github.com/google/libphonenumber/blob/master/FALSEHOODS.md    :-)
+	mobilephoneRegEx: /^(\+[1-9]{1}[0-9]{1,14})|(0[0-9]{3} *[-/][0-9 ]{1,50})$/,
 
 	//TODO: show character counter at the right.  (e.g for fixed length imputs  "3/6")
 
@@ -70,12 +76,12 @@ export default {
 		value: { type: String, default: "" },
 		label: { type: String, default: undefined },
 		placeholder: { type: String, default: undefined },
-		type: { type: String, required: false, default: "Text" },
+		type: { type: String, required: false, default: "Text" },  //email, mobilephonenumer
 		disabled: { type: Boolean, default: false },
 		pattern: { type: String, default: undefined },
 		maxlength: { type: Number, default: 1024 },
 		invalidFeedback: { type: String, default: undefined },
-		validFunc: { type: Function, required: false, default: () => true },
+		validFunc: { type: Function, required: false, default: () => this.defaultValidFunc() },
 		validateOn: { type: String, required: false, default: "keyup" }, //TODO: these could be arrays, e.g. validateOn: ["keyup", "blur"]
 		forceValidateOn: { type: String, required: false, default: "blur" },
 	},
@@ -105,6 +111,16 @@ export default {
 	},
 	mounted() {},
 	methods: {
+		defaultValidFunc(val) {
+			if (this.type === "email") {
+				return this.isValidEmail(val)
+			} else {
+				return true
+			}
+		},
+		isValidEmail(val) {
+			return val !== undefined && val !== null && this.eMailRegEx.test(val)
+		},
 		keyup(evt) {
 			if (this.validateOn === "keyup") {
 				this.validateField()

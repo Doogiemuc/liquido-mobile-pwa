@@ -29,8 +29,6 @@ const teamsCacheConfig = {
 	referencedPathAttr: "$ref",
 	idAttr: "id",
 }
-const teamCache  = new PopulatingCache(teamsCacheConfig)
-const CURRENT_USER_KEY = "currentUser"   // key for current user object in teamCache
 
 /**
  * fetch function for polls or one pollByID
@@ -59,7 +57,6 @@ const pollsCacheConfig = {
 	referencedPathAttr: "$ref",
 	idAttr: "id",
 }
-const pollsCache = new PopulatingCache(pollsCacheConfig)
 
 /**
  * Nice logging of HTTP error messages
@@ -91,26 +88,26 @@ export default {
 	 * @param {String} jwt JsonWebToken
 	 */
 	login(team, user, jwt) {
-		teamCache.put("team", team)
-		teamCache.put(CURRENT_USER_KEY, user)
-		teamCache.put("jwt", jwt)
+		this.teamCache.put("team", team)
+		this.teamCache.put(this.CURRENT_USER_KEY, user)
+		this.teamCache.put("jwt", jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
-		log.debug("Login: <"+user.email+"> into team '" + team.name  + "'")
+		log.debug("Login: <"+user.email+"> into team '" + team.teamName  + "'")
 	},
 
 	logout() {
 		axios.defaults.headers.common["Authorization"] = undefined
-		log.debug("Logout: "+teamCache.getSync(CURRENT_USER_KEY))
-		teamCache.emptyCache()
+		log.debug("Logout: "+this.teamCache.getSync(this.CURRENT_USER_KEY))
+		this.teamCache.emptyCache()
 	},
 
 	isAuthenticated() {
-		return axios.defaults.headers.common["Authorization"] !== undefined && teamCache.getSync(CURRENT_USER_KEY) !== undefined
+		return axios.defaults.headers.common["Authorization"] !== undefined && this.teamCache.getSync(this.CURRENT_USER_KEY) !== undefined
 	},
 
 	/** Get the currently logged in user. Will throw Error, if no one is logged in! */
 	getCurrentUser() {
-		let currentUser = teamCache.getSync(CURRENT_USER_KEY)  // get from cache, without calling the backend
+		let currentUser = this.teamCache.getSync(this.CURRENT_USER_KEY)  // get from cache, without calling the backend
 		if (!currentUser) throw new Error("No current user. Not logged in!")
 		return currentUser
 	},
@@ -120,32 +117,31 @@ export default {
 	 * @return false if no one is logged in or currently logged in user is not the admin
 	 */
 	isAdmin() {
-		let currentUser = teamCache.getSync(CURRENT_USER_KEY)
+		let currentUser = this.teamCache.getSync(this.CURRENT_USER_KEY)
 		return currentUser && currentUser.isAdmin
 	},
 
-	/*  DEPRECATED.   Use REST for devLogin!
-	async devLogin(userEmail, teamName) {
+	/** Quick development login. Only available in dev and test env!!! */
+	async devLogin(email, teamName) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
 		return axios({
 			method: "GET", 
-			url: config.DEV_GET_JWT_URL,
+			url: config.devLogin.getJWTURL,  // must be an absolute URL! Otherwise axios basePath would be prepended.
 			params: {
-				userEmail: userEmail,
-				teamName: teamName
+				email: email,
+				teamName: teamName,
+				token: config.devLogin.token
 			}
 		}).then(res => {
-			console.log("API: devLogin for <"+userEmail+"> in team '"+teamName+"'", res.data)
-			throw new Error("Not yet implemented")
-			//this.login(res.data)
-			//return res.data
+			console.log("API: devLogin for <"+email+"> in team '"+teamName+"'", res.data)
+			this.login(res.data.team, res.data.user, res.data.jwt)
+			return res.data
 		}).catch(err => { 
 			console.error(err.response ? err.response : err)
 			return Promise.reject(err.response ? err.response : err)
 		})
 	},
-	*/
 
 	/**
 	 * Create a new team. 
@@ -211,7 +207,7 @@ export default {
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let poll = res.data.createPoll
-				pollsCache.put("polls/"+poll.id, poll)
+				this.pollsCache.put("polls/"+poll.id, poll)
 				log.info("Created new poll:", poll)
 				return poll
 			})
@@ -219,14 +215,14 @@ export default {
 
 	async getPollById(pollId, force = false) {
 		//log.debug("getPollById(id="+pollId+", force="+force+")")
-		return pollsCache.get("polls/"+pollId, {
-			callBackend: force ? pollsCache.FORCE_BACKEND_CALL : pollsCache.CALL_BACKEND_WHEN_EXPIRED
+		return this.pollsCache.get("polls/"+pollId, {
+			callBackend: force ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
 		})
 	},
 
 	async getPolls(force = false) {
-		return pollsCache.get("polls", {
-			callBackend: force ? pollsCache.FORCE_BACKEND_CALL : pollsCache.CALL_BACKEND_WHEN_EXPIRED
+		return this.pollsCache.get("polls", {
+			callBackend: force ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
 		})
 	},
 
@@ -236,7 +232,7 @@ export default {
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let poll = res.data.addProposal
-				pollsCache.put("polls/"+poll.id, poll)
+				this.pollsCache.put("polls/"+poll.id, poll)
 				log.info("Added proposal to poll:", poll)
 				return poll
 			})
@@ -246,6 +242,10 @@ export default {
 	err: {
 		CANNOT_CREATE_NEW_TEAM: 1,
 		TEAM_WITH_SAME_NAME_EXISTS: 2,
-	}
+	},
+
+	teamCache: new PopulatingCache(teamsCacheConfig),
+	pollsCache: new PopulatingCache(pollsCacheConfig),
+	CURRENT_USER_KEY: "currentUser",       // key for current user object in teamCache
 
 }

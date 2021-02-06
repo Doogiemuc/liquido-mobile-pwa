@@ -11,11 +11,17 @@ const routes = [
 		path: "/",
 		name: "index",
 		redirect: "/welcome", //TODO: redirect depending on auth token
+		meta: {
+			public: true
+		}
 	},
 	{
 		path: "/login",
 		name: "login",
-		component: loginPage
+		component: loginPage,
+		meta: {
+			public: true
+		}
 	},
 	{
 		path: "/devLogin",
@@ -24,11 +30,17 @@ const routes = [
 		props: (route) => ({
 			userEmail: route.query.userEmail,
 			teamName: route.query.teamName
-		})
+		}),
+		meta: {
+			public: process.env.NODE_ENV === "development"
+		}
 	},
 	{
 		path: "/welcome",
 		component: welcomeChat,
+		meta: {
+			public: true
+		}
 	},
 	{
 		path: "/team",
@@ -68,6 +80,9 @@ const routes = [
 		name: "pageNotFound",
 		component: () => import("@/views/not-found-page"),
 		//props: true,  //MAYBE: where to go "back" ?
+		meta: {
+			public: true
+		}
 	},
 	{
 		path: "*",
@@ -91,15 +106,16 @@ const router = new Router({
 	routes,
 })
 
-// route checks for authentication and redirects
+/**
+ * Check if routeis public or requires authentication.
+ * Forward to /login if required but not authenticated.
+ */
 router.beforeEach((routeTo, routeFrom, next) => {
-	// next() must exactly be called once in this method
-	if (routeTo.path.match(/login|404|welcome/)) {
-		return next()
-	} else if (routeTo.path === "/devLogin" && process.env.NODE_ENV === "development") {
+	// Keep in mind that next() must exactly be called once in this method.
+	if (routeTo.meta.public) {
 		return next()
 	} else	
-	//every route except welcome requires auth. Forward to login if not authenticated.
+	// forward to login if not authenticated.
 	if (!router.app.$api.isAuthenticated()) {
 		console.log("Forwarding to /login")
 		return next("/login")

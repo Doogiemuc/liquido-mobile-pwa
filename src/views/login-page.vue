@@ -1,30 +1,104 @@
 <template>
-	<div class="container">
+	<div id="LoginPage" class="container">
 		<h1>Login</h1>
 		
-		<a href="/" class="btn btn-primary">{{ $t('Login') }}</a>
+		<b-card class="chat-bubble shadow-sm">
+			<p>{{ $t('LoginInfo') }}</p>
+		</b-card>
+
+		<div class="mb-3">
+			<button v-if="showDevLogin" type="button" class="btn btn-primary" @click="devLoginAdmin">
+				{{ $t("DevLoginAdmin") }}
+			</button>
+			<button v-if="showDevLogin" type="button" class="btn btn-primary ml-3" @click="devLoginMember">
+				{{ $t("DevLoginMember") }}
+			</button>
+		</div>
+
+		<b-card class="chat-bubble shadow-sm input-bubble">
+			<p>{{ $t('LoginViaEmail') }}</p>
+			<liquido-input
+				id="emailInput"
+				v-model="email"
+				:label="$t('yourEMail')"
+				:placeholder="$t('emailPlaceholder')"
+				:type="email"
+				:invalid-feedback="$t('emailInvalid')"
+			/>
+			<button type="button" class="btn btn-primary float-right">
+				{{ $t("LoginEmailButton") }}
+			</button>
+		</b-card>
+
+		<b-card class="chat-bubble shadow-sm input-bubble">
+			<p>{{ $t('LoginWithAuthy') }}</p>
+			<liquido-input
+				id="mobilephoneInput"
+				v-model="mobilephone"
+				:label="$t('yourMobilephone')"
+				:placeholder="$t('mobilephonePlaceholder')"
+				:type="mobilephone"
+				:invalid-feedback="$t('mobilephoneInvalid')"
+			/>
+			<button type="button" class="btn btn-primary float-right">
+				{{ $t("OpenAuthy") }}
+			</button>
+		</b-card>
 	</div>
 </template>
 
 <script>
-//import config from "config"
+import config from "config"
+import liquidoInput from "@/components/liquido-input"
 
 export default {
 	i18n: {
 		messages: {
 			de: {
-				Login: "Login"
+				LoginInfo: "Es gibt mehrere Möglichkeiten wie du dich bei LIQUIDO einloggen kannst.",
+
+				yourEMail: "Deine Email",
+				LoginViaEmail: "Ich kann dir einen MagicLink per E-Mail schicken. Mit diesem kannst du dich dann ganz einfach einloggen.",
+				LoginEmailButton: "Link zuschicken",
+				emailPlaceholder: "info@domain.de",
+				emailInvalid: "E-Mail ungültig",
+
+				yourMobilephone: "Deine Handynummer",
+				LoginWithAuthy: "Du kannst dich mit der Authy App und einem One Time Token einloggen. Das ist besonders sicher",
+				OpenAuthy: "Authy öffnen",
+				mobilephonePlaceholder: "info@domain.de",
+				mobilephoneInvalid: "E-Mail ungültig",
+
+				DevLoginAdmin: "devLogin: Admin",
+				DevLoginMember: "devLogin: Member",
 			}
 		}
 	},
-	components: {},
+	components: { liquidoInput },
 	data() {
-		return {}
+		return {
+			email: "",
+			mobilephone: "",
+		}
 	},
-	computed: {},
+	computed: {
+		showDevLogin() {
+			return process.env.NODE_ENV === "development"
+		}
+	},
 	created() {
 	},
 	methods: {
+		devLoginAdmin() {
+			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname).then(() => {
+				this.$router.push("/team")
+			})
+		},
+		devLoginMember() {
+			this.$api.devLogin(config.devLogin.memberEmail, config.devLogin.memberTeamname).then(() => {
+				this.$router.push("/team")
+			})
+		}
 	},
 }
 </script>
