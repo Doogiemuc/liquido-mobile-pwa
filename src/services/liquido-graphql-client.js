@@ -35,7 +35,7 @@ const teamsCacheConfig = {
  */
 const fetchPollFunc = function(path) {
 	if (path[0] === "polls") {
-		log.debug("Fetch all poll of team from backend: "+JSON.stringify(path))
+		log.debug("fetchPollFunc: Fetch all poll of team from backend")
 		let graphQL = `query { polls { id, title, status, proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
 		return axios.post("/", {query: graphQL}).then(res => res.data.polls)
 	} else if (path[0].polls) {
@@ -176,9 +176,9 @@ export default {
 			// Further up some UI method will do something about the error, e.g. show an meaningful error message to the user.
 	},
 
-	async joinTeam(inviteCode, userName, userEmail, userMobilephone) {
+	async joinTeam(inviteCode, userName, userEmail) {
 		let graphQL = `mutation {	
-			joinTeam(inviteCode: "${inviteCode}", userName: "${userName}", userEmail: "${userEmail}", userMobilephone: "${userMobilephone}") {
+			joinTeam(inviteCode: "${inviteCode}", userName: "${userName}", userEmail: "${userEmail}") {
 				team {
 					id
 					teamName

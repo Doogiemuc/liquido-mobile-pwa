@@ -11,21 +11,34 @@
 			class="alert alert-success"
 		>
 			{{ successMessage }}
-			<router-link
-				tag="button"
-				class="btn btn-primary float-right"
-				:to="{name: 'polls'}"
-			>
-				Ok
-			</router-link>
 		</div>
 		<div class="clearfix" />
+
+
+		<router-link
+			id="GoToPollsButton"
+			tag="button"
+			class="btn btn-primary"
+			:to="{name: 'polls'}"
+		>
+			Polls
+		</router-link>
+		<router-link
+			id="GoToTeamButton"
+			tag="button"
+			class="btn btn-primary ml-3"
+			:to="{name: 'teamHome'}"
+		>
+			Team
+		</router-link>
+
 		<div
 			v-if="errorMessage"
 			class="alert alert-danger"
 		>
 			{{ errorMessage }}
 		</div>
+		
 		<div v-if="polls">
 			<router-link :to="{ name: 'polls'}">
 				<h4>Polls of Team</h4>
@@ -41,8 +54,9 @@
 				</li>
 			</ul>
 		</div>
-		<h4>LoginData</h4>
-		<pre>{{ $api.loginData }}</pre>
+		
+		<h4 class="mt-3">LoginData</h4>
+		<pre><small>{{ this.loginData }}</small></pre>
 	</div>
 </template>
 
@@ -61,7 +75,8 @@ export default {
 		return { 
 			successMessage: undefined,
 			errorMessage: undefined,
-			polls: undefined
+			polls: undefined,
+			loginData: undefined
 		}
 	},
 	computed: {
@@ -73,6 +88,7 @@ export default {
 		this.message = "Sending /devLogin request ..."
 		this.$api.devLogin(this.userEmail, this.teamName)
 			.then(loginData => { 
+				this.loginData = loginData
 				this.polls = loginData.polls
 				this.errorMessage = undefined
 				this.successMessage = "devLogin successfull"

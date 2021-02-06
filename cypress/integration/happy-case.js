@@ -7,11 +7,12 @@
 //import { inspect } from 'util'  // better than JSON.stringify
 
 import config from '../../config/config.test'
+
 let now = Date.now() % 10000
 
 console.log("Running Cypress HAPPY CASE test (test_uuid="+now+")", config)
 
-let fix = {}
+let fix = {}  // Test fixtures within this test RUN
 
 context('Happy Case', () => {
 	before(() => {
@@ -32,7 +33,7 @@ context('Happy Case', () => {
 		console.log("===================================================")
 	})
 
-	/*
+	/* @DEPRECTED The app checks this.
 	it('Liquido mobile backend API is available', () => {
 		cy.request({
 			url: Cypress.env("LIQUIDO_API"),   // This URL is configured in /cypress.json
@@ -49,7 +50,7 @@ context('Happy Case', () => {
 	})
 	*/
 
-	it.only('Create new team, poll and add first proposal', function() {
+	it('Create new team, poll and add first proposal', function() {
 		//GIVEN
 		assert.isString(fix.adminName)
 		assert.isString(fix.teamName)
@@ -94,13 +95,12 @@ context('Happy Case', () => {
 		cy.get('#saveProposalButton').click()
 		cy.get('#createdSuccessfullyButton').click()
 		//THEN the poll is shown with that proposal
-		cy.get('#poll-show')
+		cy.get('#poll-show').should('be.visible')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle)
+
 	})
 
 	//TODO: create test with mocked error response to check error modal
-
-	
 	
 	it('Join team', function() {
 		//GIVEN
@@ -117,26 +117,35 @@ context('Happy Case', () => {
 		cy.get('#joinTeamOkButton').click()
 
 		//THEN
-		cy.get('#joinedTeamBubble')
+		cy.get('#joinedTeamBubble').should('contain.text', fix.teamName)
+		cy.get('#joinedTeamGoToTeamButton').click()
+		cy.get('#team-home').should('contain.text', fix.teamName)
 	})
 
 	
-	it('Show team', function() {
+	it('Show team and its polls', function() {
 		//GIVEN a logged in user
-		//TODO: login user
+		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
+		//WHEN  goint to team-home
+		cy.get('#GoToTeamButton').click()
+		//THEN correct team-home is shown
+		cy.get('#team-home').should('contain.text', fix.teamName)
 
-		//WHEN
-		cy.visit('/team')
+		//WHEN navigating to team's polls
+		cy.get('#gotoPollsButton').click()
+		//THEN then a poll with the created proposal from above
+		cy.get('.poll-panel-title').should('contain.text', fix.pollTitle)
+		cy.get('.poll-panel .law-title').should('contain.text', fix.proposalTitle)
+		//cy.get('.poll-panel div.list-group').children('.proposal-list-group-item').should('have.length', 1)
 
-		//THEN
-		cy.get('#team-home')
 	})
 	
 	
-
+	/* TODO
 	it('cleanup DB', function() {
-		//TODO: 
+		
 	})
+	*/
 	
 
 })

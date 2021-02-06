@@ -32,7 +32,7 @@ const routes = [
 			teamName: route.query.teamName
 		}),
 		meta: {
-			public: process.env.NODE_ENV === "development"
+			public: process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
 		}
 	},
 	{

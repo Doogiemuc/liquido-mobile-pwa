@@ -133,6 +133,7 @@
 			<b-card	id="joinedTeamBubble"	:class="{ 'collapse-max-height': flowState !== 12 }" class="chat-bubble shadow-sm">
 				<p v-html="$t('joinedTeamSuccessfully', { teamName: team.teamName })" />
 				<b-button
+					id="joinedTeamGoToTeamButton"
 					variant="primary"
 					class="float-right mb-1"
 					@click="$router.push('/team')"
@@ -435,6 +436,7 @@ export default {
 		userNameSubmit() {
 			this.$refs.userNameInput.validateField(true)
 			if (this.isUsernameValid(this.user.name) && this.flowState === 3) {
+				this.user.name = this.user.name.trim()
 				this.flowState = 4
 				$("#userNameInput").blur()
 				this.scrollToBottom()
@@ -532,16 +534,10 @@ export default {
 		joinTeam() {
 			this.flowState = 11
 			log.info(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
-			let joinTeamRequest = {
-				inviteCode: this.inviteCode,
-				userName: this.user.name,
-				userEmail: this.user.email,
-				userMobilephone: this.user.mobilephone
-			}
-			this.$api.joinTeam(joinTeamRequest)
-				.then(res => {
+			this.$api.joinTeam(this.inviteCode, this.user.name, this.user.email, this.user.mobilephone)
+				.then(team => {
 					this.flowState = 12
-					this.team = res.team
+					this.team = team
 					this.$nextTick(() => {
 						this.scrollElemToTop("#joinedTeamBubble", 0)
 					})
