@@ -69,7 +69,7 @@
 			/>
 		</div>
 
-		<b-modal id="successModal" 
+		<b-modal id="proposalSuccessfullyAddedModal" 
 			title="Danke"
 			hide-header-close
 			no-close-on-esc
@@ -170,7 +170,7 @@ export default {
 
 		saveProposal() {
 			this.$api.addProposal(this.poll.id, this.proposal.title, this.proposal.description)
-				.then(() => this.$bvModal.show("successModal"))
+				.then(() => this.$bvModal.show("proposalSuccessfullyAddedModal"))
 				.catch(err => {
 					console.error("Cannot add proposal", err)
 				})

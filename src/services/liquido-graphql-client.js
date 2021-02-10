@@ -121,6 +121,8 @@ export default {
 		return currentUser && currentUser.isAdmin
 	},
 
+	//TODO: loginWithEmailToken(token) {  }
+
 	/** Quick development login. Only available in dev and test env!!! */
 	async devLogin(email, teamName) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")

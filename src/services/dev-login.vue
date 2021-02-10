@@ -6,7 +6,7 @@
 		<div class="alert alert-secondary">
 			NODE_ENV="{{ nodeEnv }}"
 		</div>
-		<div
+		<div id="devLoginSuccessful"
 			v-if="successMessage"
 			class="alert alert-success"
 		>

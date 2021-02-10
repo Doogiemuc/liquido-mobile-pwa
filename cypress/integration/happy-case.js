@@ -1,15 +1,13 @@
 /**
- * End-2-end HAPPY CASE test for liquido-mobile-pwa frontend
+ * End-2-end HAPPY CASE test for liquido-mobile-pwa frontend.
+ * This test runs through the easiest possible use case flow.
+ * Only the successful "happy path" without any error cases or edge cases.
  */
-
-//const { expect } = require("chai")
-
 //import { inspect } from 'util'  // better than JSON.stringify
 
 import config from '../../config/config.test'
 
 let now = Date.now() % 10000
-
 console.log("Running Cypress HAPPY CASE test (test_uuid="+now+")", config)
 
 let fix = {}  // Test fixtures within this test RUN
@@ -32,23 +30,6 @@ context('Happy Case', () => {
 		console.log("    TEST CASE >>>", Cypress.mocha.getRunner().suite.ctx.currentTest.title, "<<<")
 		console.log("===================================================")
 	})
-
-	/* @DEPRECTED The app checks this.
-	it('Liquido mobile backend API is available', () => {
-		cy.request({
-			url: Cypress.env("LIQUIDO_API"),   // This URL is configured in /cypress.json
-			timeout: 1000
-		}).then(res => {
-			if (res.status === 200) {
-				console.log("Liquido mobile backend API is reachable at "+Cypress.env("LIQUIDO_API"))
-			} else {
-				console.error("Cannot connect to liquido mobile backend API at"+Cypress.env("LIQUIDO_API"))
-				cy.log("Cannot connect to liquido mobile backend API at"+Cypress.env("LIQUIDO_API"))
-				Cypress.runner.stop();
-			}
-		})
-	})
-	*/
 
 	it('Create new team, poll and add first proposal', function() {
 		//GIVEN
@@ -103,12 +84,14 @@ context('Happy Case', () => {
 	//TODO: create test with mocked error response to check error modal
 	
 	it('Join team', function() {
-		//GIVEN
+		//GIVEN inviteCode and data for new member
 		assert.isString(fix.inviteCode, "Need inviteCode to test joinTeam")
 		assert.isString(fix.userName)
 		assert.isString(fix.userEmail)
+		assert.isString(fix.pollTitle, "Need existing poll to test joinTeam")
+		assert.isString(fix.proposalTitle, "Need existing proposal to test joinTeam")
 
-		//WHEN
+		//WHEN joining a team
 		cy.visit("/")
 		cy.get('#userNameInput').type(fix.userName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
 		cy.get('#joinTeamButton').click()
@@ -116,16 +99,25 @@ context('Happy Case', () => {
 		cy.get('#emailInput').type(fix.userEmail)
 		cy.get('#joinTeamOkButton').click()
 
-		//THEN
+		//THEN team-home is shown
 		cy.get('#joinedTeamBubble').should('contain.text', fix.teamName)
 		cy.get('#joinedTeamGoToTeamButton').click()
 		cy.get('#team-home').should('contain.text', fix.teamName)
+
+		//WHEN navigating to team's polls
+		cy.get("#gotoPollsButton").click()
+		cy.get("#polls")
+
+		//THEN poll with proposal should be shown
+		cy.get('.poll-panel-title').should('contain.text', fix.pollTitle)
+		cy.get('.poll-panel .law-title').should('contain.text', fix.proposalTitle)
 	})
 
 	
 	it('Show team and its polls', function() {
 		//GIVEN a logged in user
 		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
+		cy.get("#devLoginSuccessful").should('be.visible')
 		//WHEN  goint to team-home
 		cy.get('#GoToTeamButton').click()
 		//THEN correct team-home is shown
