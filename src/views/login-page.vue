@@ -6,11 +6,11 @@
 			<p>{{ $t('LoginInfo') }}</p>
 		</b-card>
 
-		<div class="mb-3">
-			<button v-if="showDevLogin" type="button" class="btn btn-primary" @click="devLoginAdmin">
-				{{ $t("DevLoginAdmin") }}
+		<div class="mb-3" v-if="showDevLogin">
+			<button  type="button" class="btn btn-primary" @click="devLoginAdmin">
+				<i class="fas fa-shield-alt"></i> {{ $t("DevLoginAdmin") }}
 			</button>
-			<button v-if="showDevLogin" type="button" class="btn btn-primary ml-3" @click="devLoginMember">
+			<button type="button" class="btn btn-primary ml-3" @click="devLoginMember">
 				{{ $t("DevLoginMember") }}
 			</button>
 		</div>

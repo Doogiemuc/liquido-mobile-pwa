@@ -17,19 +17,13 @@
 			</template>
 		</liquido-input>
 
-		<poll-panel v-for="poll in filteredPolls" :key="poll.id" :poll="poll" class="shadow mb-3" />
+		<poll-panel v-for="poll in filteredPolls" :key="poll.id" :poll="poll" :expanded="false" class="shadow mb-3" />
 
 		<div v-if="polls.length === 0" class="alert alert-secondary">
 			<p v-html="$t('noPollsYet')" />
 		</div>
 
-		<div v-if="
-				filteredPolls.length === 0 &&
-					searchQuery &&
-					searchQuery.trim().length > 0
-			"
-			class="alert alert-secondary"
-		>
+		<div v-if="searchResultIsEmpty" class="alert alert-secondary">
 			<p v-html="$t('noPollsMatchSearch')" />
 		</div>
 		<div
@@ -145,6 +139,9 @@ export default {
 					return !this.pollStatusFilter || poll.status === this.pollStatusFilter
 				})
 				.filter((poll) => this.matchesSearch(poll))
+		},
+		searchResultIsEmpty() {
+			return this.filteredPolls.length === 0 && this.searchQuery && this.searchQuery.trim().length > 0
 		},
 		pollsInElaboration() {
 			return this.polls.filter((poll) => poll.status === "ELABORATION").length

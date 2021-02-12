@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import EventBus from "@/services/event-bus"
+
 export default {
 	name: "LiquidoHeader",
 	i18n: {
@@ -34,17 +36,19 @@ export default {
 		// show a "backlink". You can pass an URL or the keyworkd "BACK" to use browsers back
 		backLink: { type: String, required: false, default: undefined },
 	},
+	
 	data() {
 		return {
 			filterByStatus: "ELABORATION",
+			isLoggedIn: false,
 		}
 	},
 	computed: {
-		isLoggedIn() {
-			return this.$api.isAuthenticated()
-		}
 	},
 	mounted() {
+		EventBus.$on(EventBus.LOGIN, () => this.isLoggedIn = true)
+		EventBus.$on(EventBus.LOGOUT, () => this.isLoggedIn = false)
+
 		// make header smaller when user scrolls down
 		$("#app").scroll(this.transitionHeader)
 	},

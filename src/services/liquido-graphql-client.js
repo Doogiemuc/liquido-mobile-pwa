@@ -5,6 +5,7 @@
 import axios from "axios"
 import config from "config"
 import PopulatingCache from "populating-cache"
+import EventBus from "@/services/event-bus"
 
 const log = require("loglevel").getLogger("liquido-api");
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
@@ -88,17 +89,22 @@ export default {
 	 * @param {String} jwt JsonWebToken
 	 */
 	login(team, user, jwt) {
-		this.teamCache.put("team", team)
+		this.teamCache.put(this.TEAM_KEY, team)
+		//TODO: add user.isAdmin    But SECURE also IT in the backend!
 		this.teamCache.put(this.CURRENT_USER_KEY, user)
 		this.teamCache.put("jwt", jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
+		EventBus.$emit(EventBus.LOGIN, user)
 		log.debug("Login: <"+user.email+"> into team '" + team.teamName  + "'")
 	},
 
 	logout() {
 		axios.defaults.headers.common["Authorization"] = undefined
-		log.debug("Logout: "+this.teamCache.getSync(this.CURRENT_USER_KEY))
+		this.isLoggedIn = false
+		EventBus.$emit(EventBus.LOGOUT)
 		this.teamCache.emptyCache()
+		this.pollsCache.emptyCache()
+		log.debug("Logout: "+this.teamCache.getSync(this.CURRENT_USER_KEY))
 	},
 
 	isAuthenticated() {
@@ -118,7 +124,9 @@ export default {
 	 */
 	isAdmin() {
 		let currentUser = this.teamCache.getSync(this.CURRENT_USER_KEY)
-		return currentUser && currentUser.isAdmin
+		let team        = this.teamCache.getSync(this.TEAM_KEY)
+		if (!currentUser || !team || !team.admins) return false
+		return team.admins.map(admin => admin.id).includes(currentUser.id)
 	},
 
 	//TODO: loginWithEmailToken(token) {  }
@@ -249,5 +257,7 @@ export default {
 	teamCache: new PopulatingCache(teamsCacheConfig),
 	pollsCache: new PopulatingCache(pollsCacheConfig),
 	CURRENT_USER_KEY: "currentUser",       // key for current user object in teamCache
+	TEAM_KEY: "team",
 
+	isLoggedIn: false,
 }

@@ -39,13 +39,14 @@ context('Happy Case', () => {
 
 		//WHEN
 		cy.visit("/")
-		cy.get('#userNameInput').type(fix.adminName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
+		cy.get('#userNameInput', {timeout: 8000}).type(fix.adminName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
 		cy.get('#createNewTeamButton').click()
 		cy.get('#teamNameInput').type(fix.teamName)
 		cy.get('#adminEmailInput').type(fix.adminEmail)
 		cy.get('#createNewTeamOkButton').click()
 
 		//THEN
+		cy.get('#welcomeChatErrorModal').should('not.exist')   // no error modal is shown
 		cy.get('#newTeamCreatedBubble')
 		//TODO: cy.get("#inviteLink").should('contain', 'http')
 		cy.get('#newTeamInviteCode').invoke('text').should('have.length.of.at.least', 6)
@@ -93,7 +94,7 @@ context('Happy Case', () => {
 
 		//WHEN joining a team
 		cy.visit("/")
-		cy.get('#userNameInput').type(fix.userName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
+		cy.get('#userNameInput', {timeout: 8000}).type(fix.userName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
 		cy.get('#joinTeamButton').click()
 		cy.get('#inviteCodeInput').type(fix.inviteCode)
 		cy.get('#emailInput').type(fix.userEmail)

@@ -244,13 +244,14 @@
 		<!-- Error modal -->
 		<b-modal 
 			id="welcomeChatErrorModal"
-			ref="errorModal"
+			ref="welcomeChatErrorModal"
 			:title="errorTitle"
 			centered
 			ok-only
 			no-close-on-esc
 			no-close-on-backdrop
 			hide-header-close
+			:content-class="errorModalClasses"
 		>
 			{{ errorMessage }}
 		</b-modal>
@@ -382,6 +383,7 @@ export default {
 			// localized message in the error modal popup
 			errorTitle: this.$t("Error"),
 			errorMessage: "",
+			errorVariant: "info",
 		}
 	},
 	computed: {
@@ -391,6 +393,16 @@ export default {
 		createNewTeamOkButtonDisabled() {
 			return !this.isTeamNameValid(this.team.teamName) || !this.isAdminEmailValid(this.user.email) || this.flowState > 20
 		},
+		errorModalClasses() {
+			switch (this.errorVariant) {
+				case "error":
+					return { "bg-danger" : true, "text-white": true }
+				case "warning": 
+					return { "bg-warning" : true, "text-dark": true }
+				default:
+					return { "bg-info" : true, "text-white": true }
+			}
+		}
 	},
 	watch: {
 		
@@ -411,9 +423,9 @@ export default {
 		$("html, body").scrollTop(0)
 		this.flowState = 0
 		this.$api.pingApi().catch(() => {
-			this.errorTitle = undefined // this.$t("Attention")
+			this.errorTitle = this.$t("Attention")
 			this.errorMessage = this.$t("areYouOffline")
-			this.$refs["errorModal"].show()
+			this.$refs["welcomeChatErrorModal"].show()
 		})
 
 		if (this.isBottomInView("#welcomeBubble")) {
@@ -514,14 +526,18 @@ export default {
 					})
 				})
 				.catch((err) => {			// on error show modal
-					let errCode = err.response.data.liquidoErrorCode
+					let errCode = err && err.response && err.response && err.response.data ? err.response.data.liquidoErrorCode : undefined
+					// https://babeljs.io/docs/en/babel-plugin-proposal-optional-chaining  Here Babel is cool. Ey, you need this cool top notch language feature. Just "install" it :-)
+					//MAYBE:  let errCode = err?.response?.data?.liquidoErrorCode  
 					if (errCode === this.$api.err.TEAM_WITH_SAME_NAME_EXISTS) {
+						this.errorTitle = this.$t("Error")
 						this.errorMessage = this.$t("teamWithSameNameExists")
 					} else {
+						this.errorTitle = this.$t("Error")
 						this.errorMessage = this.$t("cannotCreateNewTeam")
 						log.error("Cannot create new team", err)
 					}
-					$("#errorMessage").modal({show: true})
+					this.$refs["welcomeChatErrorModal"].show()
 					this.flowState = 20
 				})
 		},
