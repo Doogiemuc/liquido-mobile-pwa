@@ -328,8 +328,7 @@ export default {
 					"Wahlvorschlag (<i class='fas fa-vote-yea'></i>) hinzufügen.",
 				createPoll: "Abstimmung anlegen",
 
-				error: "Fehler",
-				areYouOffline: "Der Liquido Server ist nicht erreichbar. Bist du offline? Bitte schalte dein WLAN ein.",
+				areYouOffline: "Der LIQUIDO Server ist nicht erreichbar. Bist vielleicht du offline? Bitte schalte dein WLAN ein.",
 				teamWithSameNameExists: "Ein Teamm mit diesem Namen existiert bereits. Bitte wählen einen anderen Namen für dein Team.",
 				cannotCreateNewTeam: "Es tut uns sehr leid, das neue Team konnt nicht angelegt werden. Bitte versuche es später noch einmal.",
 				cannotJoinTeam: "Du kannst diesem Team nicht beitreten. {errorDetails}"
@@ -396,11 +395,11 @@ export default {
 		errorModalClasses() {
 			switch (this.errorVariant) {
 				case "error":
-					return { "bg-danger" : true, "text-white": true }
+					return "bg-danger text-white"
 				case "warning": 
-					return { "bg-warning" : true, "text-dark": true }
+					return "bg-warning text-dark"
 				default:
-					return { "bg-info" : true, "text-white": true }
+					return "bg-info text-white"
 			}
 		}
 	},

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="team-home">
 		<h2 id="team-home" class="page-title">
 			{{ teamName }}
 		</h2>
@@ -87,6 +87,10 @@ export default {
 </script>
 
 <style lang="scss">
+.team-home {
+	background-color: white;
+}
+
 #adminCards {
 	.card {
 		width: 30%;

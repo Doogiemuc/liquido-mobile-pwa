@@ -4,7 +4,7 @@
 			{{ pageTitleLoc }}
 		</h2>
 
-		<poll-panel v-if="poll.id" id="pollPanel" :poll="poll" :read-only="true" class="shadow mb-3" />
+		<poll-panel v-if="poll.id" :poll="poll" :read-only="true" class="shadow mb-3" />
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
 			<div v-html="$t('cannotFindPoll', {pollId: pollId})" />
@@ -113,7 +113,7 @@ export default {
 				return true
 			}
 			let currentUser = this.$api.getCurrentUser()
-			if (currentUser.isAdmin) return true
+			if (currentUser && currentUser.isAdmin) return true
 			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUser.id).length === 0
 		},
 		showStartVotingPhase() {

@@ -54,7 +54,7 @@ const fetchPollFunc = function(path) {
  */
 const pollsCacheConfig = {
 	fetchFunc: fetchPollFunc,
-	ttl: 10*60*1000,
+	ttl: 60*1000,
 	referencedPathAttr: "$ref",
 	idAttr: "id",
 }
@@ -101,21 +101,23 @@ export default {
 	logout() {
 		axios.defaults.headers.common["Authorization"] = undefined
 		this.isLoggedIn = false
+		log.debug("Logout")
 		EventBus.$emit(EventBus.LOGOUT)
 		this.teamCache.emptyCache()
 		this.pollsCache.emptyCache()
-		log.debug("Logout: "+this.teamCache.getSync(this.CURRENT_USER_KEY))
 	},
 
 	isAuthenticated() {
 		return axios.defaults.headers.common["Authorization"] !== undefined && this.teamCache.getSync(this.CURRENT_USER_KEY) !== undefined
 	},
 
-	/** Get the currently logged in user. Will throw Error, if no one is logged in! */
+	/** 
+	 * Synchrounously get the currently logged in user from local cache.
+	 * @return {Object} Currently logged in user from local cache.
+	 * @throws Error, if no one is logged in or user in cache is expired!
+	 */
 	getCurrentUser() {
-		let currentUser = this.teamCache.getSync(this.CURRENT_USER_KEY)  // get from cache, without calling the backend
-		if (!currentUser) throw new Error("No current user. Not logged in!")
-		return currentUser
+		return this.teamCache.getSync(this.CURRENT_USER_KEY)  // get from cache, without calling the backend
 	},
 
 	/** 
@@ -123,7 +125,7 @@ export default {
 	 * @return false if no one is logged in or currently logged in user is not the admin
 	 */
 	isAdmin() {
-		let currentUser = this.teamCache.getSync(this.CURRENT_USER_KEY)
+		let currentUser = this.getCurrentUser()
 		let team        = this.teamCache.getSync(this.TEAM_KEY)
 		if (!currentUser || !team || !team.admins) return false
 		return team.admins.map(admin => admin.id).includes(currentUser.id)

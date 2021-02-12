@@ -49,10 +49,14 @@ export default {
 			const fromDepth = from.path.split("/").length
 			const toDepth = to.path.split("/").length
 			this.transitionName = ""
+			// specific transtions
+			if (from.name === "teamHome")  { this.transitionName = "slide-left" } else
+			if (to.name === "teamHome")  { this.transitionName = "slide-up" } else   // click on icon in liquido-header
+			if (from.name === "createPoll" && to.name === "showPoll") { this.transitionName = "slide-left" } else
+			// transition from one depth to another
 			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
 			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
-			if (from.path === "/team")  { this.transitionName = "slide-left" } else
-			if (from.name === "createPoll" && to.name === "showPoll") { this.transitionName = "slide-left" } else
+			// default is fade
 			if (fromDepth === toDepth) { this.transitionName = "fade" }
 		},
 	},
@@ -117,4 +121,20 @@ export default {
 	-webkit-transform: translate(-100%, 0);
 	transform: translate(-100%, 0);
 }
+
+.slide-up-enter {
+	-webkit-transform: translate(0, 100%);
+	transform: translate(0, 100%);
+}
+.slide-up-leave-active {
+	position: absolute;
+	width: 100%;
+}
+.slide-up-leave-to {
+	-webkit-transform: translate(0, 0);
+	transform: translate(0, 0);
+}
+
+
+
 </style>

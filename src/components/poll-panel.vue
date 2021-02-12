@@ -1,5 +1,5 @@
 <template>
-	<b-card :pollid="poll.id" no-body class="poll-panel shadow mb-3">
+	<b-card :id="pollCardId" :pollid="poll.id" no-body class="poll-panel shadow mb-3">
 		<template #header>
 			<h4 v-if="readOnly" class="read-only poll-panel-title">
 				<i class="fas fa-poll" />
@@ -7,7 +7,7 @@
 			</h4>
 			<h4 v-else class="poll-panel-title" @click="goToPoll(poll.id)">
 				<i class="fas fa-angle-double-right goto-poll-icon" />
-				<i class="fas fa-poll" />
+				<i :class="iconForPoll" />
 				&nbsp;{{ poll.title }}
 			</h4>
 		</template>
@@ -89,7 +89,22 @@ export default {
 	data() {
 		return {}
 	},
-	computed: {},
+	computed: {
+		pollCardId() { return "PollCard_"+this.poll.id },
+		iconForPoll() {
+			if (!this.poll) return undefined
+			switch (this.poll.status) {
+				case "ELABORATION":
+					return "far fa-comments"   // or fa-poll?
+				case "VOTING":
+					return "fas fa-person-booth"    // fa-vote-yea
+				case "FINISHED":
+					return "fas fa-university"
+				default:
+					return undefined
+			}
+		},
+	},
 	mounted() {
 		if (!this.expanded) this.toggleCollapse() // collapse the proposal descriptions when initially not expanded. This is animated!
 	},
@@ -100,34 +115,10 @@ export default {
 			return moment(dateVal).format("L")
 		},
 
-		/*
-		getIconForLaw(law) {
-			switch (law.status) {
-				case "IDEA":
-					return "far fa-lightbulb"
-				case "PROPOSAL":
-					return "far fa-file-alt"
-				case "ELABORATION":
-					return "far fa-comments"
-				case "VOTING":
-					return "fas fa-vote-yea"
-				case "LAW":
-					return "fas fa-balance-scale-left"
-				case "DROPPED":
-					return "far fa-window-close"
-				case "RETENTION":
-					return "fas fa-temperature-low"
-				case "RETRACTED":
-					return "fas fa-backspace"
-				default:
-					return "fas fa-university"
-			}
-		},
-		*/
-
 		toggleCollapse() {
-			$(".proposal-list-group-item").toggleClass("collapse-law-panel")
-			$(".collapse-icon").toggleClass("collapsed")
+			console.log("toggleCollapse #"+this.pollCardId)
+			$("#"+this.pollCardId + " .proposal-list-group-item").toggleClass("collapse-law-panel")
+			$("#"+this.pollCardId + " .collapse-icon").toggleClass("collapsed")
 		},
 
 		goToPoll(pollId) {
@@ -142,18 +133,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* size of law proposal image */
-$avatar_size: 32px;
+/* size of proposal image */
+$proposal_img_size: 32px;
 
 .poll-panel {
 	.card-header {
 		margin: 0;
 		padding: 0;
+		background-color: $secondary-bg;
 		h4 {
 			// same as .law-title
 			color: $primary;
 			margin: 8px 10px;
-			font-size: 18px;
+			font-size: 14px;
+			font-weight: bold;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -186,17 +179,18 @@ $avatar_size: 32px;
 
 	// law-panel inside poll panel - list of proposals in poll
 	.proposal-list-group-item {
-		height: 8rem;  // 30px + 25px + $avatar_size + 15px; // title + subtitle + avatar_img + padding
+		height: 8rem;  // 30px + 25px + $proposal_img_size + 15px; // title + subtitle + avatar_img + padding
 		overflow: hidden;
 		padding: 10px;
 		transition: height 0.5s;
+		//background-color: $secondary-bg;
 		&.collapse-law-panel {
-			height: 55px;
+			height: 18px + $proposal_img_size;
 		}
 		.law-title {
 			margin-bottom: 0px;
 			padding: 0;
-			font-size: 18px;
+			font-size: 14px;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -207,24 +201,24 @@ $avatar_size: 32px;
 			margin-bottom: 5px;
 		}
 		.flex-fixed-width {
-			flex: 0 0 $avatar_size + 10px;
+			flex: 0 0 $proposal_img_size + 10px;
 			//border: 1px solid red;
 		}
 		.law-image {
 			border-radius: 5px;
-			min-width: $avatar_size;
-			max-width: $avatar_size;
-			width: $avatar_size;
-			min-height: $avatar_size;
-			max-height: $avatar_size;
-			height: $avatar_size;
+			min-width: $proposal_img_size;
+			max-width: $proposal_img_size;
+			width: $proposal_img_size;
+			min-height: $proposal_img_size;
+			max-height: $proposal_img_size;
+			height: $proposal_img_size;
 			margin-right: 10px;
 		}
 
 		.law-description {
 			font-size: 12px;
-			height: $avatar_size;
-			max-height: $avatar_size;
+			height: $proposal_img_size;
+			max-height: $proposal_img_size;
 			overflow: hidden;
 		}
 		.like-button {

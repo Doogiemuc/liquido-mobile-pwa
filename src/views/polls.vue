@@ -20,46 +20,42 @@
 		<poll-panel v-for="poll in filteredPolls" :key="poll.id" :poll="poll" :expanded="false" class="shadow mb-3" />
 
 		<div v-if="polls.length === 0" class="alert alert-secondary">
-			<p v-html="$t('noPollsYet')" />
+			<p v-html="$t('noPollYet')" />
 		</div>
 
 		<div v-if="searchResultIsEmpty" class="alert alert-secondary">
 			<p v-html="$t('noPollsMatchSearch')" />
 		</div>
-		<div
-			v-if="
-				filteredPolls.length === 0 &&
-					!searchQuery &&
-					pollStatusFilter === 'ELABORATION'
-			"
-			class="alert alert-secondary"
-		>
-			<p v-html="$t('noPollsInElaboration')" />
-			<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
+
+		<div v-if="pollStatusFilter === 'ELABORATION'">
+			<div v-if="!searchResultIsEmpty" class="alert alert-info">
+				<i class="fas fa-info-circle float-right" />
+				<p v-html="$t('pollsInElaborationInfo')" />
+			</div>
+
+			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-secondary">
+				<p v-html="$t('noPollsInElaboration')" />
+				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
+			</div>
 		</div>
-		<div
-			v-if="
-				filteredPolls.length === 0 &&
-					!searchQuery &&
-					pollStatusFilter === 'VOTING'
-			"
-			class="alert alert-secondary"
-		>
-			<p v-html="$t('noPollsInVoting')" />
-			<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')" />
+
+		<div v-if="pollStatusFilter === 'VOTING'">
+			<div v-if="!searchResultIsEmpty" class="alert alert-info">
+				<i class="fas fa-info-circle float-right" />
+				<p v-html="$t('pollsInVotingInfo')" />
+			</div>
+			<div v-if="filteredPolls.length === 0 && !searchQuery"
+				class="alert alert-secondary">
+				<p v-html="$t('noPollsInVoting')" />
+				<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')" />
+			</div>
 		</div>
-		<div
-			v-if="
-				filteredPolls.length === 0 &&
-					!searchQuery &&
-					pollStatusFilter === 'FINISHED'
-			"
-			class="alert alert-secondary"
-		>
+
+		<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'FINISHED'"
+			class="alert alert-secondary">
 			<p v-html="$t('noFinishedPolls')" />
 			<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
 		</div>
-
 
 		<div v-if="userIsAdmin" class="my-5 text-right">
 			<b-button variant="primary" @click="createPoll()">
@@ -92,7 +88,11 @@ export default {
 				butPollInVoting: "However there is a poll in which you can vote.",
 			},
 			de: {
-				noPollsYet: "Euer Admin hat bisher noch keine Abstimmung erstellt.",
+				pollsInElaborationInfo: 
+					"<p>Bitte diskutiert die Wahlvorschläge in diesen Abstimmungen. Die jeweiligen Ersteller können ihren Vorschlag auch noch anpassen.</p>" +
+					"<p>In dieser Phase kann jedes Teammitglied auch noch seinen Vorschlag hinzufügen. Euer Teamadmin starten dann die Abstimmungsphase.</p>",
+				pollsInVotingInfo: "In diesen Abstimmung kannst du jetzt deine Stimme abgeben.",
+				noPollYet: "Euer Admin hat bisher noch keine Abstimmung erstellt.",
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es läuft gerade keine Abstimmungen, in der du deine Stimmen abgegeben könntest.",
@@ -100,7 +100,7 @@ export default {
 				butProposalsInDiscussion: "Es gibt jedoch Abstimmungen in Diskussion. Dort könnt ihr die Wahlvorschlägen diskutieren.",
 				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
 				createPoll: "Neue Abstimmung anlegen",
-				allPolls: "Eure Abstimmungen",
+				allPolls: "Alle eure Abstimmungen",
 			},
 		},
 	},
