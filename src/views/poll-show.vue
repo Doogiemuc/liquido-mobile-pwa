@@ -116,8 +116,9 @@ export default {
 			if (currentUser && currentUser.isAdmin) return true
 			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUser.id).length === 0
 		},
+		/** The voting phase can be started when there are at least two proposals */
 		showStartVotingPhase() {
-			return this.userIsAdmin && this.poll.status === "ELABORATION" && this.poll.proposals && this.poll.proposals.length > 0
+			return this.userIsAdmin && this.poll.status === "ELABORATION" && this.poll.proposals && this.poll.proposals.length > 1
 		},
 	},
 	created() {

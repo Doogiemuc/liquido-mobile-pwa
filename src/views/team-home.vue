@@ -27,13 +27,13 @@
 			{{ $t('teamMembers') }}
 		</h3>
 		<b-card-group id="memberCards" deck>
-			<b-card v-for="member in members" :key="member.email" :img-src="member.picture" img-alt="Avatar" img-top>
+			<b-card v-for="admin in admins" :key="admin.id" :img-src="admin.picture" img-alt="Avatar" img-top>
 				<i class="fas fa-shield-alt admin-shield"></i>
 				<b-card-text class="text-center">
-					<b>{{ member.name }}</b>
+					<b>{{ admin.name }}</b>
 				</b-card-text>
 			</b-card>
-			<b-card v-for="member in admins" :key="member.email" :img-src="member.picture" img-alt="Avatar" img-top>
+			<b-card v-for="member in members" :key="member.id" :img-src="member.picture" img-alt="Avatar" img-top>
 				<b-card-text class="text-center">
 					{{ member.name }}
 				</b-card-text>

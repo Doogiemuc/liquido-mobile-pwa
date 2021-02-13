@@ -67,10 +67,12 @@
 </template>
 
 <script>
+import config from "config"
 import lawPanel from "../components/law-panel"
 //import Sortable from 'sortablejs'
 import draggable from "vuedraggable"
 import _ from "lodash"
+const log = require("loglevel").getLogger("cast-vote");
 
 export default {
 	i18n: {
@@ -84,8 +86,8 @@ export default {
 			de: {
 				castVoteTitle: "Abstimmen",
 				castVoteInfo: 
-					"<p>In <span class='liquido'></span> stimmst du nicht nur für oder gegen <em>einen</em> Vorschlag, sondern du sortierst alle Vorschläge in deine bevorzugte Reihenfolge.</p>" +
-					"<p>Schiebe deinen Favoriten ganz nach oben und ordne alle anderen Vorschläge der Reihe nach darunter an.</p>",
+					"<p>In <span class='liquido'></span> stimmst du nicht für oder gegen nur <em>einen</em> Vorschlag, sondern du sortierst alle Vorschläge in deine persönlich bevorzugte Reihenfolge.</p>" +
+					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
 				yourBallot: "Dein Stimmzettel:",
 				saveBallot: "Diese Stimme abgeben",
 				voteCastedSuccessfully:
@@ -126,12 +128,17 @@ export default {
 
 		},
 
-		clickCastVote() {
+		async clickCastVote() {
 			this.voteCastedError = false
 			this.voteCastedSuccessfully = false
 			this.castVoteLoading = true
+
+			let voteOrder = this.ballot.map(proposal => "/laws/"+proposal.id)
+			let voterToken = await this.$api.getVoterToken(config.voterTokenSecret)
+
+			log.debug("CAST VOTE: poll.id="+this.poll.id, "voterToken="+voterToken, "voteOrder", voteOrder )
 			this.$api
-				.castVote(this.poll.id, this.ballot)
+				.castVote(this.poll.id, voteOrder, voterToken)
 				.then(() => {
 					console.log("Vote casted successfully")
 					this.castVoteLoading = false
@@ -147,7 +154,7 @@ export default {
 		},
 
 		goToPoll() {
-			this.$router.go(-1)
+			this.$router.push("/polls/"+this.poll.id)
 		},
 	},
 }

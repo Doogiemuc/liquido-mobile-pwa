@@ -250,7 +250,28 @@ export default {
 			})
 	},
 
-	/** Liquido backend error codes */
+	async getVoterToken(tokenSecret, becomePublicProxy = false) {
+		let graphQL = `mutation { getVoterToken(tokenSecret: "${tokenSecret}", becomePublicProxy: ${becomePublicProxy}) ` +
+			`{ voterToken }`
+		return axios.post("", {query: graphQL})
+			.then(res => {
+				log.info("Received valid voterToken.")
+				return res.data.getVoterToken.voterToken
+			})
+	},
+
+
+	async castVote(pollId, voteOrder, voterToken) {
+		let graphQL = `mutation { castVote(pollId: "${pollId}", ballot: ${voteOrder}, voterToken: ${voterToken}) ` +
+			`{ voteCount ballot { id level checksum } }`
+		return axios.post("", {query: graphQL})
+			.then(res => {
+				log.info("Vote casted successfully!")
+				return res.data.castVote
+			})
+	},
+
+	/** Liquido backend error codes.  LiquidoException.java */
 	err: {
 		CANNOT_CREATE_NEW_TEAM: 1,
 		TEAM_WITH_SAME_NAME_EXISTS: 2,
@@ -261,5 +282,4 @@ export default {
 	CURRENT_USER_KEY: "currentUser",       // key for current user object in teamCache
 	TEAM_KEY: "team",
 
-	isLoggedIn: false,
 }

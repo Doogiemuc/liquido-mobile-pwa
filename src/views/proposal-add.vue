@@ -107,7 +107,7 @@ export default {
 				describeYourProposal: "Beschreibe deinen Wahlvorschlag ...",
 				descriptionInfo: "(Mindestes {minChars} Zeichen)",
 				descriptionTooShort: "Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
-				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Deine Vorschlag wird der Erste sein.",
+				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Dein Vorschlag wird der Erste sein.",
 				createdSuccessfully: "Dein Vorschlag wurde zur Abstimmung mit aufgenommen",
 				gotoPoll: "Zur Abstimmung",
 			},
