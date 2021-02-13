@@ -2,7 +2,7 @@
 	<b-card :id="pollCardId" :pollid="poll.id" no-body class="poll-panel shadow mb-3">
 		<template #header>
 			<h4 v-if="readOnly" class="read-only poll-panel-title">
-				<i class="fas fa-poll" />
+				<i class="iconForPoll" />
 				&nbsp;{{ poll.title }}
 			</h4>
 			<h4 v-else class="poll-panel-title" @click="goToPoll(poll.id)">
@@ -32,7 +32,7 @@
 					<div>
 						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
 					</div>
-					<div class="d-flex flex-column">
+					<div class="d-flex flex-column text-truncate">
 						<h4 class="law-title">
 							{{ law.title }}
 						</h4>
@@ -97,7 +97,7 @@ export default {
 				case "ELABORATION":
 					return "far fa-comments"   // or fa-poll?
 				case "VOTING":
-					return "fas fa-person-booth"    // fa-vote-yea
+					return "fas fa-person-booth"    // or fa-vote-yea?
 				case "FINISHED":
 					return "fas fa-university"
 				default:
@@ -109,14 +109,11 @@ export default {
 		if (!this.expanded) this.toggleCollapse() // collapse the proposal descriptions when initially not expanded. This is animated!
 	},
 	methods: {
-		addProposal() {},
-
 		formatDate(dateVal) {
 			return moment(dateVal).format("L")
 		},
 
 		toggleCollapse() {
-			console.log("toggleCollapse #"+this.pollCardId)
 			$("#"+this.pollCardId + " .proposal-list-group-item").toggleClass("collapse-law-panel")
 			$("#"+this.pollCardId + " .collapse-icon").toggleClass("collapsed")
 		},
@@ -147,9 +144,11 @@ $proposal_img_size: 32px;
 			margin: 8px 10px;
 			font-size: 14px;
 			font-weight: bold;
+			/* bootstraps .text-truncate does this for us
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+			*/
 		}
 		.read-only {
 			color: black;
@@ -182,8 +181,8 @@ $proposal_img_size: 32px;
 		height: 8rem;  // 30px + 25px + $proposal_img_size + 15px; // title + subtitle + avatar_img + padding
 		overflow: hidden;
 		padding: 10px;
+		background-color: $proposal-bg;
 		transition: height 0.5s;
-		//background-color: $secondary-bg;
 		&.collapse-law-panel {
 			height: 18px + $proposal_img_size;
 		}
@@ -200,10 +199,6 @@ $proposal_img_size: 32px;
 			color: #bbb;
 			margin-bottom: 5px;
 		}
-		.flex-fixed-width {
-			flex: 0 0 $proposal_img_size + 10px;
-			//border: 1px solid red;
-		}
 		.law-image {
 			border-radius: 5px;
 			min-width: $proposal_img_size;
@@ -217,8 +212,6 @@ $proposal_img_size: 32px;
 
 		.law-description {
 			font-size: 12px;
-			height: $proposal_img_size;
-			max-height: $proposal_img_size;
 			overflow: hidden;
 		}
 		.like-button {

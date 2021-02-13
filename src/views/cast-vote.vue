@@ -5,14 +5,16 @@
 			&nbsp;{{ $t("castVoteTitle") }}
 		</h2>
 
-		<p>{{ $t("castVoteInfo") }}</p>
-
-		<div id="ballot" class="ballot">
-			<h2 class="ballot-title">
-				{{ $t("yourBallot") }}
-			</h2>
+		<b-card no-body class="ballot-card mb-3">
+			<template #header>
+				<h4 class="poll-title">
+					<i class="fas fa-poll" />
+					&nbsp;{{ poll ? poll.title : "" }}
+				</h4>
+			</template>
 			<draggable
 				v-model="ballot"
+				class="draggable"
 				:swap-threshold="0.5"
 				:delay="50"
 				:animation="500"
@@ -24,16 +26,22 @@
 					:law="prop"
 					:read-only="true"
 					:collapsed="true"
-					class="mb-2 shadow-sm"
+					class="shadow-sm"
 				/>
 			</draggable>
-		</div>
+			<div class="collapse-icon-wrapper">
+				<a class="collapse-icon" href="#" @click="toggleBallotCollapse()">
+					<i class="fa" />
+				</a>
+			</div>
+		</b-card>
 
-		<div class="text-right mb-3">
-			<b-button variant="primary" :disabled="castVoteLoading" @click="clickCastVote()">
-				<b-spinner v-if="castVoteLoading" small />
+		<div class="text-right my-5">
+			<b-button variant="primary" size="lg" :disabled="castVoteLoading" @click="clickCastVote()">
+				<i class="fas fa-vote-yea"></i>
 				<i v-if="voteCastedSuccessfully" class="far fa-check-circle" />
-				{{ $t("castVote") }}
+				{{ $t("saveBallot") }}
+				<b-spinner v-if="castVoteLoading" small />
 			</b-button>
 		</div>
 
@@ -50,6 +58,11 @@
 				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
+
+		<div class="alert alert-secondary">
+			<i class="fas fa-info-circle float-right" />
+			<p v-html="$t('castVoteInfo')"></p>
+		</div>
 	</div>
 </template>
 
@@ -64,28 +77,28 @@ export default {
 		messages: {
 			en: {
 				castVoteTitle: "Cast your vote",
-				castVoteInfo:
-					"Please sort the proposals into your personally preferred order. With your favorite proposal at the top.",
+				castVoteInfo: "Please sort the proposals into your personally preferred order. With your favorite proposal at the top.",
 				castVote: "Cast vote",
 				yourBallot: "Your ballot",
 			},
 			de: {
 				castVoteTitle: "Abstimmen",
-				castVoteInfo:
-					"Bitte sortiere die Vorschläge in die von dir favorisierte Reihenfolge. Mit deinem besten Favoriten ganz oben.",
-				castVote: "Diese Stimme abgeben",
-				yourBallot: "Dein Stimmzettel",
+				castVoteInfo: 
+					"<p>In <span class='liquido'></span> stimmst du nicht nur für oder gegen <em>einen</em> Vorschlag, sondern du sortierst alle Vorschläge in deine bevorzugte Reihenfolge.</p>" +
+					"<p>Schiebe deinen Favoriten ganz nach oben und ordne alle anderen Vorschläge der Reihe nach darunter an.</p>",
+				yourBallot: "Dein Stimmzettel:",
+				saveBallot: "Diese Stimme abgeben",
 				voteCastedSuccessfully:
 					"<p>Deine Stimme wurde erfolgreich gezählt.</p><p>In <span class='liquido'></span> kannst du deinen Stimmzettel "+
 					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.</p>" +
 					"<p>Du erhälst eine Benachrichtigung, sobald die Abstimmung abgeschlossen ist. Dann kannst du das Ergebnis der Wahl sehen.</p>",
-				voteCastedError:
-					"Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
+				voteCastedError: "Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
 			},
 		},
 	},
 	components: { lawPanel, draggable },
 	props: {
+		// the cast-vote page only receives the pollId and reloads the poll from the backend
 		pollId: { type: String, required: true },
 	},
 	data() {
@@ -99,12 +112,20 @@ export default {
 	},
 	computed: {},
 	created() {
-		this.poll = this.$api.getPollById(this.pollId)
-		if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
-		this.ballot = _.cloneDeep(this.poll.proposals)
+		//force refresh of the poll. Load it from the backend
+		this.$api.getPollById(this.pollId, true).then(poll => {
+			this.poll = poll
+			if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
+			this.ballot = _.cloneDeep(this.poll.proposals)
+		})
 	},
 	mounted() {},
 	methods: {
+		/** Collapse the descriptions of all proposals in the ballot */
+		toggleBallotCollapse() {
+
+		},
+
 		clickCastVote() {
 			this.voteCastedError = false
 			this.voteCastedSuccessfully = false
@@ -133,21 +154,55 @@ export default {
 </script>
 
 <style lang="scss">
-.ballot {
-	padding: 1rem 0.5rem;
-	margin: 0.5rem -0.5rem 1em -0.5rem;
-	background: #f0f0f0;
-	border-radius: 4px;
-	border: 1px solid #e0e0e0;
+.ballot-card {
+	.card-header {
+		padding: 0.5rem;
+		background-color: $header-bg;
+		.poll-title {
+			margin: 0;
+			font-size: 14px;
+			font-weight: bold;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
 }
-.ballot-title {
-	font-size: 1.5rem;
-	text-align: center;
+
+.draggable {
+	background-color: $input-bg;
+	padding: 1rem;
+	.law-panel {
+		margin-bottom: 1rem;  // need some space between proposals to make it easier to drag & sort them
+		cursor: grab;
+	}
+	.sortable-ghost {
+		opacity: 0.1;
+	}
+	.sortable-chosen {
+		border: 1px solid $primary;
+		-webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
+		transform: translate(5px, 5px);
+	}
 }
-.law-panel {
-	cursor: grab;
+
+.collapse-icon-wrapper {
+	background-color: $input-bg;
+	.collapse-icon {
+		position: absolute;
+		bottom: 5px;
+		right: 5px;
+		opacity: 0.5;
+	}
 }
-.sortable-ghost {
-	opacity: 0.1;
+
+.collapse-icon .fa:before {
+	content: "\f139";
 }
+
+.collapse-icon.collapsed .fa:before {
+	content: "\f13a";
+}
+
 </style>

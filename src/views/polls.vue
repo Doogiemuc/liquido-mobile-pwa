@@ -19,11 +19,11 @@
 
 		<poll-panel v-for="poll in filteredPolls" :key="poll.id" :poll="poll" :expanded="false" class="shadow mb-3" />
 
-		<div v-if="polls.length === 0" class="alert alert-secondary">
+		<div v-if="polls.length === 0" class="alert alert-info">
 			<p v-html="$t('noPollYet')" />
 		</div>
 
-		<div v-if="searchResultIsEmpty" class="alert alert-secondary">
+		<div v-if="searchResultIsEmpty" class="alert alert-info">
 			<p v-html="$t('noPollsMatchSearch')" />
 		</div>
 
@@ -33,7 +33,7 @@
 				<p v-html="$t('pollsInElaborationInfo')" />
 			</div>
 
-			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-secondary">
+			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
 				<p v-html="$t('noPollsInElaboration')" />
 				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
 			</div>
@@ -44,15 +44,15 @@
 				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('pollsInVotingInfo')" />
 			</div>
-			<div v-if="filteredPolls.length === 0 && !searchQuery"
-				class="alert alert-secondary">
+			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
+				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('noPollsInVoting')" />
 				<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')" />
 			</div>
 		</div>
 
-		<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'FINISHED'"
-			class="alert alert-secondary">
+		<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'FINISHED'" class="alert alert-info">
+			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('noFinishedPolls')" />
 			<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
 		</div>
