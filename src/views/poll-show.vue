@@ -40,7 +40,7 @@
 			<p v-html="$t('votingPhaseInfo')" />
 			<b-button variant="primary" class="float-right" @click="clickCastVote()">
 				<i class="fas fa-person-booth" />
-				{{ $t("castVote") }}
+				{{ $t("goToCastVote") }}
 				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
@@ -75,7 +75,7 @@ export default {
 					"Hallo Admin! Möchstest du die Wahlphase für diese Abstimmung starten? Dann sind die Wahlvorschläge fixiert und dein Team kann abstimmen.",
 				startVotingPhase: "Wahl starten",
 				votingPhaseInfo: "Die Wahlphase dieser Abstimmung läuft gerade und du kannst jetzt hier deine Stimme abgeben.",
-				castVote: "Abstimmen",
+				goToCastVote: "Zur Abstimmung",
 				editOwnVote: "Stimmzettel ändern",
 				alreadyVotedInfo:
 					"<p>Du hast in dieser Abstimmung bereits eine Stimme abgegeben.</p><p>So lange die Wahlphase dieser Abstimmung noch läuft, "+

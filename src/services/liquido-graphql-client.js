@@ -251,19 +251,20 @@ export default {
 	},
 
 	async getVoterToken(tokenSecret, becomePublicProxy = false) {
-		let graphQL = `mutation { getVoterToken(tokenSecret: "${tokenSecret}", becomePublicProxy: ${becomePublicProxy}) ` +
-			`{ voterToken }`
+		let graphQL = `query { voterToken(tokenSecret: "${tokenSecret}", becomePublicProxy: ${becomePublicProxy}) }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
-				log.info("Received valid voterToken.")
-				return res.data.getVoterToken.voterToken
+				log.info("OK, received valid voterToken:")  // SECURITY: Do not log secret voterToken!
+				return res.data.voterToken
 			})
 	},
 
 
-	async castVote(pollId, voteOrder, voterToken) {
-		let graphQL = `mutation { castVote(pollId: "${pollId}", ballot: ${voteOrder}, voterToken: ${voterToken}) ` +
-			`{ voteCount ballot { id level checksum } }`
+	async castVote(pollId, voteOrderIds, voterToken) {
+		let voteOrderStr = "[" + voteOrderIds.join(",") + "]"
+		console.log("Cast vote in poll.id="+pollId+" => ", voteOrderStr)
+		let graphQL = `mutation { castVote(pollId: "${pollId}", voteOrderIds: ${voteOrderStr}, voterToken: "${voterToken}") ` +
+			`{ voteCount ballot { id level checksum } } }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				log.info("Vote casted successfully!")

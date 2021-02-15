@@ -38,10 +38,11 @@
 
 		<div class="text-right my-5">
 			<b-button variant="primary" size="lg" :disabled="castVoteLoading" @click="clickCastVote()">
-				<i class="fas fa-vote-yea"></i>
+				<i v-if="!voteCastedSuccessfully && !voteCastedError && !castVoteLoading"  class="fas fa-vote-yea"></i>
 				<i v-if="voteCastedSuccessfully" class="far fa-check-circle" />
+				<i v-if="voteCastedError" class="fas fa-excamation-circle" />
+				<b-spinner v-if="castVoteLoading" small/>
 				{{ $t("saveBallot") }}
-				<b-spinner v-if="castVoteLoading" small />
 			</b-button>
 		</div>
 
@@ -54,7 +55,7 @@
 
 		<div v-if="voteCastedSuccessfully" class="text-right mb-3">
 			<b-button variant="primary" @click="goToPoll()">
-				{{ $t("ok") }}
+				{{ $t("Ok") }}
 				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
@@ -86,7 +87,8 @@ export default {
 			de: {
 				castVoteTitle: "Abstimmen",
 				castVoteInfo: 
-					"<p>In <span class='liquido'></span> stimmst du nicht für oder gegen nur <em>einen</em> Vorschlag, sondern du sortierst alle Vorschläge in deine persönlich bevorzugte Reihenfolge.</p>" +
+					"<p>In <span class='liquido'></span> stimmst du nicht für oder gegen nur <em>einen</em> Vorschlag, sondern du sortierst " +
+					"alle Vorschläge in deine persönlich bevorzugte Reihenfolge.</p>" +
 					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
 				yourBallot: "Dein Stimmzettel:",
 				saveBallot: "Diese Stimme abgeben",
@@ -133,23 +135,24 @@ export default {
 			this.voteCastedSuccessfully = false
 			this.castVoteLoading = true
 
-			let voteOrder = this.ballot.map(proposal => "/laws/"+proposal.id)
+			let voteOrderIds = this.ballot.map(proposal => +proposal.id)
 			let voterToken = await this.$api.getVoterToken(config.voterTokenSecret)
 
-			log.debug("CAST VOTE: poll.id="+this.poll.id, "voterToken="+voterToken, "voteOrder", voteOrder )
+			//TODO: start a timeer for timeout
+
+			log.debug("CAST VOTE: poll.id="+this.poll.id, "voterToken="+voterToken, "voteOrderIds", voteOrderIds )
 			this.$api
-				.castVote(this.poll.id, voteOrder, voterToken)
+				.castVote(this.poll.id, voteOrderIds, voterToken)
 				.then(() => {
-					console.log("Vote casted successfully")
 					this.castVoteLoading = false
 					this.voteCastedSuccessfully = true
-					this.$root.scrollToBottom()
+					//this.$root.scrollToBottom()
 				})
 				.catch((err) => {
 					console.error("Cannot cast vote", err)
 					this.castVoteLoading = false
 					this.voteCastedError = true
-					this.$root.scrollToBottom()
+					//this.$root.scrollToBottom()
 				})
 		},
 

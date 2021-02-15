@@ -139,6 +139,7 @@ export default {
 					return !this.pollStatusFilter || poll.status === this.pollStatusFilter
 				})
 				.filter((poll) => this.matchesSearch(poll))
+				.sort((p1,p2) => p1.id - p2.id)    //TODO: sort polls by status and then by createdAt
 		},
 		searchResultIsEmpty() {
 			return this.filteredPolls.length === 0 && this.searchQuery && this.searchQuery.trim().length > 0
