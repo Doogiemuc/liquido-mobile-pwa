@@ -6,8 +6,9 @@
 		<div class="alert alert-secondary">
 			NODE_ENV="{{ nodeEnv }}"
 		</div>
-		<div id="devLoginSuccessful"
+		<div
 			v-if="successMessage"
+			id="devLoginSuccessful"
 			class="alert alert-success"
 		>
 			{{ successMessage }}
@@ -56,7 +57,7 @@
 		</div>
 		
 		<h4 class="mt-3">LoginData</h4>
-		<pre><small>{{ this.loginData }}</small></pre>
+		<pre><small>{{ loginData }}</small></pre>
 	</div>
 </template>
 

@@ -40,6 +40,7 @@ module.exports = {
 		"vue/attributes-order": "warn",
 		"vue/no-v-html": "off",
 		"vue/html-self-closing": "off",
+		"vue/singleline-html-element-content-newline": "off",
 	},
 	extends: [
 		"plugin:vue/recommended",

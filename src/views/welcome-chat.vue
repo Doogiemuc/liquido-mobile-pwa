@@ -206,23 +206,21 @@
 				class="chat-bubble shadow-sm"
 			>
 				<p>{{ $t("teamCreated") }}</p>
-				<ul>
-					<li>
-						{{ $t("shareThisLink") }}
-						<a id="inviteLink" :href="team.inviteLink" @click.prevent="shareLink()">
-							{{ team.inviteLink }}
-							<i class="fas fa-external-link-alt" />
-						</a>
-					</li>
-					<li>
-						{{ $t("tellInvitationCode") }}
-						<b id="newTeamInviteCode">{{ team.inviteCode }}</b>
-					</li>
-					<li>{{ $t("scanQrCode") }}</li>
-				</ul>
-				<div class="text-center my-3">
+				<p>
+					{{ $t("shareThisLink") }}
+					<a id="inviteLink" :href="team.inviteLink" @click.prevent="shareLink()">
+						{{ team.inviteLink }}
+						<i class="fas fa-external-link-alt" />
+					</a>
+				</p>
+				<p>
+					{{ $t("tellInvitationCode") }}
+					<b id="newTeamInviteCode">{{ team.inviteCode }}</b>
+				</p>
+				<p>
+					{{ $t("scanQrCode") }}
 					<img :src="team.qrCodeUrl" class="qr-code">
-				</div>
+				</p>
 				<p v-html="$t('teamInfo')" />
 			</b-card>
 
@@ -680,7 +678,7 @@ label {
 }
 
 .qr-code {
-	width: 60%;
+	width: 80%;
 	max-width: 300px;
 }
 </style>

@@ -28,6 +28,7 @@
 		<div class="clearfix mb-3" />
 
 		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
+			<i class="fas fa-shield-alt float-right"></i>
 			<p v-html="$t('startVotingPhaseInfo')" />
 			<b-button variant="primary" class="float-right" @click="clickStartVote()">
 				<i class="fas fa-user-shield" />

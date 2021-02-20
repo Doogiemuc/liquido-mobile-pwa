@@ -1,14 +1,19 @@
 <template>
 	<div class="team-home">
 		<h2 id="team-home" class="page-title">
-			{{ teamName }}
+			{{ team.name }}
 		</h2>
 
 		<b-card class="chat-bubble shadow-sm">
 			<b-card-text>
-				{{ $t('introYourTeam') }}
+				<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
 			</b-card-text>
 		</b-card>
+
+		<div v-if="isAdmin" class="alert alert-admin">
+			<i class="fas fa-shield-alt float-right"></i>
+			<p v-html="$t('introForOneAdmin')"></p>
+		</div>
 
 		<b-button
 			id="gotoPollsButton"
@@ -27,22 +32,46 @@
 			{{ $t('teamMembers') }}
 		</h3>
 		<b-card-group id="memberCards" deck>
-			<b-card v-for="admin in admins" :key="admin.id" :img-src="admin.picture" img-alt="Avatar" img-top>
+			<b-card v-for="admin in team.admins" :key="admin.id" :img-src="admin.picture" img-alt="Avatar" img-top>
 				<i class="fas fa-shield-alt admin-shield"></i>
 				<b-card-text class="text-center">
 					<b>{{ admin.name }}</b>
 				</b-card-text>
 			</b-card>
-			<b-card v-for="member in members" :key="member.id" :img-src="member.picture" img-alt="Avatar" img-top>
+			<b-card v-for="member in team.members" :key="member.id" :img-src="member.picture" img-alt="Avatar" img-top>
 				<b-card-text class="text-center">
 					{{ member.name }}
 				</b-card-text>
 			</b-card>
 		</b-card-group>
+
+		<b-card 
+			id="teamInfo"
+			class="chat-bubble shadow-sm"
+			:title="$t('inviteNewMembers')"
+		>
+			<p>
+				{{ $t("inviteLink") }}
+				<a id="inviteLink" :href="inviteLinkURL" @click.prevent="shareLink()">
+					{{ inviteLinkURL }}
+					<i class="fas fa-external-link-alt" />
+				</a>
+			</p>
+			<p>
+				{{ $t("inviteCode") }}
+				<b id="newTeamInviteCode">{{ team.inviteCode }}</b>
+			</p>
+			<p class="mb-0">{{ $t("qrCode") }}</p>
+			<div class="text-center">
+				<img id="qrCodeImg" src="" class="qr-code">
+			</div>
+		</b-card>
 	</div>
 </template>
 
 <script>
+import config from "config"
+import QRCode from "qrcode"
 
 export default {
 	i18n: {
@@ -53,30 +82,60 @@ export default {
 				teamMembers: "Team members",
 			},
 			de: {
-				introYourTeam: 
-					"Willkommen in deinem Team! Wenn euer Admin eine Abstimmung erstellt, kann jeder im Team seinen Wahlvorschlag hinzufügen. "+
-					"Nachdem der Admin dann die Wahlphase gestartet hat, kann jeder seine Stimme abgeben. Bis am Ende das Wahlergebnis feststeht.",
+				introYourTeam: "Hallo <b>{name}</b>! Willkommen in deinem Team!",
+				introForOneAdmin: 
+					"Du bist der Admin dieses Teams. Nur du kannst neue Abstimmungen erstellen.",
 				teamMembers: "Teammitglieder",
 				teamAdmins: "Team Admin | Team Admin | Team Admins",
-				gotoPolls: "Eure Abstimmungen"
+				gotoPolls: "Zu euren Abstimmungen",
+				inviteNewMembers: "Neue Teammitglieder einladen",
+				inviteLink: "Einladunglink teilen:",
+				inviteCode: "Einladungscode eingeben:",
+				qrCode: "QR Code scannen:",
 			},
 		},
 	},
 	components: { },
 	data() {
-		return {}
+		return {
+			team: {}
+		}
 	},
 	computed: {
-		teamName() { return this.$api.teamCache.getSync("team").teamName },
-		admins()   { return this.$api.teamCache.getSync("team").admins },
-		members()  { 
-			let res = this.$api.teamCache.getSync("team").members 
-			return res
+		currentUserName() { 
+			let currentUser = this.$api.getCurrentUser()
+			return currentUser ? currentUser.name : ""
+		},
+		isAdmin() {
+			return this.$api.isAdmin()
+		},
+		inviteLinkURL() {
+			return config.inviteLinkPrefix + this.team.inviteCode
 		},
 	},
 	created() {
+		this.team = this.$api.getCurrentTeam()
 	},
-	mounted() {},
+	mounted() {
+		let QRcodeOpts = {
+			scale: 10,
+			/*
+			errorCorrectionLevel: 'M',
+			type: 'image/jpeg',
+			quality: 0.3,
+			margin: 1,
+			*/
+		}
+		
+		QRCode.toDataURL("text", QRcodeOpts, function (err, url) {
+			if (err) {
+				console.warn("Cannot create QR code", err)
+			} else {
+				let img = document.getElementById("qrCodeImg")
+				img.src = url
+			}
+		})
+	},
 	
 	methods: {
 		gotoPolls() {

@@ -6,8 +6,8 @@
 			<p>{{ $t('LoginInfo') }}</p>
 		</b-card>
 
-		<div class="mb-3" v-if="showDevLogin">
-			<button  type="button" class="btn btn-primary" @click="devLoginAdmin">
+		<div v-if="showDevLogin" class="mb-3">
+			<button type="button" class="btn btn-primary" @click="devLoginAdmin">
 				<i class="fas fa-shield-alt"></i> {{ $t("DevLoginAdmin") }}
 			</button>
 			<button type="button" class="btn btn-primary ml-3" @click="devLoginMember">
@@ -44,12 +44,15 @@
 				{{ $t("OpenAuthy") }}
 			</button>
 		</b-card>
+
+		<popup-modal id="popupModal11" ref="popupModal11" type="warn" message="Just a test"></popup-modal>
 	</div>
 </template>
 
 <script>
 import config from "config"
 import liquidoInput from "@/components/liquido-input"
+import popupModal from "@/components/popup-modal"
 
 export default {
 	i18n: {
@@ -74,7 +77,7 @@ export default {
 			}
 		}
 	},
-	components: { liquidoInput },
+	components: { liquidoInput, popupModal },
 	data() {
 		return {
 			email: "",
@@ -86,7 +89,8 @@ export default {
 			return process.env.NODE_ENV === "development"
 		}
 	},
-	created() {
+	mounted() {
+		this.$refs["popupModal11"].show()
 	},
 	methods: {
 		devLoginAdmin() {

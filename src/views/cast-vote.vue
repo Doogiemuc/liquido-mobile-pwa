@@ -38,19 +38,36 @@
 
 		<div class="text-right my-5">
 			<b-button variant="primary" size="lg" :disabled="castVoteLoading" @click="clickCastVote()">
-				<i v-if="!voteCastedSuccessfully && !voteCastedError && !castVoteLoading"  class="fas fa-vote-yea"></i>
+				<i v-if="!voteCastedSuccessfully && !voteCastedError && !castVoteLoading" class="fas fa-vote-yea"></i>
 				<i v-if="voteCastedSuccessfully" class="far fa-check-circle" />
 				<i v-if="voteCastedError" class="fas fa-excamation-circle" />
-				<b-spinner v-if="castVoteLoading" small/>
+				<b-spinner v-if="castVoteLoading" small />
 				{{ $t("saveBallot") }}
 			</b-button>
 		</div>
 
-		<div
-			v-if="voteCastedSuccessfully"
-			class="alert alert-success"
-			v-html="$t('voteCastedSuccessfully')"
-		/>
+		<b-modal 
+			id="castVoteModal"
+			ref="castVoteModal"
+			centered
+			ok-only
+			no-close-on-backdrop
+			:content-class="modalContentClass"
+		>
+			<template #modal-header>
+				<i class="far fa-check-circle success-icon"></i>
+				<div class="success-icon-shadow">&nbsp;</div>
+			</template>
+			<template #default>
+				<div v-html="$t('voteCastedSuccessfully')"></div>
+			</template>
+			<template #modal-footer="{ ok }">
+				<b-button variant="primary" class="okButton" @click="ok()">
+					{{ $t('Ok') }}
+				</b-button>
+			</template>
+		</b-modal>
+		
 		<div v-if="voteCastedError" class="alert alert-danger" v-html="$t('voteCastedError')" />
 
 		<div v-if="voteCastedSuccessfully" class="text-right mb-3">
@@ -92,8 +109,9 @@ export default {
 					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
 				yourBallot: "Dein Stimmzettel:",
 				saveBallot: "Diese Stimme abgeben",
-				voteCastedSuccessfully:
-					"<p>Deine Stimme wurde erfolgreich gezählt.</p><p>In <span class='liquido'></span> kannst du deinen Stimmzettel "+
+				voteCastedSuccessfully: "Deine Stimme wurde erfolgreich gezählt.",
+				changeBallotLaterInfo: 
+					"In <span class='liquido'></span> kannst du deinen Stimmzettel "+
 					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.</p>" +
 					"<p>Du erhälst eine Benachrichtigung, sobald die Abstimmung abgeschlossen ist. Dann kannst du das Ergebnis der Wahl sehen.</p>",
 				voteCastedError: "Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
@@ -114,7 +132,11 @@ export default {
 			voteCastedError: false,
 		}
 	},
-	computed: {},
+	computed: {
+		modalContentClass() {
+			return "bg-success text-white text-center shadow-lg"
+		}
+	},
 	created() {
 		//force refresh of the poll. Load it from the backend
 		this.$api.getPollById(this.pollId, true).then(poll => {
@@ -123,7 +145,9 @@ export default {
 			this.ballot = _.cloneDeep(this.poll.proposals)
 		})
 	},
-	mounted() {},
+	mounted() {
+		this.$refs["castVoteModal"].show()
+	},
 	methods: {
 		/** Collapse the descriptions of all proposals in the ballot */
 		toggleBallotCollapse() {
@@ -214,5 +238,55 @@ export default {
 .collapse-icon.collapsed .fa:before {
 	content: "\f13a";
 }
+
+#castVoteModal {
+	.modal-header {
+		border-bottom: none;   // "Less is more in UI-design!"
+		height: 3rem;
+	}
+	.success-icon {
+		z-index: 2020;
+		position: absolute;
+		text-align: center;
+		top: -3.5rem;
+		left: 0;
+		right: 0;
+		width: 6rem;
+		margin: 0 auto;
+		font-size: 6rem;
+		background-color: green;
+		border-radius: 50%;
+	}
+	.success-icon-shadow {
+		z-index: 2010;   // behind icon
+		position: absolute;
+		top: 0.8rem;
+		left: 0;
+		right: 0;
+		width: 6rem;
+		height: 1rem;
+		margin: 0 auto;
+		//background-color: rgba(0, 0, 0, 0);
+		border-radius: 50%;
+		//border: 1px solid red;
+		box-shadow: 0 20px 10px 2px rgba(0, 0, 0, 0.5) ;
+	}
+	.modal-footer {
+		justify-content: center;
+		border-top: none;
+	}
+	.okButton {
+		font-weight: bold;
+		width: 90%;
+		background-color: green;
+		border-color: green;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+	}
+}
+
+#castVoteModal + .modal-backdrop {
+	opacity: 0.8;
+}
+
 
 </style>

@@ -8,4 +8,5 @@ export default {
 	usernameMinLength: 5,
 	inviteCodeLength: 6,			// used for validating inviteCodes in welcome-chat.vue
 	pollTitleMinLength: 10,
+	inviteLinkPrefix: "http://www.liquido.me/invite?inviteCode=",
 }

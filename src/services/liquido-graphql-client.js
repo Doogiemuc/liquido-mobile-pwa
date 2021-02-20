@@ -90,7 +90,7 @@ export default {
 	 */
 	login(team, user, jwt) {
 		this.teamCache.put(this.TEAM_KEY, team)
-		//TODO: add user.isAdmin    But SECURE also IT in the backend!
+		//TODO: add user.isAdmin    But also SECURE it in the backend!
 		this.teamCache.put(this.CURRENT_USER_KEY, user)
 		this.teamCache.put("jwt", jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
@@ -113,11 +113,14 @@ export default {
 
 	/** 
 	 * Synchrounously get the currently logged in user from local cache.
-	 * @return {Object} Currently logged in user from local cache.
-	 * @throws Error, if no one is logged in or user in cache is expired!
+	 * @return {Object} Currently logged in user from local cache or undefined if no one is logged in
 	 */
 	getCurrentUser() {
 		return this.teamCache.getSync(this.CURRENT_USER_KEY)  // get from cache, without calling the backend
+	},
+
+	getCurrentTeam() {
+		return this.teamCache.getSync(this.TEAM_KEY)
 	},
 
 	/** 
@@ -126,7 +129,7 @@ export default {
 	 */
 	isAdmin() {
 		let currentUser = this.getCurrentUser()
-		let team        = this.teamCache.getSync(this.TEAM_KEY)
+		let team        = this.getCurrentTeam()
 		if (!currentUser || !team || !team.admins) return false
 		return team.admins.map(admin => admin.id).includes(currentUser.id)
 	},
@@ -166,6 +169,7 @@ export default {
 					id
 					teamName
 					inviteCode
+					admins  { id, email, name, website, picture, mobilephone }
 					members { id, email, name, website, picture, mobilephone }
 				}
 				user { id, email, name, website, picture, mobilephone }
@@ -195,6 +199,7 @@ export default {
 					id
 					teamName
 					inviteCode
+					admins  { id, email, name, website, picture, mobilephone }
 					members { id, email, name, website, picture, mobilephone }
 				}
 				user { id, email, name, website, picture, mobilephone }
@@ -247,6 +252,26 @@ export default {
 				this.pollsCache.put("polls/"+poll.id, poll)
 				log.info("Added proposal to poll:", poll)
 				return poll
+			})
+	},
+
+	async startVotingPhase(pollId) {
+		let graphQL = `mutation { startVotingPhase(pollId: "${pollId}") ` +
+			`{ id status } }`
+		return axios.post("", {query: graphQL})
+			.then(res => {
+				log.info(`Started voting phase of poll.id=${pollId}`)
+				return res.data.castVote
+			})
+	},
+	
+	async finishVotingPhase(pollId) {
+		let graphQL = `mutation { finishVotingPhase(pollId: "${pollId}") ` +
+			`{ id status } }`
+		return axios.post("", {query: graphQL})
+			.then(res => {
+				log.info(`Started voting phase of poll.id=${pollId}`)
+				return res.data.castVote
 			})
 	},
 
