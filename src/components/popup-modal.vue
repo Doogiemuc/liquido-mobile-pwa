@@ -3,13 +3,12 @@
 		:id="id"
 		ref="modalRef"
 		centered
-		ok-only
 		no-close-on-backdrop
 		:content-class="modalContentClass"
 	>
 		<template #modal-header>
-			<i :class="headerIconClass"></i>
-			<div class="header-icon-shadow">&nbsp;</div>
+			<i :class="headerIconClass" class="bounce-anim-icon"></i>
+			<div class="header-icon-shadow bounce-anim-shadow">&nbsp;</div>
 		</template>
 		<template #default>
 			<slot>{{ message }}</slot>
@@ -76,7 +75,6 @@ export default {
 	},
 	methods: {
 		show() {
-			console.log("showing", this.id)
 			this.$bvModal.show(this.id)
 		},
 		hide() {
@@ -110,32 +108,39 @@ export default {
 		font-size: 6rem;
 		border-radius: 50%;
 	}
+
+	/* 
+	This is an unbelievable cool animated 3D shadow below the bouncing header icon. CSS ftw :-) 
+	The object that casts the shadow is a transparent oval.
+	The actual shadow is well below the oval. So that the oval does not cover the shadow.
+	And it is behind the icon, but above the modal.
+	*/
+	.header-icon-shadow {
+		z-index: 2010;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		width: 5rem;
+		height: 1rem;
+		margin: 0 auto;
+		background-color: rgba(0, 0, 0, 0);
+		border-radius: 50%;
+		//border: 1px solid red; // for debugging :-)
+		box-shadow: -5px 1.2rem 10px 2px rgba(0, 0, 0, 0.5);
+	}
 	.header-icon-danger {
 		color: darkred;
 		background-color: #dc3545;
 	}
 	.header-icon-success {
-		background-color: green;
+		background-color: darkgreen;
 	}
 	.header-icon-info {
 		color: $primary;
 	}
 	.header-icon-warn {
 		color: darkgoldenrod;
-	}
-	.header-icon-shadow {
-		z-index: 2010;   // behind icon
-		position: absolute;
-		top: 0.8rem;
-		left: 0;
-		right: 0;
-		width: 6rem;
-		height: 1rem;
-		margin: 0 auto;
-		//background-color: rgba(0, 0, 0, 0);
-		border-radius: 50%;
-		//border: 1px solid red;
-		box-shadow: 0 20px 10px 2px rgba(0, 0, 0, 0.5) ;
 	}
 	.modal-footer {
 		justify-content: center;
@@ -146,16 +151,61 @@ export default {
 		width: 100%;
 		border: none;
 	}
+
+	/* Unbelievably clever 3D shadow bounce animation */
+	.bounce-anim-icon {
+		animation-direction: alternate-reverse;
+		animation-duration: 1s;
+		animation-iteration-count: infinite;
+		animation-name: bounce-anim-icon;
+		transition-timing-function: linear;
+	}
+	@keyframes bounce-anim-icon {
+		from {
+			transform: scale(1.0, 0.8) translateY(12%);
+			animation-timing-function: linear;
+		}
+		25% {
+			transform: scale(1.0, 1.0) translateY(0); 
+			animation-timing-function: cubic-bezier(0.0, 0.5, 0.5, 1.0);
+		}
+		to  {
+			transform: scale(1.0, 1.0) translateY(-20px);
+			animation-timing-function: cubic-bezier(0.5, 0.0, 1.0, 0.5)
+		}
+	}
+
+	.bounce-anim-shadow {
+		animation-direction: alternate-reverse;
+		animation-duration: 1s;
+		animation-iteration-count: infinite;
+		animation-name: bounce-anim-shadow;
+	}
+	@keyframes bounce-anim-shadow {
+		from {
+			transform: scaleX(1.0);
+		}
+		50%,
+		to  {
+			transform: scaleX(0.8)
+		}
+	}
+
+	&.bg-primary .btn {
+		background-color: grey;
+	}
+	&.bg-danger .btn {
+		background-color: darkred;
+	}
+	&.bg-success .btn {
+		background-color: darkgreen;
+	}
+	&.bg-warning .btn {
+		background-color: darkgoldenrod;
+	}
+
 }
 
-.modal-content.bg-danger .ok-button {
-	background-color: darkred;
-}
-.modal-content.bg-success .ok-button {
-	background-color: darkgreen;
-}
-.modal-content.bg-warning .ok-button {
-	background-color: darkgoldenrod;
-}
+
 
 </style>

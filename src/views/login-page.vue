@@ -13,6 +13,10 @@
 			<button type="button" class="btn btn-primary ml-3" @click="devLoginMember">
 				{{ $t("DevLoginMember") }}
 			</button>
+
+			<button type="button" class="btn btn-primary m-3" @click="showModal">
+				Show Modal
+			</button>
 		</div>
 
 		<b-card class="chat-bubble shadow-sm input-bubble">
@@ -45,7 +49,12 @@
 			</button>
 		</b-card>
 
-		<popup-modal id="popupModal11" ref="popupModal11" type="warn" message="Just a test"></popup-modal>
+		<popup-modal 
+			id="popupModal11"
+			ref="popupModal11"
+			type="success"
+			message="Just a test"
+		></popup-modal>
 	</div>
 </template>
 
@@ -90,9 +99,12 @@ export default {
 		}
 	},
 	mounted() {
-		this.$refs["popupModal11"].show()
+		
 	},
 	methods: {
+		showModal() {
+			this.$refs["popupModal11"].show()
+		},
 		devLoginAdmin() {
 			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname).then(() => {
 				this.$router.push("/team")
