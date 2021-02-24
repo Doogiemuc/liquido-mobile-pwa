@@ -17,7 +17,17 @@
 			</template>
 		</liquido-input>
 
-		<poll-panel v-for="poll in filteredPolls" :key="poll.id" :poll="poll" :expanded="false" class="shadow mb-3" />
+
+		<!-- list of polls -->
+		<poll-panel 
+			v-for="poll in filteredPolls"
+			:key="poll.id"
+			:poll="poll"
+			:collapse="true"
+			class="shadow mb-3"
+		/>
+
+
 
 		<div v-if="polls.length === 0" class="alert alert-info">
 			<p v-html="$t('noPollYet')" />
@@ -28,7 +38,7 @@
 		</div>
 
 		<div v-if="pollStatusFilter === 'ELABORATION'">
-			<div v-if="!searchResultIsEmpty" class="alert alert-info">
+			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
 				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('pollsInElaborationInfo')" />
 			</div>
@@ -40,7 +50,7 @@
 		</div>
 
 		<div v-if="pollStatusFilter === 'VOTING'">
-			<div v-if="!searchResultIsEmpty" class="alert alert-info">
+			<div v-if="filteredPolls.length > 0" class="alert alert-info">
 				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('pollsInVotingInfo')" />
 			</div>
@@ -57,11 +67,10 @@
 			<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
 		</div>
 
-		<div v-if="userIsAdmin" class="my-5 text-right">
-			<b-button variant="primary" @click="createPoll()">
-				<i class="fas fa-poll" />
-				{{ $t("createPoll") }}
-				<i class="fas fa-angle-double-right" />
+		<div v-if="userIsAdmin" class="my-5 alert alert-admin">
+			{{ $t('onlyAdminCanCreateNewPolls') }}
+			<b-button variant="primary" class="float-right" @click="createPoll()">
+				<i class="fas fa-shield-alt" /> {{ $t("createPoll") }} <i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
 
@@ -89,8 +98,8 @@ export default {
 			},
 			de: {
 				pollsInElaborationInfo: 
-					"<p>Bitte diskutiert die Wahlvorschläge in diesen Abstimmungen. Die jeweiligen Ersteller können ihren Vorschlag auch noch anpassen.</p>" +
-					"<p>In dieser Phase kann jedes Teammitglied auch noch seinen Vorschlag hinzufügen. Euer Teamadmin starten dann die Abstimmungsphase.</p>",
+					"<p>Bitte diskutiert die Wahlorschläge dieser Abstimmungen untereinander.</p>" +
+					"<p>Euer Teamadmin starten dann die jeweilige Abstimmungsphase.</p>",
 				pollsInVotingInfo: "In diesen Abstimmung kannst du jetzt deine Stimme abgeben.",
 				noPollYet: "Euer Admin hat bisher noch keine Abstimmung erstellt.",
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
@@ -99,6 +108,8 @@ export default {
 				noFinishedPolls: "Es gibt bisher noch keine abgeschlossenen Abstimmungen.",
 				butProposalsInDiscussion: "Es gibt jedoch Abstimmungen in Diskussion. Dort könnt ihr die Wahlvorschlägen diskutieren.",
 				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
+				onlyAdminCanCreateNewPolls: "Nur du als Admin dieses Teams kannst neue Abstimmungen erstellen. " +
+					"Jeder im Team kann dann seinen Wahlvorschlag zur Abstimmung hinzufügen.",
 				createPoll: "Neue Abstimmung anlegen",
 				allPolls: "Alle eure Abstimmungen",
 			},

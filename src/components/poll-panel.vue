@@ -2,7 +2,7 @@
 	<b-card :id="pollCardId" :pollid="poll.id" no-body class="poll-panel shadow mb-3">
 		<template #header>
 			<h4 v-if="readOnly" class="read-only poll-panel-title">
-				<i class="iconForPoll" />
+				<i :class="iconForPoll" />
 				&nbsp;{{ poll.title }}
 			</h4>
 			<h4 v-else class="poll-panel-title" @click="goToPoll(poll.id)">
@@ -27,8 +27,8 @@
 		</div>
 
 		<b-list-group v-else flush>
-			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item">
-				<div class="d-flex">
+			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item" :class="{'collapse-law-panel' : collapsed}">
+				<div class="d-flex" @click="goToPoll(poll.id)">
 					<div>
 						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
 					</div>
@@ -57,6 +57,7 @@
 		<a
 			v-if="poll.proposals && poll.proposals.length > 0"
 			class="collapse-icon"
+			:class="{'collapsed' : collapsed}"
 			href="#"
 			@click="toggleCollapse()"
 		>
@@ -84,10 +85,12 @@ export default {
 		poll: { type: Object, required: true },
 		readOnly: { type: Boolean, required: false, default: false },
 		showAddProposalButton: { type: Boolean, required: false, default: false },
-		expanded: { type: Boolean, required: false, default: true },
+		collapse: { type: Boolean, required: false, default: false },
 	},
 	data() {
-		return {}
+		return {
+			collapsed: this.collapse
+		}
 	},
 	computed: {
 		pollCardId() { return "PollCard_"+this.poll.id },
@@ -101,12 +104,11 @@ export default {
 				case "FINISHED":
 					return "fas fa-university"
 				default:
-					return undefined
+					return "far fa-poll"
 			}
 		},
 	},
 	mounted() {
-		if (!this.expanded) this.toggleCollapse() // collapse the proposal descriptions when initially not expanded. This is animated!
 	},
 	methods: {
 		formatDate(dateVal) {
@@ -114,8 +116,7 @@ export default {
 		},
 
 		toggleCollapse() {
-			$("#"+this.pollCardId + " .proposal-list-group-item").toggleClass("collapse-law-panel")
-			$("#"+this.pollCardId + " .collapse-icon").toggleClass("collapsed")
+			this.collapsed = !this.collapsed
 		},
 
 		goToPoll(pollId) {

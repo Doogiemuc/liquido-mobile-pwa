@@ -1,5 +1,5 @@
 <template>
-	<b-card :id="law.id" no-body class="law-panel">
+	<b-card :id="law.id" no-body class="law-panel" :class="{'collapse-law-panel' : collapsed}">
 		<div class="d-flex">
 			<div>
 				<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
@@ -41,10 +41,12 @@ export default {
 	props: {
 		law: { type: Object, required: true },
 		readOnly: { type: Boolean, required: false, default: false },
-		expanded: { type: Boolean, required: false, default: true },
+		collapse: { type: Boolean, required: false, default: false },  // initial value
 	},
 	data() {
-		return {}
+		return {
+			collapsed: this.collapse  // switch for classes
+		}
 	},
 	computed: {
 		iconForLaw() {
@@ -71,15 +73,14 @@ export default {
 		},
 	},
 	mounted() {
-		if (!this.expanded) this.toggleCollapse()
+		//if (!this.expanded) this.toggleCollapse()
 	},
 	methods: {
 		formatDate(dateVal) {
 			return moment(dateVal).format("L")
 		},
 		toggleCollapse() {
-			$(".law-panel").toggleClass("collapse-law-panel")
-			$(".collapse-icon").toggleClass("collapsed")
+			this.collapsed = !this.collapsed
 		},
 	},
 }

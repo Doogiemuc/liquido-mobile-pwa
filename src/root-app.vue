@@ -13,6 +13,20 @@
 <script>
 import liquidoHeader from "@/components/liquido-header"
 
+/** Pages will slide from right to left in this order */
+const page_order = {
+	"index": 0,
+	"login": 1,
+	"welcome": 2,
+	"teamHome": 3,
+	"polls": 4,
+	"createPoll": 5,
+	"showPoll": 6,
+	"addProposal": 7,
+	"castVote": 8,
+}
+
+
 /** Liquido Root App */
 export default {
 	name: "LiquidoApp",
@@ -46,18 +60,12 @@ export default {
 	// https://router.vuejs.org/guide/advanced/transitions.html#per-route-transition
 	watch: {
 		$route(to, from) {
-			const fromDepth = from.path.split("/").length
-			const toDepth = to.path.split("/").length
 			this.transitionName = ""
-			// specific transtions
-			if (from.name === "teamHome")  { this.transitionName = "slide-left" } else
-			if (to.name === "teamHome")  { this.transitionName = "slide-up" } else   // click on icon in liquido-header
-			if (from.name === "createPoll" && to.name === "showPoll") { this.transitionName = "slide-left" } else
-			// transition from one depth to another
-			if (fromDepth < toDepth)  { this.transitionName = "slide-left" } else
-			if (fromDepth > toDepth)  { this.transitionName = "slide-right"} else 
-			// default is fade
-			if (fromDepth === toDepth) { this.transitionName = "fade" }
+			const fromOrder = page_order[from.name]
+			const toOrder = page_order[to.name]
+			if (fromOrder < toOrder)  { this.transitionName = "slide-left" } else
+			if (fromOrder > toOrder)  { this.transitionName = "slide-right"}
+			else { this.transitionName = "fade" }  // default is fade
 		},
 	},
 	// all data properties are set in main.js !

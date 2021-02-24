@@ -26,7 +26,7 @@ const shouldNotBeCalled = function(path) {
 }
 const teamsCacheConfig = {
 	fetchFunc: shouldNotBeCalled,
-	ttl: 10*60*1000,
+	ttl: 10*60*1000,		// 10 minutes for team cache
 	referencedPathAttr: "$ref",
 	idAttr: "id",
 }
@@ -48,13 +48,12 @@ const fetchPollFunc = function(path) {
 		return Promise.reject(new Error("Cannot fetch poll(s) at path: "+JSON.stringify(path)))
 	}
 }
-
 /**
  * Cache for polls
  */
 const pollsCacheConfig = {
 	fetchFunc: fetchPollFunc,
-	ttl: 60*1000,
+	ttl: 60*1000,				// 60 seconds for polls Cache
 	referencedPathAttr: "$ref",
 	idAttr: "id",
 }
@@ -264,7 +263,7 @@ export default {
 				return res.data.castVote
 			})
 	},
-	
+
 	async finishVotingPhase(pollId) {
 		let graphQL = `mutation { finishVotingPhase(pollId: "${pollId}") ` +
 			`{ id status } }`
@@ -275,15 +274,28 @@ export default {
 			})
 	},
 
+	/** Get voterToken (cached) */
 	async getVoterToken(tokenSecret, becomePublicProxy = false) {
-		let graphQL = `query { voterToken(tokenSecret: "${tokenSecret}", becomePublicProxy: ${becomePublicProxy}) }`
-		return axios.post("", {query: graphQL})
-			.then(res => {
-				log.info("OK, received valid voterToken:")  // SECURITY: Do not log secret voterToken!
-				return res.data.voterToken
-			})
+		return this.teamCache.get(this.VOTER_TOKEN_KEY, {
+			fetchFunc: async function() {
+				let graphQL = `query { voterToken(tokenSecret: "${tokenSecret}", becomePublicProxy: ${becomePublicProxy}) }`
+				const res = await axios.post("", { query: graphQL });
+				log.info("OK, received valid voterToken from backend"); // SECURITY: Do not log secret voterToken!
+				return res.data.voterToken;
+			}
+		})
 	},
 
+	/** Get voter's ballot if he voted already. MAY return null if not. */
+	async getBallot(pollId, voterToken) {
+		let graphQL = `query { ballot(pollId: "${pollId}", voterToken: "${voterToken}") ` +
+			`{ level checksum voteOrder { id } area { id } } }`
+		return axios.post("", {query: graphQL})
+			.then(res => {
+				log.info("Received users ballot:", res.data.ballot)
+				return res.data.ballot
+			})
+	},
 
 	async castVote(pollId, voteOrderIds, voterToken) {
 		let voteOrderStr = "[" + voteOrderIds.join(",") + "]"
@@ -307,5 +319,5 @@ export default {
 	pollsCache: new PopulatingCache(pollsCacheConfig),
 	CURRENT_USER_KEY: "currentUser",       // key for current user object in teamCache
 	TEAM_KEY: "team",
-
+	VOTER_TOKEN_KEY: "voterToken",
 }

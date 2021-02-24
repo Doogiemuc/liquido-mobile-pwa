@@ -4,6 +4,16 @@
 			{{ pageTitleLoc }}
 		</h2>
 
+		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
+			<i class="fas fa-shield-alt float-right"></i>
+			<p v-html="$t('startVotingPhaseInfo')" />
+			<b-button variant="primary" class="float-right" @click="clickStartVote()">
+				<i class="fas fa-user-shield" />
+				{{ $t("startVotingPhase") }}
+			</b-button>
+		</div>
+		<div class="clearfix mb-3" />
+
 		<poll-panel v-if="poll.id" :poll="poll" :read-only="true" class="shadow mb-3" />
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
@@ -13,7 +23,7 @@
 			</b-button>
 		</div>
 
-		<div v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert alert-secondary mb-3">
+		<div v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert alert-info mb-3">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('pollInElaborationInfo')" />
 		</div>
@@ -23,16 +33,6 @@
 			<b-button id="addProposalButton" variant="primary" class="float-right" @click="clickAddProposal()">
 				{{ $t("addProposal") }}
 				<i class="fas fa-angle-double-right" />
-			</b-button>
-		</div>
-		<div class="clearfix mb-3" />
-
-		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
-			<i class="fas fa-shield-alt float-right"></i>
-			<p v-html="$t('startVotingPhaseInfo')" />
-			<b-button variant="primary" class="float-right" @click="clickStartVote()">
-				<i class="fas fa-user-shield" />
-				{{ $t("startVotingPhase") }}
 			</b-button>
 		</div>
 		<div class="clearfix mb-3" />
@@ -76,7 +76,7 @@ export default {
 					"Hallo Admin! Möchstest du die Wahlphase für diese Abstimmung starten? Dann sind die Wahlvorschläge fixiert und dein Team kann abstimmen.",
 				startVotingPhase: "Wahl starten",
 				votingPhaseInfo: "Die Wahlphase dieser Abstimmung läuft gerade und du kannst jetzt hier deine Stimme abgeben.",
-				goToCastVote: "Zur Abstimmung",
+				goToCastVote: "Stimme abgeben",
 				editOwnVote: "Stimmzettel ändern",
 				alreadyVotedInfo:
 					"<p>Du hast in dieser Abstimmung bereits eine Stimme abgegeben.</p><p>So lange die Wahlphase dieser Abstimmung noch läuft, "+

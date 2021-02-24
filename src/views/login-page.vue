@@ -1,10 +1,6 @@
 <template>
 	<div id="LoginPage" class="container">
 		<h1>Login</h1>
-		
-		<b-card class="chat-bubble shadow-sm">
-			<p>{{ $t('LoginInfo') }}</p>
-		</b-card>
 
 		<div v-if="showDevLogin" class="mb-3">
 			<button type="button" class="btn btn-primary" @click="devLoginAdmin">
@@ -13,14 +9,10 @@
 			<button type="button" class="btn btn-primary ml-3" @click="devLoginMember">
 				{{ $t("DevLoginMember") }}
 			</button>
-
-			<button type="button" class="btn btn-primary m-3" @click="showModal">
-				Show Modal
-			</button>
 		</div>
 
-		<b-card class="chat-bubble shadow-sm input-bubble">
-			<p>{{ $t('LoginViaEmail') }}</p>
+		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginViaEmail')">
+			<p>{{ $t('LoginViaEmailInfo') }}</p>
 			<liquido-input
 				id="emailInput"
 				v-model="email"
@@ -34,8 +26,8 @@
 			</button>
 		</b-card>
 
-		<b-card class="chat-bubble shadow-sm input-bubble">
-			<p>{{ $t('LoginWithAuthy') }}</p>
+		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginWithAuthy')">
+			<p>{{ $t('LoginWithAuthyInfo') }}</p>
 			<liquido-input
 				id="mobilephoneInput"
 				v-model="mobilephone"
@@ -48,35 +40,27 @@
 				{{ $t("OpenAuthy") }}
 			</button>
 		</b-card>
-
-		<popup-modal 
-			id="popupModal11"
-			ref="popupModal11"
-			type="success"
-			message="Just a test"
-		></popup-modal>
 	</div>
 </template>
 
 <script>
 import config from "config"
 import liquidoInput from "@/components/liquido-input"
-import popupModal from "@/components/popup-modal"
 
 export default {
 	i18n: {
 		messages: {
 			de: {
-				LoginInfo: "Es gibt mehrere Möglichkeiten wie du dich bei LIQUIDO einloggen kannst.",
-
+				LoginViaEmail: "Login per Email",
 				yourEMail: "Deine Email",
-				LoginViaEmail: "Ich kann dir einen MagicLink per E-Mail schicken. Mit diesem kannst du dich dann ganz einfach einloggen.",
+				LoginViaEmailInfo: "Ich kann dir einen MagicLink per E-Mail schicken. Mit diesem kannst du dich dann ganz einfach einloggen.",
 				LoginEmailButton: "Link zuschicken",
 				emailPlaceholder: "info@domain.de",
 				emailInvalid: "E-Mail ungültig",
 
+				LoginWithAuthy: "Login with Authy",
 				yourMobilephone: "Deine Handynummer",
-				LoginWithAuthy: "Du kannst dich mit der Authy App und einem One Time Token einloggen. Das ist besonders sicher",
+				LoginWithAuthyInfo: "Die Authy App kann dir einen einmal gültigen Login-Code per SMS schicken. Das ist besonders sicher",
 				OpenAuthy: "Authy öffnen",
 				mobilephonePlaceholder: "info@domain.de",
 				mobilephoneInvalid: "E-Mail ungültig",
@@ -86,7 +70,7 @@ export default {
 			}
 		}
 	},
-	components: { liquidoInput, popupModal },
+	components: { liquidoInput },
 	data() {
 		return {
 			email: "",
@@ -102,9 +86,6 @@ export default {
 		
 	},
 	methods: {
-		showModal() {
-			this.$refs["popupModal11"].show()
-		},
 		devLoginAdmin() {
 			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname).then(() => {
 				this.$router.push("/team")

@@ -1,5 +1,5 @@
 <template>
-	<b-modal 
+	<!-- b-modal 
 		:id="id"
 		ref="modalRef"
 		centered
@@ -11,32 +11,82 @@
 			<div class="header-icon-shadow bounce-anim-shadow">&nbsp;</div>
 		</template>
 		<template #default>
-			<slot>{{ message }}</slot>
+			<slot>{{ currentMessage }}</slot>
 		</template>
-		<template #modal-footer="{ ok }">
-			<b-button variant="primary" class="ok-button" @click="ok()">
+		<template #modal-footer="{ ok, cancel }">
+			<b-button v-if="showCancel" variant="secondary" class="cancel-button" @click="cancel()">
+				{{ $t('Cancel') }}
+			</b-button>
+			<b-button variant="primary" class="ok-button" @click="clickOk(ok)">
 				{{ $t('Ok') }}
 			</b-button>
 		</template>
-	</b-modal>
+	</b-modal -->
+
+	<!-- Modal -->
+	<div :id="id"
+		class="modal"
+		tabindex="-1"
+		data-backdrop="static"
+		data-keyboard="false"
+		aria-labelledby="modalLabel"
+		aria-hidden="true"
+	>
+		<div class="modal-dialog" :class="{'modal-dialog-centered': centered}">
+			<div class="modal-content" :class="modalContentClass">
+				<div class="modal-header">
+					<slot name="modal-header">
+						<i :class="headerIconClass" class="bounce-anim-icon"></i>
+						<div class="header-icon-shadow bounce-anim-shadow">&nbsp;</div>
+						<h5 v-if="title" id="modalLabel" class="modal-title">{{ titel }}</h5>
+						<button v-if="showHeaderClose" type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</slot>
+				</div>
+				<div class="modal-body">
+					<slot name="modal-body">{{ message }}</slot>
+				</div>
+				<div class="modal-footer">
+					<slot name="modal-footer">
+						<button v-if="secondaryButtonText" type="button" class="btn btn-secondary flex-grow-1" @clic="clickSecondary">{{ secondaryButtonText }}</button>
+						<button type="button" class="btn btn-primary flex-grow-1" data-dismiss="modal" @click="clickPrimary">{{ primaryButtonText }}</button>
+					</slot>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
 /**
  * Bootstrap modal for info, success, warning and error messages.
+ * 
+ * Use like this:
+ * 
+ * <popup-modal id="successModal" ref="successModal" type="success" :showCancel="true" >
+ *  <div>Any HTML content</div>
+ * </popup-modal>
+ * 
+ * And then open e.g. like this
+ * this.$refs["successModal"].open()
  */
 export default {
-
 	name: "PopupModal",
-
 	props: {
 		id: { type: String, required: true },
 		type: { type: String, required: false, default: "info" },
-		message: { type: String, required: true },
-		contentClass:  { type: String, required: false, default: "" },
+		showHeaderClose: { type: Boolean, required: false, default: false },
+		centered: { type: Boolean, required: false, default: true },
+		title: { type: String, required: false, default: "" },  // or HTML can be provided into the <slot modal-title>
+		message: { type: String, required: false, default: "" },  // or HTML can be provided into the <slot modal-body>
+		contentClass: { type: String, required: false, default: "" },
+		primaryButtonText: { type: String, required: false, default: function() { return this.$t("Ok") } },
+		secondaryButtonText: { type: String, required: false, default: undefined },
 	},
 	data() {
 		return {
+			currentMessage: this.message
 		}
 	},
 	computed: {
@@ -74,18 +124,27 @@ export default {
 		}
 	},
 	methods: {
-		show() {
-			this.$bvModal.show(this.id)
+		/** Show the modal. Can optionally pass a message. */
+		show(msg) {
+			if (msg) this.currentMessage = msg
+			$("#"+this.id).modal("show")
 		},
 		hide() {
-			this.$bvModal.hide(this.id)
+			$("#"+this.id).modal("hide")
 		},
 		close() {   // be nice to your callers :-)
-			this.$bvModal.hide(this.id)
+			$("#"+this.id).modal("hide")
 		},
 		toggle() {
-			this.$refs["modalRef"].toggle()
+			$("#"+this.id).modal("toggle")
+		},
+		clickPrimary() {
+			this.$emit("clickPrimary", this.id)
+		},
+		clickSecondary() {
+			this.$emit("clickSecondary", this.id)
 		}
+
 	},
 }
 </script>

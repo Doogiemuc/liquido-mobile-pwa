@@ -5,6 +5,11 @@
 			&nbsp;{{ $t("castVoteTitle") }}
 		</h2>
 
+		<div v-if="isUpdatableBallot" class="alert alert-info">
+			<i class="fas fa-info-circle float-right" />
+			<p v-html="$t('updateBallotInfo')"></p>
+		</div>
+
 		<b-card no-body class="ballot-card mb-3">
 			<template #header>
 				<h4 class="poll-title">
@@ -13,19 +18,20 @@
 				</h4>
 			</template>
 			<draggable
-				v-model="ballot"
+				v-model="proposalsInBallot"
 				class="draggable"
 				:swap-threshold="0.5"
-				:delay="50"
+				:delay="40"
 				:animation="500"
 				:can-scroll-x="false"
 			>
 				<law-panel
-					v-for="prop in ballot"
+					v-for="prop in proposalsInBallot"
+					ref="proposalInBallot"
 					:key="prop.id"
 					:law="prop"
 					:read-only="true"
-					:collapsed="true"
+					:collapse="true"
 					class="shadow-sm"
 				/>
 			</draggable>
@@ -36,48 +42,34 @@
 			</div>
 		</b-card>
 
-		<div class="text-right my-5">
+		<div v-if="canCastVote" class="text-right my-5">
 			<b-button variant="primary" size="lg" :disabled="castVoteLoading" @click="clickCastVote()">
 				<i v-if="!voteCastedSuccessfully && !voteCastedError && !castVoteLoading" class="fas fa-vote-yea"></i>
 				<i v-if="voteCastedSuccessfully" class="far fa-check-circle" />
 				<i v-if="voteCastedError" class="fas fa-excamation-circle" />
 				<b-spinner v-if="castVoteLoading" small />
-				{{ $t("saveBallot") }}
+				{{ isUpdatableBallot ? $t("updateBallotButton") : $t("castVoteButton") }}
 			</b-button>
 		</div>
 
-		<b-modal 
-			id="castVoteModal"
-			ref="castVoteModal"
-			centered
-			ok-only
-			no-close-on-backdrop
-			:content-class="modalContentClass"
-		>
-			<template #modal-header>
-				<i class="far fa-check-circle success-icon"></i>
-				<div class="success-icon-shadow">&nbsp;</div>
-			</template>
-			<template #default>
-				<div v-html="$t('voteCastedSuccessfully')"></div>
-			</template>
-			<template #modal-footer="{ ok }">
-				<b-button variant="primary" class="okButton" @click="ok()">
-					{{ $t('Ok') }}
-				</b-button>
-			</template>
-		</b-modal>
+		<popup-modal 
+			id="successModal"
+			ref="successModal"
+			type="success"
+			:message="$t('voteCastedSuccessfully')"
+			@clickPrimary="clickSuccessModalOk"
+		></popup-modal>
 		
 		<div v-if="voteCastedError" class="alert alert-danger" v-html="$t('voteCastedError')" />
 
-		<div v-if="voteCastedSuccessfully" class="text-right mb-3">
+		<div v-if="voteCastedSuccessfully" class="alert alert-info mb-3">
+			<p v-html="$t('changeBallotLaterInfo')"></p>
 			<b-button variant="primary" @click="goToPoll()">
-				{{ $t("Ok") }}
-				<i class="fas fa-angle-double-right" />
+				{{ $t("GoBackToPoll") }} <i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
 
-		<div class="alert alert-secondary">
+		<div class="alert alert-info">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('castVoteInfo')"></p>
 		</div>
@@ -86,7 +78,9 @@
 
 <script>
 import config from "config"
-import lawPanel from "../components/law-panel"
+import lawPanel from "@/components/law-panel"
+import popupModal from "@/components/popup-modal"
+
 //import Sortable from 'sortablejs'
 import draggable from "vuedraggable"
 import _ from "lodash"
@@ -104,21 +98,25 @@ export default {
 			de: {
 				castVoteTitle: "Abstimmen",
 				castVoteInfo: 
-					"<p>In <span class='liquido'></span> stimmst du nicht für oder gegen nur <em>einen</em> Vorschlag, sondern du sortierst " +
+					"<p>In <span class='liquido'></span> stimmst du nicht nur für <em>einen</em> Vorschlag, sondern du sortierst " +
 					"alle Vorschläge in deine persönlich bevorzugte Reihenfolge.</p>" +
 					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
+				updateBallotInfo: "Du hast in dieser Abstimmung bereits eine Stimme abgegeben. In <span class='liquido'></span> kannst du deine Prio Reihenfolge " + 
+					"auch jetzt noch aktualisieren, so lange die Wahlphase dieser Abstimmung noch läuft.",
 				yourBallot: "Dein Stimmzettel:",
-				saveBallot: "Diese Stimme abgeben",
+				updateBallotButton: "Eigene Stimme aktualisieren",
+				castVoteButton: "Diese Stimme abgeben",
 				voteCastedSuccessfully: "Deine Stimme wurde erfolgreich gezählt.",
 				changeBallotLaterInfo: 
 					"In <span class='liquido'></span> kannst du deinen Stimmzettel "+
 					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.</p>" +
 					"<p>Du erhälst eine Benachrichtigung, sobald die Abstimmung abgeschlossen ist. Dann kannst du das Ergebnis der Wahl sehen.</p>",
 				voteCastedError: "Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
+				GoBackToPoll: "Zurück zur Abstimmung",
 			},
 		},
 	},
-	components: { lawPanel, draggable },
+	components: { lawPanel, draggable, popupModal },
 	props: {
 		// the cast-vote page only receives the pollId and reloads the poll from the backend
 		pollId: { type: String, required: true },
@@ -126,43 +124,55 @@ export default {
 	data() {
 		return {
 			poll: undefined,
-			ballot: [],
+			proposalsInBallot: [],
+			existingBallot: undefined,
 			castVoteLoading: false,
 			voteCastedSuccessfully: false,
 			voteCastedError: false,
 		}
 	},
 	computed: {
-		modalContentClass() {
-			return "bg-success text-white text-center shadow-lg"
-		}
+		canCastVote() {
+			return this.poll && this.poll.status == "VOTING"
+		},
+		isUpdatableBallot() {
+			return this.poll && this.poll.status == "VOTING" && this.existingBallot
+		},
 	},
 	created() {
 		//force refresh of the poll. Load it from the backend
 		this.$api.getPollById(this.pollId, true).then(poll => {
 			this.poll = poll
 			if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
-			this.ballot = _.cloneDeep(this.poll.proposals)
+			this.proposalsInBallot = _.cloneDeep(this.poll.proposals)
 		})
+		this.$api.getVoterToken(config.voterTokenSecret).then(voterToken => {
+			this.$api.getBallot(this.pollId, voterToken).then(ballot => {
+				this.existingBallot = ballot  // may be undefined!
+			})
+		})
+		
 	},
 	mounted() {
-		this.$refs["castVoteModal"].show()
+		
 	},
 	methods: {
 		/** Collapse the descriptions of all proposals in the ballot */
 		toggleBallotCollapse() {
-
+			this.$refs["proposalInBallot"].forEach(pollPanel => {
+				console.log("toogle collapse on", pollPanel)
+				pollPanel.toggleCollapse()})
 		},
 
 		async clickCastVote() {
+			this.castVoteLoading = true
 			this.voteCastedError = false
 			this.voteCastedSuccessfully = false
-			this.castVoteLoading = true
 
-			let voteOrderIds = this.ballot.map(proposal => +proposal.id)
-			let voterToken = await this.$api.getVoterToken(config.voterTokenSecret)
+			let voteOrderIds = this.proposalsInBallot.map(proposal => +proposal.id)
+			let voterToken   = await this.$api.getVoterToken(config.voterTokenSecret)
 
-			//TODO: start a timeer for timeout
+			//TODO: start a timer for timeout
 
 			log.debug("CAST VOTE: poll.id="+this.poll.id, "voterToken="+voterToken, "voteOrderIds", voteOrderIds )
 			this.$api
@@ -170,7 +180,8 @@ export default {
 				.then(() => {
 					this.castVoteLoading = false
 					this.voteCastedSuccessfully = true
-					//this.$root.scrollToBottom()
+					//this.$bvModal.show("successModal")  or the vue-bootstrap internal way
+					this.$refs["successModal"].show()
 				})
 				.catch((err) => {
 					console.error("Cannot cast vote", err)
@@ -178,6 +189,10 @@ export default {
 					this.voteCastedError = true
 					//this.$root.scrollToBottom()
 				})
+		},
+
+		clickSuccessModalOk() {
+			console.log("Cast vote successModal: clicked OK")
 		},
 
 		goToPoll() {
