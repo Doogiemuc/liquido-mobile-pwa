@@ -49,7 +49,7 @@
 				</div>
 				<div class="modal-footer">
 					<slot name="modal-footer">
-						<button v-if="secondaryButtonText" type="button" class="btn btn-secondary flex-grow-1" @clic="clickSecondary">{{ secondaryButtonText }}</button>
+						<button v-if="secondaryButtonText" type="button" class="btn btn-secondary flex-grow-1" @click="clickSecondary">{{ secondaryButtonText }}</button>
 						<button type="button" class="btn btn-primary flex-grow-1" data-dismiss="modal" @click="clickPrimary">{{ primaryButtonText }}</button>
 					</slot>
 				</div>
@@ -149,7 +149,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .modal-content {
 	.modal-header {
 		border-bottom: none;   // "Less is more in UI-design!"
@@ -204,11 +204,11 @@ export default {
 	.modal-footer {
 		justify-content: center;
 		border-top: none;
-	}
-	.ok-button {
-		//font-weight: bold;
-		width: 100%;
-		border: none;
+		.btn {
+			//font-weight: bold;
+			width: 100%;
+			border: none;
+		}
 	}
 
 	/* Unbelievably clever 3D shadow bounce animation */

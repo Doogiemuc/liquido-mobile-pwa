@@ -62,6 +62,7 @@ const globalTranslations = {
 		Attention: "Achtung",
 		Error: "Fehler",
 		Login: "Login",
+		Loading: "Lade ...",
 
 		// Singular and plural form
 		Idea: "Idee",

@@ -1,6 +1,7 @@
 @startuml
 
 ' LIQUIDO Mobile - Screen Flow
+' OUTDATED.  There is a better version in draw.io  See "Easiest use case flow possible.svg"
 
 object "Welcome" as Welcome {
   username

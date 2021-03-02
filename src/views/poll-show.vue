@@ -4,6 +4,10 @@
 			{{ pageTitleLoc }}
 		</h2>
 
+		<div v-if="loading" class="my-3">
+			<b-spinner small />&nbsp;{{ $t('Loading') }}
+		</div>
+		
 		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
 			<i class="fas fa-shield-alt float-right"></i>
 			<p v-html="$t('startVotingPhaseInfo')" />
@@ -91,6 +95,7 @@ export default {
 	},
 	data() {
 		return {
+			loading: true,
 			poll: {},
 			showError: false
 		}
@@ -123,13 +128,16 @@ export default {
 		},
 	},
 	created() {
+		this.loading = true
 		this.$api.getPollById(this.pollId, true)
 			.then(receivedPoll => {
 				this.poll = receivedPoll
+				this.loading = false
 				this.showError = false
 			})
 			.catch(err => {
 				console.warn("Cannot find poll.id=" + this.pollId, err)
+				this.loading = false
 				this.showError = true
 			})
 	},

@@ -208,8 +208,8 @@
 				<p>{{ $t("teamCreated") }}</p>
 				<p>
 					{{ $t("shareThisLink") }}
-					<a id="inviteLink" :href="team.inviteLink" @click.prevent="shareLink()">
-						{{ team.inviteLink }}
+					<a id="inviteLink" :href="inviteLinkURL" @click.prevent="shareLink()">
+						{{ inviteLinkURL }}
 						<i class="fas fa-external-link-alt" />
 					</a>
 				</p>
@@ -217,10 +217,10 @@
 					{{ $t("tellInvitationCode") }}
 					<b id="newTeamInviteCode">{{ team.inviteCode }}</b>
 				</p>
-				<p>
-					{{ $t("scanQrCode") }}
-					<img :src="team.qrCodeUrl" class="qr-code">
-				</p>
+				<p>{{ $t("scanQrCode") }}</p>
+				<div class="text-center">
+					<img id="qrCodeImg" src="" class="qr-code">
+				</div>
 				<p v-html="$t('teamInfo')" />
 			</b-card>
 
@@ -258,6 +258,7 @@
 
 <script>
 import config from "config"
+import QRCode from "qrcode"
 import liquidoInput from "@/components/liquido-input"
 const log = require("loglevel").getLogger("welcome-chat")
 
@@ -399,7 +400,10 @@ export default {
 				default:
 					return "bg-info text-white"
 			}
-		}
+		},
+		inviteLinkURL() {
+			return config.inviteLinkPrefix + this.team.inviteCode
+		},
 	},
 	watch: {
 		
@@ -425,11 +429,11 @@ export default {
 			this.$refs["welcomeChatErrorModal"].show()
 		})
 
-		if (this.isBottomInView("#welcomeBubble")) {
+		if (this.$root.isBottomInView("#welcomeBubble")) {
 			this.startChatAnimation()
 		} else {
 			$(window).scroll(() => {
-				if (this.isBottomInView("#welcomeBubble")) {
+				if (this.$root.isBottomInView("#welcomeBubble")) {
 					this.startChatAnimation()
 				}
 			})
@@ -448,10 +452,10 @@ export default {
 				this.user.name = this.user.name.trim()
 				this.flowState = 4
 				$("#userNameInput").blur()
-				this.scrollToBottom()
+				this.$root.scrollToBottom()
 				setTimeout(() => {
 					this.flowState = 6
-					this.scrollToBottom()
+					this.$root.scrollToBottom()
 				}, 1500)
 			}
 		},
@@ -484,24 +488,24 @@ export default {
 		chooseJoinTeam() {
 			if (this.flowState === 6) {
 				this.flowState = 10
-				this.scrollToBottom()
+				this.$root.scrollToBottom()
 			}
 		},
 		cancelJoinTeam() {
 			this.flowState = 6
-			this.scrollToBottom()
+			this.$root.scrollToBottom()
 		},
 
 		chooseCreateNewTeam() {
 			if (this.flowState === 6) {
 				this.flowState = 20
-				this.scrollToBottom()
+				this.$root.scrollToBottom()
 				$("#teamNameInput").focus()
 			}
 		},
 		cancelCreateNewTeam() {
 			this.flowState = 6
-			this.scrollToBottom()
+			this.$root.scrollToBottom()
 		},
 
 		/** Create a new team */
@@ -517,9 +521,11 @@ export default {
 			this.$api.createNewTeam(newTeamRequest)
 				.then((team) => {
 					this.team = team
+					this.createTeamQRCode()
 					this.flowState = 22
 					this.$nextTick(() => {
-						this.scrollElemToTop("#newTeamCreatedBubble", 0)
+						let headerHeight = this.$root.$refs["liquido-header"].height
+						this.$root.scrollElemToTop("#newTeamCreatedBubble", headerHeight)
 					})
 				})
 				.catch((err) => {			// on error show modal
@@ -539,6 +545,18 @@ export default {
 				})
 		},
 
+		createTeamQRCode() {
+			let QRcodeOpts = { scale: 10 }
+			QRCode.toDataURL(this.inviteLinkURL, QRcodeOpts, function (err, url) {
+				if (err) {
+					console.warn("Cannot create QR code", err)
+				} else {
+					let img = document.getElementById("qrCodeImg")
+					img.src = url
+				}
+			})
+		},
+
 		gotoCreatePoll() {
 			this.$router.push({name: "createPoll"})
 		},
@@ -552,7 +570,8 @@ export default {
 					this.flowState = 12
 					this.team = team
 					this.$nextTick(() => {
-						this.scrollElemToTop("#joinedTeamBubble", 0)
+						let headerHeight = this.$root.$refs["liquido-header"].height
+						this.$root.scrollElemToTop("#joinedTeamBubble", headerHeight)
 					})
 				})
 				.catch(err => {
@@ -566,51 +585,21 @@ export default {
 
 		// Here comes some UX magic :-)
 
-		
-		/** scroll to the very bottom of the content. Show last chat message */
-		scrollToBottom() {
-			this.$nextTick(() => {
-				$("#appContent").animate({ scrollTop: $("#app").height() }, 1000)
-			})
-		},
-
-		/**
-		 * scroll an HTML elemant right under the header
-		 * (as far up as possible, depending on content below the elem)
-		 * @param {String} elem JQuery selector for dom elem
-		 * @param {Number} margin margin below headerHeight in pixels (default 0)
-		 */
-		scrollElemToTop(elem, margin = 0) {
-			let scrollTop = $("#appContent").scrollTop() + $(elem).offset().top - margin
-			this.$nextTick(() => {
-				$("#appContent").animate({ scrollTop: scrollTop }, 1000)
-			})
-		},
-
-		/** Check if the bottom of elem is scrolled into view */
-		isBottomInView(elem) {
-			let docViewTop = $(window).scrollTop()
-			let docViewBottom = docViewTop + $(window).height()
-			let elemTop = $(elem).offset().top
-			let elemBottom = elemTop + $(elem).height()
-			return elemBottom <= docViewBottom
-		},
-
 		startChatAnimation() {
 			if (this.chatAnimationStarted) return  // start chat animation only once
 			this.chatAnimationStarted = true
 			$(window).off("scroll")
 			window.setTimeout(() => {
 				this.flowState = 1
-				this.scrollToBottom()
+				this.$root.scrollToBottom()
 			}, 500)
 			window.setTimeout(() => {
 				this.flowState = 2
-				this.scrollToBottom()
+				this.$root.scrollToBottom()
 			}, 2500)
 			window.setTimeout(() => {
 				this.flowState = 3
-				this.scrollToBottom()
+				this.$root.scrollToBottom()
 			}, 3000)
 		},
 

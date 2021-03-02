@@ -1,10 +1,10 @@
 <template>
 	<div class="team-home">
 		<h2 id="team-home" class="page-title">
-			{{ team.name }}
+			{{ team.teamName }}
 		</h2>
 
-		<b-card class="chat-bubble shadow-sm">
+		<b-card id="team-home-user-welcome" class="chat-bubble shadow-sm">
 			<b-card-text>
 				<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
 			</b-card-text>
@@ -127,7 +127,7 @@ export default {
 			*/
 		}
 		
-		QRCode.toDataURL("text", QRcodeOpts, function (err, url) {
+		QRCode.toDataURL(this.inviteLinkURL, QRcodeOpts, function (err, url) {
 			if (err) {
 				console.warn("Cannot create QR code", err)
 			} else {

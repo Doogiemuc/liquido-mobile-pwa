@@ -8,7 +8,7 @@
 import config from '../../config/config.test'
 
 let now = Date.now() % 10000
-console.log("Running Cypress HAPPY CASE test (test_uuid="+now+")", config)
+console.log("Running Cypress HAPPY CASE test (test_uuid="+now+")", config, process.env.NODE_ENV)
 
 let fix = {}  // Test fixtures within this test RUN
 
@@ -23,6 +23,8 @@ context('Happy Case', () => {
 		fix.pollTitle  = 'Cypress Poll '+now
 		fix.proposalTitle  = 'Cypress Proposal '+now
 		fix.proposalDescription = now + ' lorem ipsum best description ever that needs to be a bit longer because we want to test things like clipping and many more useless UX magic'
+		fix.proposalTitle2  = 'Second Proposal '+now
+		fix.proposalDescription2 = now + ' Description of Second proposal. lorem ipsum best description ever that needs to be a bit long'
 	})
 
 	beforeEach(() => {
@@ -73,7 +75,7 @@ context('Happy Case', () => {
 		cy.get('#addProposalButton').click()
 		//WHEN adding a proposal
 		cy.get('#propTitle').type(fix.proposalTitle)
-		cy.get('#propDescription').type(fix.proposalDescription)
+		cy.get('#propDescription').type(fix.proposalDescription, { delay: 1 })
 		cy.get('#saveProposalButton').click()
 		cy.get('#createdSuccessfullyButton').click()
 		//THEN the poll is shown with that proposal
@@ -130,9 +132,49 @@ context('Happy Case', () => {
 		cy.get('.poll-panel-title').should('contain.text', fix.pollTitle)
 		cy.get('.poll-panel .law-title').should('contain.text', fix.proposalTitle)
 		//cy.get('.poll-panel div.list-group').children('.proposal-list-group-item').should('have.length', 1)
+	})
 
+	it("User adds proposal", function() {
+		assert.isString(fix.pollTitle, "Need existing poll to test joinTeam")
+
+		//GIVEN a logged in user
+		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
+		cy.get("#devLoginSuccessful").should('be.visible')
+		// AND a poll in voting
+		cy.get("#GoToPollsButton").click()
+		cy.get("#elaborationArrow").click()
+		cy.get(".poll-panel-title").first().then(pollTitle => {
+			expect(pollTitle, 'Need poll in elaboration').to.contain.text(fix.pollTitle)
+			pollTitle.click()
+			//Cypress.$(pollTitle).click()
+		})
+		
+		// WHEN user adds a proposal
+		cy.get("#addProposalButton").click()  // This might not be visible, when that user already added a proposal to the poll. => Not happy case
+		cy.get("#propTitle").type(fix.proposalTitle2)
+		cy.get("#propDescription").type(fix.proposalDescription2)
+		cy.get("#saveProposalButton").click()
+		cy.get('#createdSuccessfullyButton').click()		
+		
+		//THEN the poll is shown with that proposal
+		cy.get('#poll-show').should('be.visible')
+		cy.get('.law-title').should('contain.text', fix.proposalTitle2)
 	})
 	
+	/*
+	it('Cast a vote', function() {
+		//GIVEN a logged in user
+		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
+		cy.get("#devLoginSuccessful").should('be.visible')
+		// AND a poll in voting
+		cy.get("#GoToPollsButton").click()
+		cy.get("#votingArrow").click()
+
+		cy.get(".poll-panel").then(pollPanel => {
+			expect(pollPanel, 'Polls in Voting').to.have.length.of.at.least(1)
+			Cypress.$(pollPanel).click()
+		})
+	})
 	
 	/* TODO
 	it('cleanup DB', function() {

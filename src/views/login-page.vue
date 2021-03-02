@@ -2,6 +2,13 @@
 	<div id="LoginPage" class="container">
 		<h1>Login</h1>
 
+		<popup-modal 
+			id="dummyModal"
+			ref="dummyModal"
+			type="error"
+			message="dummy Modal"
+		></popup-modal>
+
 		<div v-if="showDevLogin" class="mb-3">
 			<button type="button" class="btn btn-primary" @click="devLoginAdmin">
 				<i class="fas fa-shield-alt"></i> {{ $t("DevLoginAdmin") }}
@@ -10,6 +17,10 @@
 				{{ $t("DevLoginMember") }}
 			</button>
 		</div>
+
+		<button type="button" class="btn btn-primary mb-3" @click="$refs['dummyModal'].show()">
+			show Modal
+		</button>
 
 		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginViaEmail')">
 			<p>{{ $t('LoginViaEmailInfo') }}</p>
@@ -46,6 +57,7 @@
 <script>
 import config from "config"
 import liquidoInput from "@/components/liquido-input"
+import popupModal from "@/components/popup-modal"
 
 export default {
 	i18n: {
@@ -60,17 +72,17 @@ export default {
 
 				LoginWithAuthy: "Login with Authy",
 				yourMobilephone: "Deine Handynummer",
-				LoginWithAuthyInfo: "Die Authy App kann dir einen einmal gültigen Login-Code per SMS schicken. Das ist besonders sicher",
+				LoginWithAuthyInfo: "Die Authy App kann dir ein einmal gültiges Login-Token per SMS schicken. Das ist besonders sicher",
 				OpenAuthy: "Authy öffnen",
-				mobilephonePlaceholder: "info@domain.de",
-				mobilephoneInvalid: "E-Mail ungültig",
+				mobilephonePlaceholder: "+49 151 1234567",
+				mobilephoneInvalid: "Handynummer ungültig",
 
 				DevLoginAdmin: "devLogin: Admin",
 				DevLoginMember: "devLogin: Member",
 			}
 		}
 	},
-	components: { liquidoInput },
+	components: { liquidoInput, popupModal },
 	data() {
 		return {
 			email: "",

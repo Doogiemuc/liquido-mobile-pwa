@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2 class="page-title">
+		<h2 id="addProposalTitle" class="page-title">
 			{{ $t("addProposal") }}
 		</h2>
 
@@ -69,31 +69,25 @@
 			/>
 		</div>
 
-		<b-modal id="proposalSuccessfullyAddedModal" 
-			title="Danke"
-			hide-header-close
-			no-close-on-esc
-			no-close-on-backdrop 
-			header-bg-variant="success"
-			header-text-variant="light"
-			body-bg-variant="success"
-			body-text-variant="light"
-			footer-bg-variant="success"
-			footer-text-variant="light"
+		<popup-modal
+			id="proposalSuccessfullyAddedModal"
+			ref="successModal"
+			type="success"
 		>
 			{{ $t('createdSuccessfully') }}
-			<template #modal-footer="{}">
+			<template #modal-footer>
 				<b-button id="createdSuccessfullyButton" variant="primary" @click="gotoPoll()">
 					{{ $t('gotoPoll') }}&nbsp;<i class="fas fa-angle-double-right"></i>
 				</b-button>
 			</template>
-		</b-modal>
+		</popup-modal>
 	</div>
 </template>
 
 <script>
 import pollPanel from "../components/poll-panel"
 import liquidoInput from "../components/liquido-input"
+import popupModal from "@/components/popup-modal"
 
 export default {
 	i18n: {
@@ -113,7 +107,7 @@ export default {
 			},
 		},
 	},
-	components: { pollPanel, liquidoInput },
+	components: { pollPanel, liquidoInput, popupModal },
 	props: {
 		pollId: { type: String, required: true },
 	},
@@ -170,7 +164,7 @@ export default {
 
 		saveProposal() {
 			this.$api.addProposal(this.poll.id, this.proposal.title, this.proposal.description)
-				.then(() => this.$bvModal.show("proposalSuccessfullyAddedModal"))
+				.then(() => this.$refs["successModal"].show())
 				.catch(err => {
 					console.error("Cannot add proposal", err)
 				})

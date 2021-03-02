@@ -17,9 +17,13 @@
 					&nbsp;{{ poll ? poll.title : "" }}
 				</h4>
 			</template>
-			<draggable
+			<div v-if="loading" class="draggable">
+				<b-spinner small />&nbsp;{{ $t('Loading') }}
+			</div>
+			<draggable v-else
 				v-model="proposalsInBallot"
 				class="draggable"
+				:disabled="loading || castVoteLoading"
 				:swap-threshold="0.5"
 				:delay="40"
 				:animation="500"
@@ -42,11 +46,9 @@
 			</div>
 		</b-card>
 
-		<div v-if="canCastVote" class="text-right my-5">
+		<div v-if="canCastVote" class="text-center mb-5">
 			<b-button variant="primary" size="lg" :disabled="castVoteLoading" @click="clickCastVote()">
-				<i v-if="!voteCastedSuccessfully && !voteCastedError && !castVoteLoading" class="fas fa-vote-yea"></i>
-				<i v-if="voteCastedSuccessfully" class="far fa-check-circle" />
-				<i v-if="voteCastedError" class="fas fa-excamation-circle" />
+				<i v-if="!castVoteLoading" class="fas fa-vote-yea"></i>
 				<b-spinner v-if="castVoteLoading" small />
 				{{ isUpdatableBallot ? $t("updateBallotButton") : $t("castVoteButton") }}
 			</b-button>
@@ -56,17 +58,28 @@
 			id="successModal"
 			ref="successModal"
 			type="success"
-			:message="$t('voteCastedSuccessfully')"
-			@clickPrimary="clickSuccessModalOk"
+		>
+			<template #modal-body>
+				<div class="text-center">
+					<p>{{ isUpdatableBallot ? $t("voteUpdatedSuccessfully") : $t("voteCastedSuccessfully") }}</p>
+					<p>
+						Checksum:<br />
+						<pre>{{ existingBallot ? existingBallot.checksum : "" }}</pre>
+					</p>
+				</div>
+			</template>
+		</popup-modal>
+
+		<popup-modal 
+			id="errorModal"
+			ref="errorModal"
+			type="error"
+			:message="$t('voteCastError')"
 		></popup-modal>
 		
-		<div v-if="voteCastedError" class="alert alert-danger" v-html="$t('voteCastedError')" />
-
 		<div v-if="voteCastedSuccessfully" class="alert alert-info mb-3">
+			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('changeBallotLaterInfo')"></p>
-			<b-button variant="primary" @click="goToPoll()">
-				{{ $t("GoBackToPoll") }} <i class="fas fa-angle-double-right" />
-			</b-button>
 		</div>
 
 		<div class="alert alert-info">
@@ -107,11 +120,12 @@ export default {
 				updateBallotButton: "Eigene Stimme aktualisieren",
 				castVoteButton: "Diese Stimme abgeben",
 				voteCastedSuccessfully: "Deine Stimme wurde erfolgreich gezählt.",
+				voteUpdatedSuccessfully: "Deine Stimme wurde erfolgreich aktualisiert.",
 				changeBallotLaterInfo: 
 					"In <span class='liquido'></span> kannst du deinen Stimmzettel "+
 					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.</p>" +
 					"<p>Du erhälst eine Benachrichtigung, sobald die Abstimmung abgeschlossen ist. Dann kannst du das Ergebnis der Wahl sehen.</p>",
-				voteCastedError: "Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
+				voteCastError: "Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
 				GoBackToPoll: "Zurück zur Abstimmung",
 			},
 		},
@@ -123,35 +137,38 @@ export default {
 	},
 	data() {
 		return {
+			loading: true,
 			poll: undefined,
 			proposalsInBallot: [],
 			existingBallot: undefined,
 			castVoteLoading: false,
 			voteCastedSuccessfully: false,
-			voteCastedError: false,
 		}
 	},
 	computed: {
 		canCastVote() {
-			return this.poll && this.poll.status == "VOTING"
+			return this.poll && this.poll.status === "VOTING"
 		},
 		isUpdatableBallot() {
-			return this.poll && this.poll.status == "VOTING" && this.existingBallot
+			return this.poll && this.poll.status === "VOTING" && this.existingBallot
 		},
 	},
 	created() {
+		this.loading = true
 		//force refresh of the poll. Load it from the backend
-		this.$api.getPollById(this.pollId, true).then(poll => {
+		let loadPoll = this.$api.getPollById(this.pollId, true).then(poll => {
 			this.poll = poll
 			if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
 			this.proposalsInBallot = _.cloneDeep(this.poll.proposals)
 		})
-		this.$api.getVoterToken(config.voterTokenSecret).then(voterToken => {
-			this.$api.getBallot(this.pollId, voterToken).then(ballot => {
+		let getVoterToken = this.$api.getVoterToken(config.voterTokenSecret).then(voterToken => {
+			return this.$api.getBallot(this.pollId, voterToken).then(ballot => {
 				this.existingBallot = ballot  // may be undefined!
-			})
+			}).catch(err => console.warn("Cannot get ballot of user", err))
+		}).catch(err => console.warn("Cannot voterToken of user", err))
+		Promise.all([loadPoll, getVoterToken]).then(() => {
+			this.loading = false
 		})
-		
 	},
 	mounted() {
 		
@@ -166,38 +183,30 @@ export default {
 
 		async clickCastVote() {
 			this.castVoteLoading = true
-			this.voteCastedError = false
 			this.voteCastedSuccessfully = false
 
 			let voteOrderIds = this.proposalsInBallot.map(proposal => +proposal.id)
-			let voterToken   = await this.$api.getVoterToken(config.voterTokenSecret)
+			let voterToken   = await this.$api.getVoterToken(config.voterTokenSecret)  // This will normally fetch the cached voterToken
 
 			//TODO: start a timer for timeout
 
 			log.debug("CAST VOTE: poll.id="+this.poll.id, "voterToken="+voterToken, "voteOrderIds", voteOrderIds )
-			this.$api
-				.castVote(this.poll.id, voteOrderIds, voterToken)
-				.then(() => {
+			this.$api.castVote(this.poll.id, voteOrderIds, voterToken)
+				.then(() => this.$api.getBallot(this.poll.id, voterToken))
+				.then(ballot => {
+					console.log("Vote casted successfully ballot.checksum=", ballot.checksum)
+					this.existingBallot = ballot
 					this.castVoteLoading = false
 					this.voteCastedSuccessfully = true
-					//this.$bvModal.show("successModal")  or the vue-bootstrap internal way
 					this.$refs["successModal"].show()
-				})
+				})//
 				.catch((err) => {
 					console.error("Cannot cast vote", err)
 					this.castVoteLoading = false
-					this.voteCastedError = true
-					//this.$root.scrollToBottom()
+					this.$refs["errorModal"].show()
 				})
 		},
 
-		clickSuccessModalOk() {
-			console.log("Cast vote successModal: clicked OK")
-		},
-
-		goToPoll() {
-			this.$router.push("/polls/"+this.poll.id)
-		},
 	},
 }
 </script>

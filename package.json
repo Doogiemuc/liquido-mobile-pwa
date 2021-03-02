@@ -14,7 +14,7 @@
 		"deploy": "D:\\Coding\\DevApps\\WinSCP\\WinSCP.exe \"IONOS doogie.de\"  /synchronize /defaults D:\\Coding\\liquido\\liquido-mobile-pwa\\dist\\ /liquido_mobile/",
 		"lint": "vue-cli-service lint",
 		"unit-test": "cross-env NODE_ENV=test mocha --require @babel/register --recursive",
-		"cypress": "cypress open"
+		"cypress": "cross-env NODE_ENV=test cypress open"
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
@@ -52,7 +52,7 @@
 		"@vue/eslint-config-prettier": "^6.0.0",
 		"axios-mock-adapter": "^1.19.0",
 		"cross-env": "^7.0.3",
-		"cypress": "^6.5.0",
+		"cypress": "^6.6.0",
 		"eslint": "^7.20.0",
 		"eslint-plugin-prettier": "^3.3.1",
 		"eslint-plugin-vue": "^7.6.0",

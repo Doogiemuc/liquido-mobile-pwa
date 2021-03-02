@@ -44,6 +44,9 @@ export default {
 		}
 	},
 	computed: {
+		height() {
+			return $("#liquidoHeader").height()
+		}
 	},
 	mounted() {
 		EventBus.$on(EventBus.LOGIN, () => this.isLoggedIn = true)

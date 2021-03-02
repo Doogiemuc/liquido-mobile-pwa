@@ -1,5 +1,5 @@
 //
-// Configuration for LIQUIDO mobile PWA in INT environment
+// Configuration for LIQUIDO mobile PWA during testing environment
 //
 
 import _ from "lodash"

@@ -1,7 +1,9 @@
 /**
- * Common configuration that is used in all environments.
+ * Common LIQUIDO PWA configuration that is used in all environments.
  * This file is merged into the environment specific configs.
  */
+
+//TODO: this is built-in into vue-cli. We can simply use .env.production files.
 
 export default {
 	mockBackend: false,

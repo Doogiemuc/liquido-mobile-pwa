@@ -4,6 +4,10 @@
 			{{ pageTitleLoc }}
 		</h2>
 
+		<div v-if="loading" class="my-3">
+			<b-spinner small />&nbsp;{{ $t('Loading') }}
+		</div>
+
 		<liquido-input
 			v-if="polls.length > 3"
 			id="searchInput"
@@ -121,6 +125,7 @@ export default {
 	},
 	data() {
 		return {
+			loading: true,
 			polls: [],
 			searchQuery: "",
 			/**current filter for poll status, undefined|ELABORATION|VOTING|FINISHED */
@@ -169,8 +174,10 @@ export default {
 		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
 			this.pollStatusFilter = this.status
 		}
+		this.loading = true
 		this.$api.getPolls().then(polls => {
 			this.polls = polls
+			this.loading = false
 			//console.log("polls", polls)
 		})
 	},

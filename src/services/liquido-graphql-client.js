@@ -304,7 +304,7 @@ export default {
 			`{ voteCount ballot { id level checksum } } }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
-				log.info("Vote casted successfully!")
+				log.info("Ballot with voteOrder sent to backend.")
 				return res.data.castVote
 			})
 	},
