@@ -140,41 +140,54 @@ context('Happy Case', () => {
 		//GIVEN a logged in user
 		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
 		cy.get("#devLoginSuccessful").should('be.visible')
-		// AND a poll in voting
+		// AND a poll in elaboration
 		cy.get("#GoToPollsButton").click()
 		cy.get("#elaborationArrow").click()
-		cy.get(".poll-panel-title").first().then(pollTitle => {
-			expect(pollTitle, 'Need poll in elaboration').to.contain.text(fix.pollTitle)
-			pollTitle.click()
-			//Cypress.$(pollTitle).click()
-		})
+		cy.contains(".poll-panel-title", fix.pollTitle).click()
 		
 		// WHEN user adds a proposal
 		cy.get("#addProposalButton").click()  // This might not be visible, when that user already added a proposal to the poll. => Not happy case
 		cy.get("#propTitle").type(fix.proposalTitle2)
-		cy.get("#propDescription").type(fix.proposalDescription2)
+		cy.get("#propDescription").type(fix.proposalDescription2, { delay: 1 })
 		cy.get("#saveProposalButton").click()
-		cy.get('#createdSuccessfullyButton').click()		
+		cy.get('#createdSuccessfullyButton').click()
 		
 		//THEN the poll is shown with that proposal
 		cy.get('#poll-show').should('be.visible')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle2)
 	})
-	
+
+	it("Admin starts voting phase", function() {
+		//GIVEN a logged in user
+		cy.visit("/devLogin?userEmail="+fix.adminEmail+"&teamName="+fix.teamName)
+		cy.get("#devLoginSuccessful").should('be.visible')
+		// AND our poll in elaboration
+		cy.get("#GoToPollsButton").click()
+		cy.contains(".poll-panel-title", fix.pollTitle).click()
+
+		// WHEN admin stars voting phase
+		cy.get("#startVoteButton").click()
+
+		// THEN sucessModla is shown and poll is in status voting
+		cy.get("#votingPhaseStartedModal .btn-primary").click()
+		cy.get(".poll-panel").its("data-poll-status").should("eq", "VOTING")
+	})
+
 	/*
-	it('Cast a vote', function() {
+	it("User casts vote", function() {
 		//GIVEN a logged in user
 		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
 		cy.get("#devLoginSuccessful").should('be.visible')
 		// AND a poll in voting
 		cy.get("#GoToPollsButton").click()
 		cy.get("#votingArrow").click()
-
-		cy.get(".poll-panel").then(pollPanel => {
-			expect(pollPanel, 'Polls in Voting').to.have.length.of.at.least(1)
-			Cypress.$(pollPanel).click()
+		cy.get(".poll-panel-title").first().then(pollTitle => {
+			expect(pollTitle, 'Need poll in elaboration').to.contain.text(fix.pollTitle)
+			pollTitle.click()
+			//Cypress.$(pollTitle).click()
 		})
 	})
+	
 	
 	/* TODO
 	it('cleanup DB', function() {

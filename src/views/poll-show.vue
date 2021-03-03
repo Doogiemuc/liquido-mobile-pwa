@@ -4,15 +4,16 @@
 			{{ pageTitleLoc }}
 		</h2>
 
-		<div v-if="loading" class="my-3">
+		<div v-if="loadingPoll" class="my-3">
 			<b-spinner small />&nbsp;{{ $t('Loading') }}
 		</div>
 		
 		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
 			<i class="fas fa-shield-alt float-right"></i>
 			<p v-html="$t('startVotingPhaseInfo')" />
-			<b-button variant="primary" class="float-right" @click="clickStartVote()">
-				<i class="fas fa-user-shield" />
+			<b-button id="startVoteButton" :disabled="startVoteLoading" variant="primary" class="float-right" @click="clickStartVote()">
+				<b-spinner v-if="startVoteLoading" small />
+				<i v-else class="fas fa-user-shield" />
 				{{ $t("startVotingPhase") }}
 			</b-button>
 		</div>
@@ -59,11 +60,21 @@
 				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
+
+		<popup-modal 
+			id="votingPhaseStartedModal"
+			ref="votingPhaseStartedModal"
+			type="success"
+		>
+			{{ $t("votingPhaseStartedSuccessfully") }}
+		</popup-modal>
 	</div>
 </template>
 
 <script>
 import pollPanel from "../components/poll-panel"
+import popupModal from "@/components/popup-modal"
+const log = require("loglevel").getLogger("poll-show")
 
 export default {
 	i18n: {
@@ -79,6 +90,7 @@ export default {
 				startVotingPhaseInfo:
 					"Hallo Admin! Möchstest du die Wahlphase für diese Abstimmung starten? Dann sind die Wahlvorschläge fixiert und dein Team kann abstimmen.",
 				startVotingPhase: "Wahl starten",
+				votingPhaseStartedSuccessfully: "Ok, die Wahlphase dieser Abstimmung ist jetzt gestartet.",
 				votingPhaseInfo: "Die Wahlphase dieser Abstimmung läuft gerade und du kannst jetzt hier deine Stimme abgeben.",
 				goToCastVote: "Stimme abgeben",
 				editOwnVote: "Stimmzettel ändern",
@@ -86,23 +98,25 @@ export default {
 					"<p>Du hast in dieser Abstimmung bereits eine Stimme abgegeben.</p><p>So lange die Wahlphase dieser Abstimmung noch läuft, "+
 					"kannst du in <span class='liquido'></span> die Prio Reihenfolge auf deinem Stimmzettel auch noch ändern wenn du möchstest.</p>",
 				cannotFindPoll: "<h4>Fehler</h4><hr/><p>Diese Abstimmung konnte nicht gefunden werden.</p>",
+				
 			},
 		},
 	},
-	components: { pollPanel },
+	components: { pollPanel, popupModal },
 	props: {
 		pollId: { type: String, required: true }, // url parameter is passed as String
 	},
 	data() {
 		return {
-			loading: true,
 			poll: {},
-			showError: false
+			showError: false,
+			loadingPoll: true,
+			startVoteLoading: false,
 		}
 	},
 	computed: {
 		pageTitleLoc() {
-			if (!this.poll.id) return this.$t("Poll")
+			if (!this.poll || !this.poll.id) return this.$t("Poll")
 			if (!this.poll.proposals || this.poll.proposals.length === 0) return this.$t("newPoll")
 			if (this.poll.status === "ELABORATION") return this.$t("pollInElaboration")
 			if (this.poll.status === "VOTING") return this.$t("pollInVoting")
@@ -128,21 +142,26 @@ export default {
 		},
 	},
 	created() {
-		this.loading = true
-		this.$api.getPollById(this.pollId, true)
-			.then(receivedPoll => {
-				this.poll = receivedPoll
-				this.loading = false
-				this.showError = false
-			})
-			.catch(err => {
-				console.warn("Cannot find poll.id=" + this.pollId, err)
-				this.loading = false
-				this.showError = true
-			})
+		console.log("poll-show: reloading poll from created")
+		this.loadPoll()
 	},
 	mounted() {},
 	methods: {
+		loadPoll() {
+			console.log("poll-show: reloading poll INNER")
+			this.loadingPoll = true
+			return this.$api.getPollById(this.pollId, true)
+				.then(receivedPoll => {
+					this.poll = receivedPoll
+					this.loadingPoll = false
+					this.showError = false
+				})
+				.catch(err => {
+					console.warn("Cannot find poll.id=" + this.pollId, err)
+					this.loadingPoll = false
+					this.showError = true
+				})
+		},
 		goToPolls() {
 			this.$router.push({name: "polls"})
 		},
@@ -153,9 +172,16 @@ export default {
 			this.$router.push("/polls/" + this.poll.id + "/castVote")
 		},
 		clickStartVote() {
-			this.$api.startVotingPhase(this.poll.id).then(() => {
-				//TODO: Show success to user (need some kind of nice animation)
+			if (this.startVoteLoading) return  // do not allow double click
+			this.startVoteLoading = true
+			this.$api.startVotingPhase(this.poll.id).then(poll => {
+				this.startVoteLoading = false
+				this.poll = poll  // startVotingPhase returns updated poll in new status
+				this.$refs["votingPhaseStartedModal"].show()
 				$("html, body").animate({ scrollTop: 0 }, 500)
+			}).catch(err => {
+				this.startVoteLoading = false
+				log.error("Cannot start voting phase of poll(id="+this.poll.id+")", err)
 			})
 		},
 	},

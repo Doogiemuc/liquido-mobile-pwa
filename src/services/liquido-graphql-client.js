@@ -72,10 +72,27 @@ axios.interceptors.response.use(function (response) {
 });
 
 
+/** Shorthands for JQL return values */
+const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, createdBy { id } area { id } }"
+const JQL = {
+	CREATE_OR_JOIN_TEAM_RESULT: `{ team {
+		id
+		teamName
+		inviteCode
+		admins  { id, email, name, website, picture, mobilephone }
+		members { id, email, name, website, picture, mobilephone }
+	}
+	user { id, email, name, website, picture, mobilephone }
+	jwt }`,
+	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
+	POLL: "{ id, title, status, area { id } votingStartAt votingEndAt proposals " + JQL_PROPOSAL + "}",
+	POLL_FINISHED: `{ id, title, status, area { id } votingStartAt votingEndAt winner { id } dualMatrix { data } proposals ` + JQL_PROPOSAL + "}",
+}
+
 /**
- * export API methods
+ * exported API methods
  */
-export default {
+let graphQlApi = {
 	async pingApi() {
 		return axios.post("", {query: "query { ping }"})
 	},
@@ -162,19 +179,8 @@ export default {
 	 * @param {Object} newTeam teamName, adminName, adminEmail and adminMobilephone
 	 */
 	async createNewTeam(newTeam) {
-		let graphQL = `mutation {
-			createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}", adminEmail: "${newTeam.adminEmail}") {
-				team {
-					id
-					teamName
-					inviteCode
-					admins  { id, email, name, website, picture, mobilephone }
-					members { id, email, name, website, picture, mobilephone }
-				}
-				user { id, email, name, website, picture, mobilephone }
-				jwt
-			}
-		}`
+		let graphQL = `mutation { createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}", adminEmail: "${newTeam.adminEmail}") ` +
+			JQL.CREATE_OR_JOIN_TEAM_RESULT + "}"
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let team = res.data.createNewTeam.team
@@ -192,19 +198,8 @@ export default {
 	},
 
 	async joinTeam(inviteCode, userName, userEmail) {
-		let graphQL = `mutation {	
-			joinTeam(inviteCode: "${inviteCode}", userName: "${userName}", userEmail: "${userEmail}") {
-				team {
-					id
-					teamName
-					inviteCode
-					admins  { id, email, name, website, picture, mobilephone }
-					members { id, email, name, website, picture, mobilephone }
-				}
-				user { id, email, name, website, picture, mobilephone }
-				jwt
-			}
-		}`
+		let graphQL = `mutation {	joinTeam(inviteCode: "${inviteCode}", userName: "${userName}", userEmail: "${userEmail}") ` +
+			JQL.CREATE_OR_JOIN_TEAM_RESULT + "}"
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let team = res.data.joinTeam.team
@@ -243,8 +238,7 @@ export default {
 	},
 
 	async addProposal(pollId, propTitle, propDescription) {
-		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") ` +
-			`{ id, title, status, proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
+		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") ${JQL.POLL} }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let poll = res.data.addProposal
@@ -255,22 +249,21 @@ export default {
 	},
 
 	async startVotingPhase(pollId) {
-		let graphQL = `mutation { startVotingPhase(pollId: "${pollId}") ` +
-			`{ id status } }`
+		let graphQL = `mutation { startVotingPhase(pollId: "${pollId}") ${JQL.POLL} }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
-				log.info(`Started voting phase of poll.id=${pollId}`)
-				return res.data.castVote
+				let poll = res.data.startVotingPhase
+				log.info("Started voting phase of poll", poll)
+				return poll
 			})
 	},
 
 	async finishVotingPhase(pollId) {
-		let graphQL = `mutation { finishVotingPhase(pollId: "${pollId}") ` +
-			`{ id status } }`
+		let graphQL = `mutation { finishVotingPhase(pollId: "${pollId}") ${JQL.POLL} }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				log.info(`Started voting phase of poll.id=${pollId}`)
-				return res.data.castVote
+				return res.data.finishVotingPhase
 			})
 	},
 
@@ -301,7 +294,7 @@ export default {
 		let voteOrderStr = "[" + voteOrderIds.join(",") + "]"
 		console.log("Cast vote in poll.id="+pollId+" => ", voteOrderStr)
 		let graphQL = `mutation { castVote(pollId: "${pollId}", voteOrderIds: ${voteOrderStr}, voterToken: "${voterToken}") ` +
-			`{ voteCount ballot { id level checksum } } }`
+			`{ voteCount ballot { level checksum voteOrder { id } } } }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				log.info("Ballot with voteOrder sent to backend.")
@@ -315,9 +308,18 @@ export default {
 		TEAM_WITH_SAME_NAME_EXISTS: 2,
 	},
 
+	/** client side caches */
 	teamCache: new PopulatingCache(teamsCacheConfig),
 	pollsCache: new PopulatingCache(pollsCacheConfig),
+
+	/** Keys for the above caches */
 	CURRENT_USER_KEY: "currentUser",       // key for current user object in teamCache
 	TEAM_KEY: "team",
 	VOTER_TOKEN_KEY: "voterToken",
+
+	/** default JQL queries for common models */
+	JQL: JQL,
+
 }
+
+export default graphQlApi

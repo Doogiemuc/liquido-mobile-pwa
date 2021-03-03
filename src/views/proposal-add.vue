@@ -73,8 +73,8 @@
 			id="proposalSuccessfullyAddedModal"
 			ref="successModal"
 			type="success"
+			:message="$t('createdSuccessfully')"
 		>
-			{{ $t('createdSuccessfully') }}
 			<template #modal-footer>
 				<b-button id="createdSuccessfullyButton" variant="primary" @click="gotoPoll()">
 					{{ $t('gotoPoll') }}&nbsp;<i class="fas fa-angle-double-right"></i>

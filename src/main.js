@@ -3,7 +3,7 @@
  */
 console.log("%cLIQUIDO Mobile", "font-size: 40px; color:blue; font-face: Baskerville, serif; font-weight: bold; border: 1px solid blue; padding: 20px;")
 
-const log = require("loglevel").getLogger("liquido-main");
+const log = require("loglevel").getLogger("liquido-main")
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 	log.enableAll()
 }

@@ -589,18 +589,27 @@ export default {
 			if (this.chatAnimationStarted) return  // start chat animation only once
 			this.chatAnimationStarted = true
 			$(window).off("scroll")
+			let smallDelay = 500  //ms
+			let mediumDelay = 2500 // ms
+
+			// If we are running inside a Cypress test, then speedup animation.
+			if (window.Cypress) {
+				smallDelay = 100
+				mediumDelay = 200
+			}
+
 			window.setTimeout(() => {
 				this.flowState = 1
 				this.$root.scrollToBottom()
-			}, 500)
+			}, smallDelay)
 			window.setTimeout(() => {
 				this.flowState = 2
 				this.$root.scrollToBottom()
-			}, 2500)
+			}, mediumDelay)
 			window.setTimeout(() => {
 				this.flowState = 3
 				this.$root.scrollToBottom()
-			}, 3000)
+			}, smallDelay + mediumDelay)
 		},
 
 		shareLink() {

@@ -1,5 +1,5 @@
 <template>
-	<b-card :id="pollCardId" :pollid="poll.id" no-body class="poll-panel shadow mb-3">
+	<b-card :id="pollCardId" :pollid="poll.id" :data-poll-status="poll.status" no-body class="poll-panel shadow mb-3">
 		<template #header>
 			<h4 v-if="readOnly" class="read-only poll-panel-title">
 				<i :class="iconForPoll" />

@@ -47,7 +47,7 @@
 		</b-card>
 
 		<div v-if="canCastVote" class="text-center mb-5">
-			<b-button variant="primary" size="lg" :disabled="castVoteLoading" @click="clickCastVote()">
+			<b-button variant="primary" size="lg" :disabled="loading || castVoteLoading" @click="clickCastVote()">
 				<i v-if="!castVoteLoading" class="fas fa-vote-yea"></i>
 				<b-spinner v-if="castVoteLoading" small />
 				{{ isUpdatableBallot ? $t("updateBallotButton") : $t("castVoteButton") }}

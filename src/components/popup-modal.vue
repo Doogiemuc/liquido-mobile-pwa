@@ -45,7 +45,7 @@
 					</slot>
 				</div>
 				<div class="modal-body">
-					<slot name="modal-body">{{ message }}</slot>
+					<slot>{{ message }}</slot>
 				</div>
 				<div class="modal-footer">
 					<slot name="modal-footer">
