@@ -66,7 +66,7 @@ context('Happy Case', () => {
 		cy.get('#pollTitleInput').type(fix.pollTitle)
 		cy.get('#createPollButton').click()
 		//THEN newly created poll should be shown
-		cy.get('#poll-show')
+		cy.get('#poll-show-page')
 		cy.get('.poll-panel-title').should('contain.text', fix.pollTitle)
 		cy.get('#addProposalButton').should('be.visible')
 
@@ -79,7 +79,7 @@ context('Happy Case', () => {
 		cy.get('#saveProposalButton').click()
 		cy.get('#createdSuccessfullyButton').click()
 		//THEN the poll is shown with that proposal
-		cy.get('#poll-show').should('be.visible')
+		cy.get('#poll-show-page')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle)
 
 	})
@@ -153,7 +153,7 @@ context('Happy Case', () => {
 		cy.get('#createdSuccessfullyButton').click()
 		
 		//THEN the poll is shown with that proposal
-		cy.get('#poll-show').should('be.visible')
+		cy.get('#poll-show-page')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle2)
 	})
 
@@ -168,12 +168,13 @@ context('Happy Case', () => {
 		// WHEN admin stars voting phase
 		cy.get("#startVoteButton").click()
 
-		// THEN sucessModla is shown and poll is in status voting
+		// THEN sucessModal is shown and poll is in status voting
 		cy.get("#votingPhaseStartedModal .btn-primary").click()
-		cy.get(".poll-panel").its("data-poll-status").should("eq", "VOTING")
+		cy.get(".poll-panel[data-poll-status='VOTING']")
+			.should("have.attr", "data-poll-status", "VOTING")  
 	})
 
-	/*
+	
 	it("User casts vote", function() {
 		//GIVEN a logged in user
 		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
@@ -181,11 +182,18 @@ context('Happy Case', () => {
 		// AND a poll in voting
 		cy.get("#GoToPollsButton").click()
 		cy.get("#votingArrow").click()
-		cy.get(".poll-panel-title").first().then(pollTitle => {
-			expect(pollTitle, 'Need poll in elaboration').to.contain.text(fix.pollTitle)
-			pollTitle.click()
-			//Cypress.$(pollTitle).click()
-		})
+		cy.contains(".poll-panel-title", fix.pollTitle).click()
+		cy.get("#goToCastVoteButton").click()
+		cy.get("#cast-vote-page")
+
+		// WHEN user casts his vote
+		cy.get("#castVoteButton").click()
+		
+		// THEN success modal is shown
+		cy.get("#castVoteSuccessModal").should("be.visible")
+		cy.get("#castVoteSuccessModal .btn-primary").click()
+		//  AND user is informed, that he can updated his ballot
+		cy.get("#isUpdateableBallotInfo").should("be.visible")
 	})
 	
 	

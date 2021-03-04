@@ -453,10 +453,12 @@ export default {
 				this.flowState = 4
 				$("#userNameInput").blur()
 				this.$root.scrollToBottom()
+				let mediumTimeout = 1500
+				if (window.Cypress) mediumTimeout = 100
 				setTimeout(() => {
 					this.flowState = 6
 					this.$root.scrollToBottom()
-				}, 1500)
+				}, mediumTimeout)
 			}
 		},
 

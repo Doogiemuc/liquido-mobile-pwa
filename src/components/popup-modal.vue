@@ -1,29 +1,4 @@
 <template>
-	<!-- b-modal 
-		:id="id"
-		ref="modalRef"
-		centered
-		no-close-on-backdrop
-		:content-class="modalContentClass"
-	>
-		<template #modal-header>
-			<i :class="headerIconClass" class="bounce-anim-icon"></i>
-			<div class="header-icon-shadow bounce-anim-shadow">&nbsp;</div>
-		</template>
-		<template #default>
-			<slot>{{ currentMessage }}</slot>
-		</template>
-		<template #modal-footer="{ ok, cancel }">
-			<b-button v-if="showCancel" variant="secondary" class="cancel-button" @click="cancel()">
-				{{ $t('Cancel') }}
-			</b-button>
-			<b-button variant="primary" class="ok-button" @click="clickOk(ok)">
-				{{ $t('Ok') }}
-			</b-button>
-		</template>
-	</b-modal -->
-
-	<!-- Modal -->
 	<div :id="id"
 		class="modal"
 		tabindex="-1"

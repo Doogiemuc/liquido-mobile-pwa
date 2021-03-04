@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2 id="poll-show" class="page-title">
+		<h2 id="poll-show-page" class="page-title">
 			{{ pageTitleLoc }}
 		</h2>
 
@@ -44,7 +44,7 @@
 
 		<div v-if="poll.status === 'VOTING' && !poll.usersBallot" class="alert alert-secondary mb-3">
 			<p v-html="$t('votingPhaseInfo')" />
-			<b-button variant="primary" class="float-right" @click="clickCastVote()">
+			<b-button variant="primary" id="goToCastVoteButton" class="float-right" @click="clickCastVote()">
 				<i class="fas fa-person-booth" />
 				{{ $t("goToCastVote") }}
 				<i class="fas fa-angle-double-right" />

@@ -2,10 +2,7 @@
 	<div id="app">
 		<liquido-header ref="liquido-header" :back-link="backLink" />
 		<transition :name="transitionName">
-			<router-view
-				id="appContent"
-				class="router-view container-lg"
-			/>
+			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
 	</div>
 </template>

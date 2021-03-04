@@ -1,16 +1,20 @@
 <template>
-	<div class="container">
-		<h2 class="page-title">
+	<div>
+		<h2 id="cast-vote-page" class="page-title">
 			<i class="fas fa-person-booth" />
 			&nbsp;{{ $t("castVoteTitle") }}
 		</h2>
 
-		<div v-if="isUpdatableBallot" class="alert alert-info">
+		<div v-if="isUpdatableBallot" id="isUpdateableBallotInfo" class="alert alert-info">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('updateBallotInfo')"></p>
+			<p>
+				{{ $t("checksumOfYourBallot") }}<br />
+				<pre>{{ existingBallot ? existingBallot.checksum : "" }}</pre>
+			</p>
 		</div>
 
-		<b-card no-body class="ballot-card mb-3">
+		<b-card no-body class="ballot-card mb-5">
 			<template #header>
 				<h4 class="poll-title">
 					<i class="fas fa-poll" />
@@ -47,7 +51,7 @@
 		</b-card>
 
 		<div v-if="canCastVote" class="text-center mb-5">
-			<b-button variant="primary" size="lg" :disabled="loading || castVoteLoading" @click="clickCastVote()">
+			<b-button id="castVoteButton" variant="primary" size="lg" :disabled="loading || castVoteLoading" @click="clickCastVote()">
 				<i v-if="!castVoteLoading" class="fas fa-vote-yea"></i>
 				<b-spinner v-if="castVoteLoading" small />
 				{{ isUpdatableBallot ? $t("updateBallotButton") : $t("castVoteButton") }}
@@ -55,13 +59,13 @@
 		</div>
 
 		<popup-modal 
-			id="successModal"
-			ref="successModal"
+			id="castVoteSuccessModal"
+			ref="castVoteSuccessModal"
 			type="success"
 		>
-			<template #modal-body>
+			<template>
 				<div class="text-center">
-					<p>{{ isUpdatableBallot ? $t("voteUpdatedSuccessfully") : $t("voteCastedSuccessfully") }}</p>
+					<p>{{ isFirstVote ? $t("voteCastedSuccessfully") : $t("voteUpdatedSuccessfully") }}</p>
 					<p>
 						Checksum:<br />
 						<pre>{{ existingBallot ? existingBallot.checksum : "" }}</pre>
@@ -77,15 +81,14 @@
 			:message="$t('voteCastError')"
 		></popup-modal>
 		
-		<div v-if="voteCastedSuccessfully" class="alert alert-info mb-3">
-			<i class="fas fa-info-circle float-right" />
-			<p v-html="$t('changeBallotLaterInfo')"></p>
-		</div>
-
 		<div class="alert alert-info">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('castVoteInfo')"></p>
 		</div>
+
+		<router-link :to="{name: 'polls'}" type="button" class="btn btn-primary">
+			<i class="fas fa-angle-double-left"></i>&nbsp;{{ $t("backToPolls") }}
+		</router-link>
 	</div>
 </template>
 
@@ -114,19 +117,16 @@ export default {
 					"<p>In <span class='liquido'></span> stimmst du nicht nur für <em>einen</em> Vorschlag, sondern du sortierst " +
 					"alle Vorschläge in deine persönlich bevorzugte Reihenfolge.</p>" +
 					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
-				updateBallotInfo: "Du hast in dieser Abstimmung bereits eine Stimme abgegeben. In <span class='liquido'></span> kannst du deine Prio Reihenfolge " + 
-					"auch jetzt noch aktualisieren, so lange die Wahlphase dieser Abstimmung noch läuft.",
+				updateBallotInfo: "Du hast in dieser Abstimmung bereits eine Stimme abgegeben. In <span class='liquido'></span> kannst du deinen Stimmzettel " + 
+					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.",
+				checksumOfYourBallot: "Prüfsumme deines Stimmzettels:",
 				yourBallot: "Dein Stimmzettel:",
 				updateBallotButton: "Eigene Stimme aktualisieren",
 				castVoteButton: "Diese Stimme abgeben",
 				voteCastedSuccessfully: "Deine Stimme wurde erfolgreich gezählt.",
 				voteUpdatedSuccessfully: "Deine Stimme wurde erfolgreich aktualisiert.",
-				changeBallotLaterInfo: 
-					"In <span class='liquido'></span> kannst du deinen Stimmzettel "+
-					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.</p>" +
-					"<p>Du erhälst eine Benachrichtigung, sobald die Abstimmung abgeschlossen ist. Dann kannst du das Ergebnis der Wahl sehen.</p>",
 				voteCastError: "Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
-				GoBackToPoll: "Zurück zur Abstimmung",
+				backToPolls: "Zurück zur den Abstimmungen",
 			},
 		},
 	},
@@ -142,7 +142,7 @@ export default {
 			proposalsInBallot: [],
 			existingBallot: undefined,
 			castVoteLoading: false,
-			voteCastedSuccessfully: false,
+			isFirstVote: true,		// used for showing the correct confirmation message
 		}
 	},
 	computed: {
@@ -164,6 +164,7 @@ export default {
 		let getVoterToken = this.$api.getVoterToken(config.voterTokenSecret).then(voterToken => {
 			return this.$api.getBallot(this.pollId, voterToken).then(ballot => {
 				this.existingBallot = ballot  // may be undefined!
+				if (this.existingBallot) this.isFirstVote = false
 			}).catch(err => console.warn("Cannot get ballot of user", err))
 		}).catch(err => console.warn("Cannot voterToken of user", err))
 		Promise.all([loadPoll, getVoterToken]).then(() => {
@@ -183,7 +184,6 @@ export default {
 
 		async clickCastVote() {
 			this.castVoteLoading = true
-			this.voteCastedSuccessfully = false
 
 			let voteOrderIds = this.proposalsInBallot.map(proposal => +proposal.id)
 			let voterToken   = await this.$api.getVoterToken(config.voterTokenSecret)  // This will normally fetch the cached voterToken
@@ -197,9 +197,8 @@ export default {
 					console.log("Vote casted successfully ballot.checksum=", ballot.checksum)
 					this.existingBallot = ballot
 					this.castVoteLoading = false
-					this.voteCastedSuccessfully = true
-					this.$refs["successModal"].show()
-				})//
+					this.$refs["castVoteSuccessModal"].show()
+				})
 				.catch((err) => {
 					console.error("Cannot cast vote", err)
 					this.castVoteLoading = false
