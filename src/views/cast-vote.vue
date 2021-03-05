@@ -63,7 +63,7 @@
 			ref="castVoteSuccessModal"
 			type="success"
 		>
-			<template>
+			<template #default>
 				<div class="text-center">
 					<p>{{ isFirstVote ? $t("voteCastedSuccessfully") : $t("voteUpdatedSuccessfully") }}</p>
 					<p>

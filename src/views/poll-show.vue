@@ -44,7 +44,7 @@
 
 		<div v-if="poll.status === 'VOTING' && !poll.usersBallot" class="alert alert-secondary mb-3">
 			<p v-html="$t('votingPhaseInfo')" />
-			<b-button variant="primary" id="goToCastVoteButton" class="float-right" @click="clickCastVote()">
+			<b-button id="goToCastVoteButton" variant="primary" class="float-right" @click="clickCastVote()">
 				<i class="fas fa-person-booth" />
 				{{ $t("goToCastVote") }}
 				<i class="fas fa-angle-double-right" />
