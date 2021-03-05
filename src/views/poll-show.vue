@@ -19,6 +19,18 @@
 		</div>
 		<div class="clearfix mb-3" />
 
+		<div v-if="showFinishVotingPhase" class="alert alert-admin mb-3">
+			<i class="fas fa-shield-alt float-right"></i>
+			<p v-html="$t('finishVotingPhaseInfo', {numBallots: poll.numBallots})" />
+			<b-button id="finishVoteButton" :disabled="finishVoteLoading" variant="primary" class="float-right" @click="clickFinishVote()">
+				<b-spinner v-if="finishVoteLoading" small />
+				<i v-else class="fas fa-user-shield" />
+				{{ $t("finishVotingPhase") }}
+			</b-button>
+		</div>
+
+		<div class="clearfix mb-3" />
+
 		<poll-panel v-if="poll.id" :poll="poll" :read-only="true" class="shadow mb-3" />
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
@@ -61,6 +73,10 @@
 			</b-button>
 		</div>
 
+		<div v-if="poll.status === 'FINISHED'" class="alert alert-secondary mb-3">
+			<p>{{ $t('finishedPollInfo') }}</p>
+		</div>
+
 		<popup-modal 
 			id="votingPhaseStartedModal"
 			ref="votingPhaseStartedModal"
@@ -81,15 +97,18 @@ export default {
 		messages: {
 			en: {},
 			de: {
+				cannotFindPoll: "<h4>Fehler</h4><hr/><p>Diese Abstimmung konnte nicht gefunden werden.</p>",
 				pollInElaborationInfo:
 					"<p>Dieser Abstimmung ist in der <em>Diskussionphase</em>.</p>" +
 					"<p>Diskutiert die Wahlvorschläge miteinander. In diese Phase kann jeder seinen eigenen Vorschlag noch weiter anpassen und verbessern." +
 					"Wahlvorschläge können noch so lange angepasst und verbessert werden, bis euer Admin dann die <em>Wahlphase</em> für diese Abstimmung startet.</p>",
 				addProposalInfo: "Du kannst deinen eigenen Wahlvorschlag zu dieser Abstimmung hinzufügen.",
 				addProposal: "Vorschlag hinzufügen",
-				startVotingPhaseInfo:
+				startVotingPhaseInfo: 
 					"Hallo Admin! Möchstest du die Wahlphase für diese Abstimmung starten? Dann sind die Wahlvorschläge fixiert und dein Team kann abstimmen.",
-				startVotingPhase: "Wahl starten",
+				startVotingPhase: "Wahlphase starten",
+				finishVotingPhaseInfo: "Hallo Admin! Bisher wurden in dieser Abstimmung {numBallots} Stimmen abgegeben.",
+				finishVotingPhase: "Wahlphase schließen",
 				votingPhaseStartedSuccessfully: "Ok, die Wahlphase dieser Abstimmung ist jetzt gestartet.",
 				votingPhaseInfo: "Die Wahlphase dieser Abstimmung läuft gerade und du kannst jetzt hier deine Stimme abgeben.",
 				goToCastVote: "Stimme abgeben",
@@ -97,8 +116,7 @@ export default {
 				alreadyVotedInfo:
 					"<p>Du hast in dieser Abstimmung bereits eine Stimme abgegeben.</p><p>So lange die Wahlphase dieser Abstimmung noch läuft, "+
 					"kannst du in <span class='liquido'></span> die Prio Reihenfolge auf deinem Stimmzettel auch noch ändern wenn du möchstest.</p>",
-				cannotFindPoll: "<h4>Fehler</h4><hr/><p>Diese Abstimmung konnte nicht gefunden werden.</p>",
-				
+				finishedPollInfo: "Diese Abstimmung ist abgeschlossen.",
 			},
 		},
 	},
@@ -112,6 +130,7 @@ export default {
 			showError: false,
 			loadingPoll: true,
 			startVoteLoading: false,
+			finishVoteLoading: false,
 		}
 	},
 	computed: {
@@ -140,15 +159,16 @@ export default {
 		showStartVotingPhase() {
 			return this.userIsAdmin && this.poll.status === "ELABORATION" && this.poll.proposals && this.poll.proposals.length > 1
 		},
+		showFinishVotingPhase() {
+			return this.userIsAdmin && this.poll.status === "VOTING"  //TODO: and this.poll.numBallots > 0
+		},
 	},
 	created() {
-		console.log("poll-show: reloading poll from created")
 		this.loadPoll()
 	},
 	mounted() {},
 	methods: {
 		loadPoll() {
-			console.log("poll-show: reloading poll INNER")
 			this.loadingPoll = true
 			return this.$api.getPollById(this.pollId, true)
 				.then(receivedPoll => {
@@ -162,15 +182,19 @@ export default {
 					this.showError = true
 				})
 		},
+
 		goToPolls() {
 			this.$router.push({name: "polls"})
 		},
+
 		clickAddProposal() {
 			this.$router.push("/polls/" + this.poll.id + "/add")
 		},
+
 		clickCastVote() {
 			this.$router.push("/polls/" + this.poll.id + "/castVote")
 		},
+
 		clickStartVote() {
 			if (this.startVoteLoading) return  // do not allow double click
 			this.startVoteLoading = true
@@ -182,6 +206,22 @@ export default {
 			}).catch(err => {
 				this.startVoteLoading = false
 				log.error("Cannot start voting phase of poll(id="+this.poll.id+")", err)
+			})
+		},
+
+		clickFinishVote() {
+			if (this.finishVoteLoading) return  // do not allow double click
+			this.finishVoteLoading = true
+			this.$api.finishVotingPhase(this.poll.id).then(winner => {
+				this.finishVoteLoading = false
+				// Locally update poll status also in cache. No need to reload poll from backend
+				this.poll.status = "FINISHED"
+				this.poll.winner = winner
+				this.$api.pollsCache.put("poll/"+this.poll.id, this.poll)
+				$("html, body").animate({ scrollTop: 0 }, 500)
+			}).catch(err => {
+				this.finishVoteLoading = false
+				log.error("Cannot finish voting phase of poll(id="+this.poll.id+")", err)
 			})
 		},
 	},

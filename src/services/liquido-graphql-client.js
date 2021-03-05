@@ -17,6 +17,25 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 // Configure axios HTTP REST client to point to our graphQL backend
 axios.defaults.baseURL = config.LIQUIDO_GRAPHQL_URL
 
+
+
+/** Shorthands for JQL return values */
+const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, createdBy { id name email } area { id } }"
+const JQL = {
+	CREATE_OR_JOIN_TEAM_RESULT: `{ team {
+		id
+		teamName
+		inviteCode
+		admins  { id, email, name, website, picture, mobilephone }
+		members { id, email, name, website, picture, mobilephone }
+	}
+	user { id, email, name, website, picture, mobilephone }
+	jwt }`,
+	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
+	POLL: "{ id, title, status, area { id } votingStartAt votingEndAt numBallots winner { id } proposals " + JQL_PROPOSAL + "}",
+	//POLL_FINISHED: `{ id, title, status, area { id } votingStartAt votingEndAt numBallots winner { id } dualMatrix { data } proposals ` + JQL_PROPOSAL + "}",
+}
+
 /** 
  * Client side local cache for all data about team, current user and jwt 
  */
@@ -37,12 +56,12 @@ const teamsCacheConfig = {
 const fetchPollFunc = function(path) {
 	if (path[0] === "polls") {
 		log.debug("fetchPollFunc: Fetch all poll of team from backend")
-		let graphQL = `query { polls { id, title, status, proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
+		let graphQL = `query { polls ${JQL.POLL} }`
 		return axios.post("/", {query: graphQL}).then(res => res.data.polls)
 	} else if (path[0].polls) {
 		log.debug("Fetch Poll from backend: "+JSON.stringify(path))
 		let pollId = path[0].polls
-		let graphQL = `query { poll(pollId:${pollId}) { id, title, status proposals { id, title, description, status, createdAt, numSupporters, createdBy { id } } } }`
+		let graphQL = `query { poll(pollId:${pollId}) ${JQL.POLL} }`
 		return axios.post("/", {query: graphQL}).then(res => res.data.poll)
 	} else {
 		return Promise.reject(new Error("Cannot fetch poll(s) at path: "+JSON.stringify(path)))
@@ -70,24 +89,6 @@ axios.interceptors.response.use(function (response) {
 	if (error.response && error.response.data) log.debug("liquido-graphql-api: "+error.response.data.message, error.response.data)
 	return Promise.reject(error);
 });
-
-
-/** Shorthands for JQL return values */
-const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, createdBy { id } area { id } }"
-const JQL = {
-	CREATE_OR_JOIN_TEAM_RESULT: `{ team {
-		id
-		teamName
-		inviteCode
-		admins  { id, email, name, website, picture, mobilephone }
-		members { id, email, name, website, picture, mobilephone }
-	}
-	user { id, email, name, website, picture, mobilephone }
-	jwt }`,
-	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
-	POLL: "{ id, title, status, area { id } votingStartAt votingEndAt proposals " + JQL_PROPOSAL + "}",
-	POLL_FINISHED: `{ id, title, status, area { id } votingStartAt votingEndAt winner { id } dualMatrix { data } proposals ` + JQL_PROPOSAL + "}",
-}
 
 /**
  * exported API methods
@@ -158,7 +159,7 @@ let graphQlApi = {
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
 		return axios({
 			method: "GET", 
-			url: config.devLogin.getJWTURL,  // must be an absolute URL! Otherwise axios basePath would be prepended.
+			url: config.devLogin.getJWTURL,  // must be an absolute URL! Otherwise axios basePath for graphQL endpoint would be prepended.
 			params: {
 				email: email,
 				teamName: teamName,
@@ -214,7 +215,7 @@ let graphQlApi = {
 	},
 
 	async createPoll(pollTitle) {
-		let graphQL = `mutation {	createPoll(title: "${pollTitle}") {	id, title, status, proposals { id } }	}`
+		let graphQL = `mutation {	createPoll(title: "${pollTitle}") ${JQL.POLL}	}`
 		return axios.post("", {query: graphQL})
 			.then(res => {
 				let poll = res.data.createPoll
@@ -258,11 +259,16 @@ let graphQlApi = {
 			})
 	},
 
+	/**
+	 * Finish the currently runnign voting phase of a poll in VOTING.
+	 * @param {Number} pollId poll.id in VOTING
+	 * @returns {Object} the winning proposal
+	 */
 	async finishVotingPhase(pollId) {
-		let graphQL = `mutation { finishVotingPhase(pollId: "${pollId}") ${JQL.POLL} }`
+		let graphQL = `mutation { finishVotingPhase(pollId: "${pollId}") ${JQL.PROPOSAL} }`
 		return axios.post("", {query: graphQL})
 			.then(res => {
-				log.info(`Started voting phase of poll.id=${pollId}`)
+				log.info(`Finsihed voting phase of poll.id=${pollId}`)
 				return res.data.finishVotingPhase
 			})
 	},

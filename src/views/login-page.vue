@@ -2,13 +2,6 @@
 	<div id="LoginPage" class="container">
 		<h1>Login</h1>
 
-		<popup-modal 
-			id="dummyModal"
-			ref="dummyModal"
-			type="error"
-			message="dummy Modal"
-		></popup-modal>
-
 		<div v-if="showDevLogin" class="mb-3">
 			<button type="button" class="btn btn-primary" @click="devLoginAdmin">
 				<i class="fas fa-shield-alt"></i> {{ $t("DevLoginAdmin") }}
@@ -17,10 +10,6 @@
 				{{ $t("DevLoginMember") }}
 			</button>
 		</div>
-
-		<button type="button" class="btn btn-primary mb-3" @click="$refs['dummyModal'].show()">
-			show Modal
-		</button>
 
 		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginViaEmail')">
 			<p>{{ $t('LoginViaEmailInfo') }}</p>
@@ -57,7 +46,6 @@
 <script>
 import config from "config"
 import liquidoInput from "@/components/liquido-input"
-import popupModal from "@/components/popup-modal"
 
 export default {
 	i18n: {
@@ -82,7 +70,7 @@ export default {
 			}
 		}
 	},
-	components: { liquidoInput, popupModal },
+	components: { liquidoInput },
 	data() {
 		return {
 			email: "",

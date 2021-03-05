@@ -27,7 +27,7 @@
 		</div>
 
 		<b-list-group v-else flush>
-			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item" :class="{'collapse-law-panel' : collapsed}">
+			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item" :class="proposalListGroupItemClasses(law.id)">
 				<div class="d-flex" @click="goToPoll(poll.id)">
 					<div>
 						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
@@ -106,13 +106,23 @@ export default {
 				default:
 					return "far fa-poll"
 			}
-		},
+		}
 	},
 	mounted() {
+		//console.log("poll panel", this.poll)
 	},
 	methods: {
 		formatDate(dateVal) {
 			return moment(dateVal).format("L")
+		},
+
+		proposalListGroupItemClasses(propId) {
+			let isWinner = this.poll.winner && propId === this.poll.winner.id
+			return {
+				"collapse-law-panel" : this.collapsed,
+				"winner": this.poll.status === "FINISHED" && isWinner,
+				"lost": this.poll.status === "FINISHED" && !isWinner,
+			}
 		},
 
 		toggleCollapse() {
@@ -221,6 +231,19 @@ $proposal_img_size: 32px;
 		}
 		.supported {
 			color: green;
+		}
+	}
+
+	.winner {
+		//border-left: 3px solid green;
+		border-right: 3px solid green;
+		background-color: #CFC;
+	}
+
+	.lost {
+		color: grey;
+		.law-image {
+			opacity: 0.5;
 		}
 	}
 

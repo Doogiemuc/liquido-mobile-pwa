@@ -11,10 +11,10 @@ let config = {
 	inviteLinkPrefix: "http://localhost:3001/invite?inviteCode=",
 	devLogin: {
 		getJWTURL: "http://localhost:3001/liquido/v2/dev/getJWT",
-		adminEmail: "teamadmin0@TestTeam0.org",
-		adminTeamname: "TestTeam0",
-		memberEmail: "member0@TestTeam0.org",
-		memberTeamname: "TestTeam0",
+		adminEmail: "admin@TeamOne.org",
+		adminTeamname: "TeamOne",
+		memberEmail: "member0@TeamOne.org",
+		memberTeamname: "TeamOne",
 		token: 998877,
 	}
 }

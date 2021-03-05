@@ -24,18 +24,6 @@ const routes = [
 		}
 	},
 	{
-		path: "/devLogin",
-		name: "devLogin",
-		component: () => import("@/services/dev-login"),
-		props: (route) => ({
-			userEmail: route.query.userEmail,
-			teamName: route.query.teamName
-		}),
-		meta: {
-			public: process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
-		}
-	},
-	{
 		path: "/welcome",
 		component: welcomeChat,
 		meta: {
