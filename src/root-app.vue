@@ -4,11 +4,16 @@
 		<transition :name="transitionName">
 			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
+		<pollsFooter 
+			:active-status="undefined"
+		/>
 	</div>
 </template>
 
 <script>
 import liquidoHeader from "@/components/liquido-header"
+//import mobileDebugLog from "@/components/mobile-debug-log"
+import pollsFooter from "@/components/mobile-debug-log"
 
 /** Pages will slide from right to left in this order */
 const page_order = {
@@ -27,8 +32,7 @@ const page_order = {
 /** Liquido Root App */
 export default {
 	name: "LiquidoApp",
-	components: { liquidoHeader },
-	mixins: [],
+	components: { liquidoHeader, pollsFooter },
 	computed: {
 		/**
 		 * Show appropriate backlink in liquido-header

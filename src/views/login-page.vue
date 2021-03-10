@@ -1,6 +1,6 @@
 <template>
 	<div id="LoginPage" class="container">
-		<h1>Login</h1>
+		<h1>{{ $t('Login') }}</h1>
 
 		<div v-if="showDevLogin" class="mb-3">
 			<button type="button" class="btn btn-primary" @click="devLoginAdmin">

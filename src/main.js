@@ -5,7 +5,7 @@ console.log("%cLIQUIDO Mobile", "font-size: 40px; color:blue; font-face: Baskerv
 
 const log = require("loglevel").getLogger("liquido-main")
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-	log.enableAll()
+	//log.enableAll()
 }
 
 import config from "config"  // automatically mapped to environment specific config file config/config.<env>.jsin vue.config.js as a webpack alias

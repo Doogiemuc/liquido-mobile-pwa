@@ -66,6 +66,9 @@
 			<template #default>
 				<div class="text-center">
 					<p>{{ isFirstVote ? $t("voteCastedSuccessfully") : $t("voteUpdatedSuccessfully") }}</p>
+					<p v-if="voteCount > 1">
+						{{ $t('voteCountedNTimes', {voteCount: voteCount}) }}
+					</p>
 					<p>
 						Checksum:<br />
 						<pre>{{ existingBallot ? existingBallot.checksum : "" }}</pre>
@@ -119,6 +122,7 @@ export default {
 					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
 				updateBallotInfo: "Du hast in dieser Abstimmung bereits eine Stimme abgegeben. In <span class='liquido'></span> kannst du deinen Stimmzettel " + 
 					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.",
+				voteCountedNTimes: "Deine Stimme als Proxy wurde {voteCount} mal gezählt.",
 				checksumOfYourBallot: "Prüfsumme deines Stimmzettels:",
 				yourBallot: "Dein Stimmzettel:",
 				updateBallotButton: "Eigene Stimme aktualisieren",
@@ -141,6 +145,7 @@ export default {
 			poll: undefined,
 			proposalsInBallot: [],
 			existingBallot: undefined,
+			voteCount: 0,
 			castVoteLoading: false,
 			isFirstVote: true,		// used for showing the correct confirmation message
 		}
@@ -166,7 +171,7 @@ export default {
 				this.existingBallot = ballot  // may be undefined!
 				if (this.existingBallot) this.isFirstVote = false
 			}).catch(err => console.warn("Cannot get ballot of user", err))
-		}).catch(err => console.warn("Cannot voterToken of user", err))
+		}).catch(err => console.warn("Cannot get voterToken of user", err))
 		Promise.all([loadPoll, getVoterToken]).then(() => {
 			this.loading = false
 		})
@@ -184,26 +189,25 @@ export default {
 
 		async clickCastVote() {
 			this.castVoteLoading = true
-
 			let voteOrderIds = this.proposalsInBallot.map(proposal => +proposal.id)
-			let voterToken   = await this.$api.getVoterToken(config.voterTokenSecret)  // This will normally fetch the cached voterToken
 
 			//TODO: start a timer for timeout
 
-			log.debug("CAST VOTE: poll.id="+this.poll.id, "voterToken="+voterToken, "voteOrderIds", voteOrderIds )
-			this.$api.castVote(this.poll.id, voteOrderIds, voterToken)
-				.then(() => this.$api.getBallot(this.poll.id, voterToken))
-				.then(ballot => {
-					console.log("Vote casted successfully ballot.checksum=", ballot.checksum)
-					this.existingBallot = ballot
+			log.debug("CAST VOTE: poll.id="+this.poll.id, "voteOrderIds", voteOrderIds)
+			this.$api.getVoterToken(config.voterTokenSecret).then((voterToken) => {
+				console.debug("Received voter token. Now casting vote ...")
+				this.$api.castVote(this.poll.id, voteOrderIds, voterToken).then(castVoteResponse => {
+					console.info("Vote casted successfully.", castVoteResponse)
+					this.existingBallot = castVoteResponse.ballot
+					this.voteCount = castVoteResponse.voteCount
 					this.castVoteLoading = false
 					this.$refs["castVoteSuccessModal"].show()
 				})
-				.catch((err) => {
-					console.error("Cannot cast vote", err)
-					this.castVoteLoading = false
-					this.$refs["errorModal"].show()
-				})
+			}).catch((err) => {
+				console.error("Cannot cast vote", err)
+				this.castVoteLoading = false
+				this.$refs["errorModal"].show()
+			})
 		},
 
 	},
