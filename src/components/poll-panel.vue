@@ -1,5 +1,5 @@
 <template>
-	<b-card :id="pollCardId" :pollid="poll.id" :data-poll-status="poll.status" no-body class="poll-panel shadow mb-3">
+	<b-card :id="pollCardId" :pollid="poll.id" :data-poll-status="poll.status" no-body class="poll-panel shadow-sm mb-3">
 		<template #header>
 			<h4 v-if="readOnly" class="read-only poll-panel-title">
 				<i :class="iconForPoll" />
@@ -32,13 +32,11 @@
 					<div>
 						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
 					</div>
-					<div class="d-flex flex-column text-truncate">
+					<div class="proposal-header d-flex flex-column text-truncate">
 						<h4 class="law-title">
 							{{ law.title }}
 						</h4>
 						<div class="law-subtitle">
-							<i class="far fa-clock" />&nbsp;{{ formatDate(law.createdAt) }}
-							<i class="far fa-user" />&nbsp;{{ law.createdBy.name }}
 							<div :class="{ supported: law.supportedByCurrentUser }" class="like-button">
 								<i :class="{
 										far: !law.supportedByCurrentUser,
@@ -48,6 +46,8 @@
 								/>
 								&nbsp;{{ law.numSupporters }}
 							</div>
+							<i class="created-date far fa-clock" />&nbsp;{{ formatDate(law.createdAt) }}
+							<i class="createdby-user far fa-user" />&nbsp;{{ law.createdBy.name }}
 						</div>
 					</div>
 				</div>
@@ -197,10 +197,14 @@ $proposal_img_size: 32px;
 		&.collapse-law-panel {
 			height: 18px + $proposal_img_size;
 		}
+		.proposal-header {
+			margin-bottom: 5px;
+		}
 		.law-title {
 			margin-bottom: 0px;
 			padding: 0;
 			font-size: 14px;
+			line-height: 19px;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -208,7 +212,6 @@ $proposal_img_size: 32px;
 		.law-subtitle {
 			font-size: 10px;
 			color: #bbb;
-			margin-bottom: 5px;
 		}
 		.law-image {
 			border-radius: 5px;
@@ -227,23 +230,34 @@ $proposal_img_size: 32px;
 		}
 		.like-button {
 			display: inline;
-			margin-left: 0.5rem;
 		}
 		.supported {
 			color: green;
 		}
+		.created-date {
+			margin-left: 5px;
+		}
+		.createdby-user {
+			margin-left: 5px;
+		}
 	}
 
 	.winner {
-		//border-left: 3px solid green;
-		border-right: 3px solid green;
-		background-color: #CFC;
+		background-color: $header-bg;
 	}
 
 	.lost {
 		color: grey;
+		.law-title {
+			text-decoration: line-through;
+		}
 		.law-image {
 			opacity: 0.5;
+		}
+		&.collapse-law-panel {
+			height: 0;
+			margin: 0;
+			padding: 0;
 		}
 	}
 

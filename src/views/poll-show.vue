@@ -74,7 +74,12 @@
 		</div>
 
 		<div v-if="poll.status === 'FINISHED'" class="alert alert-secondary mb-3">
-			<p>{{ $t('finishedPollInfo') }}</p>
+			<p>
+				{{ $t('finishedPollInfo', {
+					winnerTitle: poll.winner ? poll.winner.title : "",
+					numBallots: poll.numBallots,
+				}) }}
+			</p>
 		</div>
 
 		<popup-modal 
@@ -116,7 +121,8 @@ export default {
 				alreadyVotedInfo:
 					"<p>Du hast in dieser Abstimmung bereits eine Stimme abgegeben.</p><p>So lange die Wahlphase dieser Abstimmung noch läuft, "+
 					"kannst du in <span class='liquido'></span> die Prio Reihenfolge auf deinem Stimmzettel auch noch ändern wenn du möchstest.</p>",
-				finishedPollInfo: "Diese Abstimmung ist abgeschlossen.",
+				finishedPollInfo: "Diese Abstimmung ist abgeschlossen. Gewonnen hat der Vorschlag '{winnerTitle}'. " +
+					"Es wurden {numBallots} Stimmen abgegeben.",
 			},
 		},
 	},
@@ -152,6 +158,7 @@ export default {
 				return true
 			}
 			let currentUser = this.$api.getCurrentUser()
+			console.log("currentUser", currentUser)
 			if (currentUser && currentUser.isAdmin) return true
 			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUser.id).length === 0
 		},

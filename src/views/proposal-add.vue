@@ -40,7 +40,7 @@
 
 				<div class="d-flex justify-content-between align-items-center">
 					<small class="ml-1">
-						<a href="#" @click="cancelAddProposal()">{{ $t("Cancel") }}</a>
+						<a href="#" @click="gotoPoll">{{ $t("Cancel") }}</a>
 					</small>
 					<button
 						id="saveProposalButton"
@@ -74,13 +74,17 @@
 			ref="successModal"
 			type="success"
 			:message="$t('createdSuccessfully')"
+			:primary-button-text="$t('gotoPoll')"
+			@clickPrimary="gotoPoll"
 		>
-			<template #modal-footer>
-				<b-button id="createdSuccessfullyButton" variant="primary" @click="gotoPoll()">
-					{{ $t('gotoPoll') }}&nbsp;<i class="fas fa-angle-double-right"></i>
-				</b-button>
-			</template>
 		</popup-modal>
+
+		<popup-modal 
+			id="proposalAddErrorModal"
+			ref="proposalAddErrorModal"
+			type="error"
+			:message="$t('proposalAddError')"
+		></popup-modal>
 	</div>
 </template>
 
@@ -102,7 +106,8 @@ export default {
 				descriptionInfo: "(Mindestes {minChars} Zeichen)",
 				descriptionTooShort: "Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
 				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Dein Vorschlag wird der Erste sein.",
-				createdSuccessfully: "Dein Vorschlag wurde zur Abstimmung mit aufgenommen",
+				createdSuccessfully: "Ok, dein Vorschlag wurde in die Abstimmung mit aufgenommen.",
+				proposalAddError: "Es gab einen Fehler beim Hinzufügen deines Vorschlages.",
 				gotoPoll: "Zur Abstimmung",
 			},
 		},
@@ -158,18 +163,16 @@ export default {
 			
 		},
 
-		cancelAddProposal() {
-			this.$router.push("/polls")
-		},
-
 		saveProposal() {
 			this.$api.addProposal(this.poll.id, this.proposal.title, this.proposal.description)
 				.then(() => this.$refs["successModal"].show())
 				.catch(err => {
 					console.error("Cannot add proposal", err)
+					this.$refs["proposalAddErrorModal"].show()
 				})
 		},
 
+		/** Called on successfull save or also on cancel. */
 		gotoPoll() {
 			this.$router.push("/polls/" + this.poll.id)
 		}

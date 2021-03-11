@@ -291,7 +291,6 @@ export default {
 		background-color: black;
 		transition: height 0.5s ease-in-out;
 		box-shadow: 0px -3px 5px rgba(0,0,0,0.5);
-		/** pretty condensed. We want to show as much info as possible */
 		font-size: 12px;
 		//font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 		font-family: monospace;
@@ -376,7 +375,8 @@ export default {
 				}
 			}
 			tr {
-				line-height: 1.0;
+				/** pretty condensed. We want to show as much info as possible */
+				line-height: 1.1;
 			}
 		}
 

@@ -25,8 +25,8 @@ const JQL = {
 	user { id, email, name, website, picture, mobilephone }
 	jwt }`,
 	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
-	POLL: "{ id, title, status, area { id } votingStartAt votingEndAt numBallots winner { id } proposals " + JQL_PROPOSAL + "}",
-	//TODO: POLL_FINISHED: `{ id, title, status, area { id } votingStartAt votingEndAt numBallots winner { id } dualMatrix { data } proposals ` + JQL_PROPOSAL + "}",
+	//POLL:          `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} }`,
+	POLL: `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} numBallots winner ${JQL_PROPOSAL} duelMatrix { data } }`,
 }
 
 /** 
@@ -106,11 +106,12 @@ let graphQlApi = {
 	 */
 	login(team, user, jwt) {
 		this.teamCache.put(this.TEAM_KEY, team)
-		//TODO: add user.isAdmin    But also SECURE it in the backend!
+		// Set user.isAdmin = true if user is admin. This must of course also be secured in the backend!
+		if (team.admins.find(u => u.id === user.id)) user.isAdmin = true
 		this.teamCache.put(this.CURRENT_USER_KEY, user)
 		this.teamCache.put("jwt", jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
-		EventBus.$emit(EventBus.LOGIN, user)
+		EventBus.$emit(EventBus.LOGIN, user)		//TODO: simply emit throug root-up  this$.root.emit(...)
 		console.debug("Login: <"+user.email+"> into team '" + team.teamName  + "'")
 	},
 
