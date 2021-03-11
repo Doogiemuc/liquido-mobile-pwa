@@ -15,7 +15,7 @@
 			<p>{{ $t('LoginViaEmailInfo') }}</p>
 			<liquido-input
 				id="emailInput"
-				v-model="email"
+				v-model="emailInput"
 				:label="$t('yourEMail')"
 				:placeholder="$t('emailPlaceholder')"
 				:type="email"
@@ -71,30 +71,39 @@ export default {
 		}
 	},
 	components: { liquidoInput },
+	props: {
+		email: { type: String, required: false, default: undefined },
+		teamName: { type: String, required: false, default: undefined },
+	},
 	data() {
 		return {
-			email: "",
+			emailInput: "",
 			mobilephone: "",
 		}
 	},
 	computed: {
 		showDevLogin() {
-			return process.env.NODE_ENV === "development"
+			return process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
 		}
 	},
 	mounted() {
-		
+		if (this.email && this.teamName) {
+			this.$api.devLogin(this.email, this.teamName).then(() => {
+				console.info("devLogin <"+this.email+"> into "+this.teamName)
+				this.$router.push("/polls")
+			}).catch(err => console.error("DevLogin via params failed!", err))
+		}
 	},
 	methods: {
 		devLoginAdmin() {
 			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname).then(() => {
 				this.$router.push("/team")
-			})
+			}).catch(err => console.error("DevLogin Admin failed!", err))
 		},
 		devLoginMember() {
 			this.$api.devLogin(config.devLogin.memberEmail, config.devLogin.memberTeamname).then(() => {
 				this.$router.push("/team")
-			})
+			}).catch(err => console.error("DevLogin Member failed!", err))
 		}
 	},
 }

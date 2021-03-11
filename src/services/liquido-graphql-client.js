@@ -6,7 +6,11 @@ import config from "config"
 import PopulatingCache from "populating-cache"
 import EventBus from "@/services/event-bus"
 
-console.info("liquido-graphql-client => " + config.LIQUIDO_GRAPHQL_URL)
+if (!config || !config.LIQUIDO_API_URL) {
+	console.log("liquido-graphql-client: ERROR I have no config!")
+} else {
+	console.info("liquido-graphql-client => " + config.LIQUIDO_API_URL)
+}
 
 // Configure axios HTTP REST client to point to our graphQL backend
 axios.defaults.baseURL = config.LIQUIDO_API_URL

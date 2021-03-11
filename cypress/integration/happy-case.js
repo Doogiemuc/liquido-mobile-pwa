@@ -77,7 +77,7 @@ context('Happy Case', () => {
 		cy.get('#propTitle').type(fix.proposalTitle)
 		cy.get('#propDescription').type(fix.proposalDescription, { delay: 1 })
 		cy.get('#saveProposalButton').click()
-		cy.get('#createdSuccessfullyButton').click()
+		cy.get('#proposalSuccessfullyAddedModal #modalPrimaryButton').click()
 		//THEN the poll is shown with that proposal
 		cy.get('#poll-show-page')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle)
@@ -119,10 +119,9 @@ context('Happy Case', () => {
 	
 	it('Show team and its polls', function() {
 		//GIVEN a logged in user
-		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
-		cy.get("#devLoginSuccessful").should('be.visible')
+		cy.visit("/login?email="+fix.userEmail+"&teamName="+fix.teamName)
 		//WHEN  goint to team-home
-		cy.get('#GoToTeamButton').click()
+		cy.get('#gotoTeamButton').click()
 		//THEN correct team-home is shown
 		cy.get('#team-home').should('contain.text', fix.teamName)
 
@@ -138,10 +137,8 @@ context('Happy Case', () => {
 		assert.isString(fix.pollTitle, "Need existing poll to test joinTeam")
 
 		//GIVEN a logged in user
-		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
-		cy.get("#devLoginSuccessful").should('be.visible')
+		cy.visit("/login?email="+fix.userEmail+"&teamName="+fix.teamName)
 		// AND a poll in elaboration
-		cy.get("#GoToPollsButton").click()
 		cy.get("#elaborationArrow").click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 		
@@ -150,7 +147,7 @@ context('Happy Case', () => {
 		cy.get("#propTitle").type(fix.proposalTitle2)
 		cy.get("#propDescription").type(fix.proposalDescription2, { delay: 1 })
 		cy.get("#saveProposalButton").click()
-		cy.get('#createdSuccessfullyButton').click()
+		cy.get('#proposalSuccessfullyAddedModal #modalPrimaryButton').click()
 		
 		//THEN the poll is shown with that proposal
 		cy.get('#poll-show-page')
@@ -159,17 +156,15 @@ context('Happy Case', () => {
 
 	it("Admin starts voting phase", function() {
 		//GIVEN a logged in user
-		cy.visit("/devLogin?userEmail="+fix.adminEmail+"&teamName="+fix.teamName)
-		cy.get("#devLoginSuccessful").should('be.visible')
-		// AND our poll in elaboration
-		cy.get("#GoToPollsButton").click()
+		cy.visit("/login?email="+fix.adminEmail+"&teamName="+fix.teamName)
+		// AND the poll in elaboration that was created above
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 
 		// WHEN admin stars voting phase
 		cy.get("#startVoteButton").click()
 
 		// THEN sucessModal is shown and poll is in status voting
-		cy.get("#votingPhaseStartedModal .btn-primary").click()
+		cy.get("#votingPhaseStartedModal #modalPrimaryButton").click()
 		cy.get(".poll-panel[data-poll-status='VOTING']")
 			.should("have.attr", "data-poll-status", "VOTING")  
 	})
@@ -177,10 +172,8 @@ context('Happy Case', () => {
 	
 	it("User casts vote", function() {
 		//GIVEN a logged in user
-		cy.visit("/devLogin?userEmail="+fix.userEmail+"&teamName="+fix.teamName)
-		cy.get("#devLoginSuccessful").should('be.visible')
+		cy.visit("/login?email="+fix.userEmail+"&teamName="+fix.teamName)
 		// AND a poll in voting
-		cy.get("#GoToPollsButton").click()
 		cy.get("#votingArrow").click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 		cy.get("#goToCastVoteButton").click()
@@ -191,9 +184,11 @@ context('Happy Case', () => {
 		
 		// THEN success modal is shown
 		cy.get("#castVoteSuccessModal").should("be.visible")
-		cy.get("#castVoteSuccessModal .btn-primary").click()
+		cy.get("#castVoteSuccessModal #modalPrimaryButton").click()
 		//  AND user is informed, that he can updated his ballot
 		cy.get("#isUpdateableBallotInfo").should("be.visible")
+
+		//TODO: verify checksum
 	})
 	
 	

@@ -13,7 +13,7 @@ export default {
 	i18n: {
 		messages: {
 			de: {
-				NotFound: "Something could not be found. Sorry.",
+				NotFound: "This page could not be found. Sorry.",
 				StartOver: "Start over"
 			}
 		}

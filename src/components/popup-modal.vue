@@ -24,8 +24,8 @@
 				</div>
 				<div class="modal-footer">
 					<slot name="modal-footer">
-						<button v-if="secondaryButtonText" type="button" class="btn btn-secondary flex-grow-1" @click="clickSecondary">{{ secondaryButtonText }}</button>
-						<button type="button" class="btn btn-primary flex-grow-1" data-dismiss="modal" @click="clickPrimary">{{ primaryButtonText }}</button>
+						<button v-if="secondaryButtonText" id="modalSecondaryButton" type="button" class="btn btn-secondary flex-grow-1" @click="clickSecondary">{{ secondaryButtonText }}</button>
+						<button id="modalPrimaryButton" type="button" class="btn btn-primary flex-grow-1" data-dismiss="modal" @click="clickPrimary">{{ primaryButtonText }}</button>
 					</slot>
 				</div>
 			</div>

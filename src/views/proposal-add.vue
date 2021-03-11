@@ -71,7 +71,7 @@
 
 		<popup-modal
 			id="proposalSuccessfullyAddedModal"
-			ref="successModal"
+			ref="proposalSuccessfullyAddedModal"
 			type="success"
 			:message="$t('createdSuccessfully')"
 			:primary-button-text="$t('gotoPoll')"
@@ -165,7 +165,7 @@ export default {
 
 		saveProposal() {
 			this.$api.addProposal(this.poll.id, this.proposal.title, this.proposal.description)
-				.then(() => this.$refs["successModal"].show())
+				.then(() => this.$refs["proposalSuccessfullyAddedModal"].show())
 				.catch(err => {
 					console.error("Cannot add proposal", err)
 					this.$refs["proposalAddErrorModal"].show()

@@ -14,7 +14,7 @@
 					<span class="liquido" @click="clickLiquidoTitle()" />
 				</div>
 				<div class="col header-right">
-					<i v-if="isLoggedIn" class="fas fa-users" @click="gotoTeam()" />
+					<i v-if="isLoggedIn" id="gotoTeamButton" class="fas fa-users" @click="gotoTeam()" />
 				</div>
 			</div>
 		</div>
