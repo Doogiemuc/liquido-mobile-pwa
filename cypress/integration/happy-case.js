@@ -188,7 +188,10 @@ context('Happy Case', () => {
 		//  AND user is informed, that he can updated his ballot
 		cy.get("#isUpdateableBallotInfo").should("be.visible")
 
-		//TODO: verify checksum
+		//WHEN verifing checksum
+		cy.get("#verifyBallotButton").click()
+		//THEN ballot is valid
+		cy.get("#ballotIsVerifiedInfo").should("be.visible")
 	})
 	
 	

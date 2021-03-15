@@ -29,14 +29,13 @@ module.exports = {
 
 		// Options for plugin:vue/recommended  https://eslint.vuejs.org
 		"vue/max-attributes-per-line": ["error", {
-			"singleline": 5,      // we do have 4K monitors nowadays!
+			"singleline": 5,      // we do have 4K monitors these days!
 			"multiline": {
 				"max": 1,
 				"allowFirstLine": true
 			}
 		}],
 		"vue/html-indent": ["error", "tab"],
-		"vue/html-self-closing": "error",
 		"vue/attributes-order": "warn",
 		"vue/no-v-html": "off",
 		"vue/html-self-closing": "off",

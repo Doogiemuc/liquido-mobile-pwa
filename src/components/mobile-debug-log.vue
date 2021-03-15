@@ -41,7 +41,7 @@
 
 <script>
 /**
- * Vue MobileDebugLog
+ * Vue mobile-debug-log
  * 
  * This vue component can be used to show debug log entries on a mobile phone
  * where you do not have direct access to the browser's console.
@@ -52,49 +52,18 @@
  * Tap the small ribbon at the bottom of the screen to open the console drawer.
  */
 
-// Maximum number of log lines to keep
-const MAX_LOG_ENTRIES = 999
+import debugLog from "./mobile-debug-log.js"
+
+
 const MAX_MESSAGE_LEN = 200
 
-/* eslint-disable no-unused-vars */
-const SILENT = 999
-const ERROR = 4
-const WARN  = 3
-const INFO  = 2
-const DEBUG = 1
-const TRACE = 0
-const ALL = -1
-
-const LEVEL_NAME = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"]
-
-/** Can catch all console.log() calls. But then you loose the caller information in the browser console */
-const REDEFINE_CONSOLE_FUNCS = true
-
-let errorFunc = console.error
-let warnFunc = console.warn
-let infoFunc = console.info
-let logFunc = console.log
-let debugFunc = console.debug
-let traceFunc = console.trace
 
 export default {
 	name: "MobileDebugLog",
 	data() {
 		return {
-			// all entries in the log. Will be truncated to MAX_LOG_ENTRIES
-			logEntries: [],
-
-			// log messages below this level will not shown (by default, show all)
-			logLevel: ALL,
-
 			// Log view can be expanded and collapsed
 			collapsed: true,
-
-			// IDs for each log entry
-			idSequence: 0,
-
-			// when logging was started. Delta is shown in timestamp col
-			startTime: 0,
 
 			// currently active filter (log message includes)
 			filterStr: "",
@@ -114,7 +83,10 @@ export default {
 				{ key: "timestamp", name: "ms", width: "40px", show: true },
 				{ key: "level", name: "lvl", width: "40px", show: true },
 				{ key: "message", name: "msg", width: undefined, show: true }
-			]
+			],
+
+			// reactive reference to logEntries that we can watch for changes
+			logEntries: debugLog.logEntries
 		}
 	},
 	computed: {
@@ -131,81 +103,26 @@ export default {
 	},
 	watch: {
 		"logEntries": function() {
-			if (this.showLastRow) {
-				this.scrollToBottom()
-			}
-		},
+			if (this.showLastRow)	this.scrollToBottom()
+		}
 	},
 	created() {
-		this.startTime = Date.now()
-
-		// Here we redefine console.log/debug/trace/info functions.  
-		// Be carefull that no one else is also doing this, e.g. logLevel does this: https://github.com/pimterry/loglevel/issues/129
-		// AND you loose the information which module logged the message. Everything will come from mobile-debug-log.vue
-		// Better call the info/debug/log/error methods below directly.
-		if (REDEFINE_CONSOLE_FUNCS) {
-			console.error = this.error
-			console.warn = this.warn
-			console.info = this.info
-			console.log  = this.log
-			console.debug = this.debug
-			console.trace = this.trace
-		}
-
+		if (process.env.NODE_ENV === "mobile") debugLog.redefineConsoleMethods()
 	},
 	mounted() {
-		console.debug("VUE mobile-debug-log mounted.")
+		debugLog.debug("Mobile Debug log started.")
 	},
 	methods: {
-		log(...args) {
-			logFunc(...args)
-			this.logAtLevel(INFO, args)
-		},
-		error(...args) {
-			errorFunc(...args)
-			this.logAtLevel(ERROR, args)
-		},
-		warn(...args) {
-			warnFunc(...args)
-			this.logAtLevel(WARN, args)
-		},
-		info(...args) {
-			infoFunc(...args)
-			this.logAtLevel(INFO, args)
-		},
-		debug(...args) {
-			debugFunc(...args)
-			this.logAtLevel(DEBUG, args)
-		},
-		trace(...args) {
-			traceFunc(...args)
-			this.logAtLevel(TRACE, args)
-		},
-
-		/** 
-		 * Create a log message.
-		 * The message will be shown in our mobile-debug-log drawer AND
-		 * in the normal browser console.
-		 */
-		logAtLevel(level, args) {
-			//if (level < this.logLevel) return
-			this.logEntries.push({
-				id: this.idSequence++,
-				timestamp: Date.now() - this.startTime,
-				level: level,
-				message: args
-			})
-			if (this.logEntries.length > MAX_LOG_ENTRIES) {
-				this.logEntries.shift()
-			}
-		},
-
+		
 		/** get display value for entry in col */
 		getColValue(col, entry) {
 			switch (col.key) {
-				case "timestamp": return entry.timestamp;
-				case "level": return entry.level <= ERROR ? LEVEL_NAME[entry.level] : entry.level;
-				case "message": return this.toString(entry.message)
+				case "timestamp": 
+					return entry.timestamp;
+				case "level": 
+					return debugLog.getLevelName(entry.level).toUpperCase()
+				case "message": 
+					return this.toString(entry.message)
 				default:
 					return ""
 			}
@@ -233,14 +150,14 @@ export default {
 			this.columns.forEach(col => col.show = true)
 		},
 
-		clearLog() {
-			this.logEntries = []
-		},
-
 		toggleShowLastRow() {
 			this.showLastRow = !this.showLastRow
 			if (this.showLastRow) this.scrollToBottom()
-		},		
+		},
+		
+		clearLog() {
+			debugLog.clearLog()
+		},
 
 		/** this is automatically called when showLastRow is active */
 		scrollToBottom() {
@@ -262,7 +179,7 @@ export default {
 		},
 
 		getRowClass(entry, idx) {
-			let res = entry.level <= ERROR ? LEVEL_NAME[entry.level] : entry.level
+			let res = debugLog.getLevelName(entry.level)
 			if (this.alternatingRows && (idx % 2 === 0)) res += " alternate-row"
 			return res
 		},
@@ -413,19 +330,22 @@ export default {
 		text-overflow: ellipsis;
 	}
 
-	tr.ERROR {
+	tr.error {
 		color: red;
 	}
-	tr.INFO .level {
+	tr.info .level {
 		color: lightskyblue;
 	}
-	tr.WARN .level {
+	tr.log .level {
+		color: lightskyblue;
+	}
+	tr.warn .level {
 		color: darkgoldenrod;
 	}
-	tr.DEBUG .level{
+	tr.debug .level{
 		color: lightgray;
 	}
-	tr.TRACE {
+	tr.trace {
 		color: grey;
 	}
 </style>

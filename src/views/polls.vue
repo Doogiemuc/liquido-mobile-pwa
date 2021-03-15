@@ -33,7 +33,7 @@
 
 
 
-		<div v-if="polls.length === 0" class="alert alert-info">
+		<div v-if="polls.length === 0 && !loading" class="alert alert-info">
 			<p v-html="$t('noPollYet')" />
 		</div>
 

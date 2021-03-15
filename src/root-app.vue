@@ -4,16 +4,13 @@
 		<transition :name="transitionName">
 			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
-		<pollsFooter 
-			:active-status="undefined"
-		/>
+		<mobile-log-viewer></mobile-log-viewer>
 	</div>
 </template>
 
 <script>
 import liquidoHeader from "@/components/liquido-header"
-//import mobileDebugLog from "@/components/mobile-debug-log"
-import pollsFooter from "@/components/mobile-debug-log"
+import mobileLogViewer from "@/components/mobile-debug-log.vue"
 
 /** Pages will slide from right to left in this order */
 const page_order = {
@@ -32,7 +29,13 @@ const page_order = {
 /** Liquido Root App */
 export default {
 	name: "LiquidoApp",
-	components: { liquidoHeader, pollsFooter },
+	components: { liquidoHeader, mobileLogViewer },
+	// All these data attributes are reactive and available in every sub-component as e.g. this.$root.transitionName
+	data() { 
+		return {
+			transitionName: "", 	// CSS sliding transition between page components
+		}
+	},
 	computed: {
 		/**
 		 * Show appropriate backlink in liquido-header
@@ -69,11 +72,9 @@ export default {
 			else { this.transitionName = "fade" }  // default is fade
 		},
 	},
-	// all data properties are set in main.js !
 	created() {},
 	mounted() {},
 	methods: {
-
 		//
 		// Here comes some HTML UX magic.
 		//

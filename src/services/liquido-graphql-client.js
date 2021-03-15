@@ -5,11 +5,12 @@ import axios from "axios"
 import config from "config"
 import PopulatingCache from "populating-cache"
 import EventBus from "@/services/event-bus"
+import log from "@/components/mobile-debug-log.js"
 
 if (!config || !config.LIQUIDO_API_URL) {
-	console.log("liquido-graphql-client: ERROR I have no config!")
+	log.error("liquido-graphql-client: ERROR I have no config!")
 } else {
-	console.info("liquido-graphql-client => " + config.LIQUIDO_API_URL)
+	log.debug("liquido-graphql-client => " + config.LIQUIDO_API_URL)
 }
 
 // Configure axios HTTP REST client to point to our graphQL backend
@@ -289,6 +290,18 @@ let graphQlApi = {
 		})
 	},
 
+	async castVote(pollId, voteOrderIds, voterToken) {
+		let voteOrderStr = "[" + voteOrderIds.join(",") + "]"
+		console.debug("Cast vote in poll(id="+pollId+") => ", voteOrderStr)
+		let graphQL = `mutation { castVote(pollId: "${pollId}", voteOrderIds: ${voteOrderStr}, voterToken: "${voterToken}") ` +
+			`{ voteCount ballot { level checksum voteOrder { id } } } }`
+		return axios.post(GRAPHQL, {query: graphQL})
+			.then(res => {
+				console.debug("CastVote: Ballot was casted successfully.")
+				return res.data.castVote
+			})
+	},
+
 	/** Get voter's ballot if he voted already. MAY return null if not. */
 	async getBallot(pollId, voterToken) {
 		let graphQL = `query { ballot(pollId: "${pollId}", voterToken: "${voterToken}") ` +
@@ -300,16 +313,12 @@ let graphQlApi = {
 			})
 	},
 
-	async castVote(pollId, voteOrderIds, voterToken) {
-		let voteOrderStr = "[" + voteOrderIds.join(",") + "]"
-		console.log("Cast vote in poll.id="+pollId+" => ", voteOrderStr)
-		let graphQL = `mutation { castVote(pollId: "${pollId}", voteOrderIds: ${voteOrderStr}, voterToken: "${voterToken}") ` +
-			`{ voteCount ballot { level checksum voteOrder { id } } } }`
+	/** Verify a voter's ballot with its checksum. */
+	async verifyBallot(pollId, checksum) {
+		let graphQL = `query { verifyBallot(pollId: "${pollId}", checksum: "${checksum}") ` +
+			`{ level checksum voteOrder { id } } }`  
+		// returns user's ballot if found
 		return axios.post(GRAPHQL, {query: graphQL})
-			.then(res => {
-				console.debug("CastVote: Ballot was casted successfully.")
-				return res.data.castVote
-			})
 	},
 
 	/** Liquido backend error codes.  LiquidoException.java */

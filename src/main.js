@@ -104,9 +104,6 @@ const i18n = new VueI18n({
 const rootApp = new Vue({
 	i18n,
 	router,
-	data: {
-		transitionName: "", 	// CSS sliding transition between page components
-	},
 	...RootApp, // merge these attributes into root-app.vue
 	//render: (h) => h(App),
 })

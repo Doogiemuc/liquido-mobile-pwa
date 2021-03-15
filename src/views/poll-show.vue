@@ -158,7 +158,6 @@ export default {
 				return true
 			}
 			let currentUser = this.$api.getCurrentUser()
-			console.log("currentUser", currentUser)
 			if (currentUser && currentUser.isAdmin) return true
 			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUser.id).length === 0
 		},
@@ -177,7 +176,9 @@ export default {
 	methods: {
 		loadPoll() {
 			this.loadingPoll = true
-			return this.$api.getPollById(this.pollId, true)
+			// Here we do not force a refresh. Fetch from cache if possible.
+			// (When user clicks on cast vote we load everything freshly.)
+			return this.$api.getPollById(this.pollId)
 				.then(receivedPoll => {
 					this.poll = receivedPoll
 					this.loadingPoll = false

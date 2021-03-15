@@ -5,15 +5,6 @@
 			&nbsp;{{ $t("castVoteTitle") }}
 		</h2>
 
-		<div v-if="isUpdatableBallot" id="isUpdateableBallotInfo" class="alert alert-info">
-			<i class="fas fa-info-circle float-right" />
-			<p v-html="$t('updateBallotInfo')"></p>
-			<p>
-				{{ $t("checksumOfYourBallot") }}<br />
-				<pre>{{ existingBallot ? existingBallot.checksum : "" }}</pre>
-			</p>
-		</div>
-
 		<b-card no-body class="ballot-card mb-5">
 			<template #header>
 				<h4 class="poll-title">
@@ -34,13 +25,13 @@
 				:can-scroll-x="false"
 			>
 				<law-panel
-					v-for="prop in proposalsInBallot"
+					v-for="(prop, idx) in proposalsInBallot"
 					ref="proposalInBallot"
 					:key="prop.id"
 					:law="prop"
 					:read-only="true"
 					:collapse="true"
-					class="shadow-sm"
+					:class="getLawPanelClass(idx)"
 				/>
 			</draggable>
 			<div class="collapse-icon-wrapper">
@@ -58,6 +49,26 @@
 			</b-button>
 		</div>
 
+		<div v-if="isUpdatableBallot" id="isUpdateableBallotInfo" class="alert alert-info">
+			<i class="fas fa-info-circle float-right" />
+			<p v-html="$t('updateBallotInfo')"></p>
+		</div>
+
+		<div v-if="hasBallot" class="alert alert-info">
+			<p>
+				{{ $t("checksumOfYourBallot") }}
+			</p>
+			<div class="text-center mb-2">
+				<b-button id="verifyBallotButton" variant="primary" size="sm" @click="verifyBallot">
+					{{ existingBallot.checksum }}
+					<i v-if="ballotIsVerified" class="fas fa-check-circle"></i>
+				</b-button>
+			</div>
+			<p v-if="ballotIsVerified" id="ballotIsVerifiedInfo">
+				{{ $t('ballotIsVerified') }}
+			</p>
+		</div>
+
 		<popup-modal 
 			id="castVoteSuccessModal"
 			ref="castVoteSuccessModal"
@@ -68,10 +79,6 @@
 					<p>{{ isFirstVote ? $t("voteCastedSuccessfully") : $t("voteUpdatedSuccessfully") }}</p>
 					<p v-if="voteCount > 1">
 						{{ $t('voteCountedNTimes', {voteCount: voteCount}) }}
-					</p>
-					<p>
-						Checksum:<br />
-						<pre>{{ existingBallot ? existingBallot.checksum : "" }}</pre>
 					</p>
 				</div>
 			</template>
@@ -120,10 +127,7 @@ export default {
 					"<p>In <span class='liquido'></span> stimmst du nicht nur für <em>einen</em> Vorschlag, sondern du sortierst " +
 					"alle Vorschläge in deine persönlich bevorzugte Reihenfolge.</p>" +
 					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
-				updateBallotInfo: "Du hast in dieser Abstimmung bereits eine Stimme abgegeben. In <span class='liquido'></span> kannst du deinen Stimmzettel " + 
-					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.",
 				voteCountedNTimes: "Deine Stimme als Proxy wurde {voteCount} mal gezählt.",
-				checksumOfYourBallot: "Prüfsumme deines Stimmzettels:",
 				yourBallot: "Dein Stimmzettel:",
 				updateBallotButton: "Eigene Stimme aktualisieren",
 				castVoteButton: "Diese Stimme abgeben",
@@ -131,6 +135,11 @@ export default {
 				voteUpdatedSuccessfully: "Deine Stimme wurde erfolgreich aktualisiert.",
 				voteCastError: "Es gab leider einen technischen Fehler beim Abgeben deiner Stimme. Bitte versuche es später noch einmal.",
 				backToPolls: "Zurück zur den Abstimmungen",
+				updateBallotInfo: "Du hast in dieser Abstimmung bereits eine Stimme abgegeben. In <span class='liquido'></span> kannst du deinen Stimmzettel " + 
+					"auch jetzt noch ändern, so lange die Wahlphase dieser Abstimmung noch läuft.",
+				checksumOfYourBallot: "Mit dieser Checksumme kannst du prüfen ob dein Stimmzettel korrekt gezählt wurde:",
+				verifyBallotButton: "Prüfen",
+				ballotIsVerified: "Deine Stimme wurde erfolgreich gezählt."
 			},
 		},
 	},
@@ -148,11 +157,15 @@ export default {
 			voteCount: 0,
 			castVoteLoading: false,
 			isFirstVote: true,		// used for showing the correct confirmation message
+			ballotIsVerified: false,
 		}
 	},
 	computed: {
 		canCastVote() {
 			return this.poll && this.poll.status === "VOTING"
+		},
+		hasBallot() {
+			return this.existingBallot
 		},
 		isUpdatableBallot() {
 			return this.poll && this.poll.status === "VOTING" && this.existingBallot
@@ -160,21 +173,51 @@ export default {
 	},
 	created() {
 		this.loading = true
+		
 		//force refresh of the poll. Load it from the backend
-		let loadPoll = this.$api.getPollById(this.pollId, true).then(poll => {
+		let loadPoll = () => this.$api.getPollById(this.pollId, true).then(poll => {
 			this.poll = poll
 			if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
-			this.proposalsInBallot = _.cloneDeep(this.poll.proposals)
-		})
-		let getVoterToken = this.$api.getVoterToken(config.voterTokenSecret).then(voterToken => {
-			return this.$api.getBallot(this.pollId, voterToken).then(ballot => {
-				this.existingBallot = ballot  // may be undefined!
-				if (this.existingBallot) this.isFirstVote = false
-			}).catch(err => console.warn("Cannot get ballot of user", err))
-		}).catch(err => console.warn("Cannot get voterToken of user", err))
-		Promise.all([loadPoll, getVoterToken]).then(() => {
+			return poll
+		}).catch(err => console.warn("Cannot get poll.id="+this.pollId, err))
+		
+		let getVoterToken = () => this.$api.getVoterToken(config.voterTokenSecret)
+			.catch(err => console.warn("Cannot get voterToken of user", err))
+
+		let getExistingBallot = (voterToken) => this.$api.getBallot(this.pollId, voterToken).then(ballot => {
+			this.existingBallot = ballot  // may be undefined!
+			if (this.existingBallot) this.isFirstVote = false
+			return ballot
+		}).catch(err => console.warn("Cannot get ballot of user", err))
+
+		/*
+		let setVoteOrder = () => {
+			let proposalsById = {}
+			this.poll.proposals.forEach(prop => proposalsById[prop.id] = prop)
+			if (ballot) {
+				this.existingBallot = ballot
+				this.proposalInBallot = ballot.voteOrderIds.map(id => proposalsById[id])
+			} else {
+				this.proposalsInBallot = _.cloneDeep(this.poll.proposals)
+			}
 			this.loading = false
-		})
+		}
+		*/
+
+		loadPoll()
+			.then(getVoterToken)
+			.then(voterToken => getExistingBallot(voterToken))
+			.then(() => {
+				this.proposalsInBallot = _.cloneDeep(this.poll.proposals)
+				this.loading = false
+			})
+			.catch(err => {
+				console.error("Cannot get data to cast vote!", err)
+				this.loading = false
+			})
+		
+
+		
 	},
 	mounted() {
 		
@@ -210,6 +253,27 @@ export default {
 			})
 		},
 
+		async verifyBallot() {
+			if (!this.existingBallot || this.ballotIsVerified) return
+			this.$api.verifyBallot(this.poll.id, this.existingBallot.checksum).then(ballot => {
+				if (!ballot) {
+					console.warn("Could not find a ballot for that checksum.")
+				} else {
+					console.debug("Ballot verified successfully.", ballot)
+					this.ballotIsVerified = true
+				}				
+			}).catch(err => {
+				console.error("Cannot verify ballot with checksum!", err)
+				//TODO: show error message
+				this.ballotIsVerified = false
+			})
+		},
+
+		getLawPanelClass(idx) {
+			if (idx === 0 && this.isFirstVote) return { "simulate-drag": true}
+			else return {}
+		},
+
 	},
 }
 </script>
@@ -237,6 +301,28 @@ export default {
 		margin-bottom: 1rem;  // need some space between proposals to make it easier to drag & sort them
 		cursor: grab;
 	}
+
+
+	.law-panel.simulate-drag {
+		transition: all 1s;
+		animation: slide-down 0.5s ease 1s 2 alternate;
+	}
+
+	@keyframes slide-down {
+		50% {
+			transform: translate(5px, 20px);
+			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
+		}
+		to {
+			transform: translate(0px, 50px);
+		}
+	}
+	@keyframes slide-up {
+		to {
+			transform: translate(5px, -20px)
+		}
+	}
+
 	.sortable-ghost {
 		opacity: 0.1;
 	}
@@ -266,54 +352,12 @@ export default {
 	content: "\f13a";
 }
 
-#castVoteModal {
-	.modal-header {
-		border-bottom: none;   // "Less is more in UI-design!"
-		height: 3rem;
-	}
-	.success-icon {
-		z-index: 2020;
-		position: absolute;
-		text-align: center;
-		top: -3.5rem;
-		left: 0;
-		right: 0;
-		width: 6rem;
-		margin: 0 auto;
-		font-size: 6rem;
-		background-color: green;
-		border-radius: 50%;
-	}
-	.success-icon-shadow {
-		z-index: 2010;   // behind icon
-		position: absolute;
-		top: 0.8rem;
-		left: 0;
-		right: 0;
-		width: 6rem;
-		height: 1rem;
-		margin: 0 auto;
-		//background-color: rgba(0, 0, 0, 0);
-		border-radius: 50%;
-		//border: 1px solid red;
-		box-shadow: 0 20px 10px 2px rgba(0, 0, 0, 0.5) ;
-	}
-	.modal-footer {
-		justify-content: center;
-		border-top: none;
-	}
-	.okButton {
-		font-weight: bold;
-		width: 90%;
-		background-color: green;
-		border-color: green;
-		border: 1px solid rgba(0, 0, 0, 0.2);
-	}
+#verifyBallotButton {
+	font-family: monospace;
+	margin: 0 auto;
 }
 
-#castVoteModal + .modal-backdrop {
-	opacity: 0.8;
-}
+
 
 
 </style>
