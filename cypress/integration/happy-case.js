@@ -194,6 +194,22 @@ context('Happy Case', () => {
 		cy.get("#ballotIsVerifiedInfo").should("be.visible")
 	})
 	
+	it("Admin finishes voting phase", function() {
+		//GIVEN a logged in user
+		cy.visit("/login?email="+fix.adminEmail+"&teamName="+fix.teamName)
+		// AND the poll in elaboration that was created before
+		cy.contains(".poll-panel-title", fix.pollTitle).click()
+
+		// WHEN admin stars voting phase
+		cy.get("#finishVoteButton").click()
+
+		// THEN poll is FINISHED
+		cy.get("#finishedPollInfo").should("be.visible")
+		cy.get(".poll-panel[data-poll-status='FINISHED']")
+			.should("have.attr", "data-poll-status", "FINISHED")  
+		//  AND there is exactly one winner (because we casted exactly one vote)
+		cy.get(".poll-panel .proposal-list-group-item.winner").should("have.length", 1)
+	})
 	
 	/* TODO
 	it('cleanup DB', function() {

@@ -73,7 +73,7 @@
 			</b-button>
 		</div>
 
-		<div v-if="poll.status === 'FINISHED'" class="alert alert-secondary mb-3">
+		<div v-if="poll.status === 'FINISHED'" id="finishedPollInfo" class="alert alert-secondary mb-3">
 			<p>
 				{{ $t('finishedPollInfo', {
 					winnerTitle: poll.winner ? poll.winner.title : "",
