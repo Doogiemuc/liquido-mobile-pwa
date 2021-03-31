@@ -8,9 +8,17 @@
 import config from '../../config/config.test'
 
 let now = Date.now() % 10000
-console.log("Running Cypress HAPPY CASE test (test_uuid="+now+")", config, process.env.NODE_ENV)
+console.log("Running Cypress HAPPY CASE test (test_uuid="+now+")", "NODE_ENV="+process.env.NODE_ENV, "Liquido config:", config)
 
 let fix = {}  // Test fixtures within this test RUN
+
+/* When one of test steps of happy case fails, then abort the whole test run. */
+afterEach(function() {
+  if (this.currentTest.state === 'failed') {
+		console.log("Cypress test step in happy case failed. Aborting.")
+    Cypress.runner.stop()
+  }
+});
 
 context('Happy Case', () => {
 	before(() => {
@@ -34,23 +42,30 @@ context('Happy Case', () => {
 	})
 
 	it('Create new team, poll and add first proposal', function() {
-		//GIVEN
+		//GIVEN some prepared test data
 		assert.isString(fix.adminName)
 		assert.isString(fix.teamName)
 		assert.isString(fix.adminName)
 
-		//WHEN
+		//WHEN we create a new team
 		cy.visit("/")
+		cy.get("#welcomeChat")
 		cy.get('#userNameInput', {timeout: 8000}).type(fix.adminName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
 		cy.get('#createNewTeamButton').click()
 		cy.get('#teamNameInput').type(fix.teamName)
 		cy.get('#adminEmailInput').type(fix.adminEmail)
 		cy.get('#createNewTeamOkButton').click()
 
-		//THEN
+		//THEN new team is created successfully 
 		cy.get('#welcomeChatErrorModal').should('not.exist')   // no error modal is shown
-		cy.get('#newTeamCreatedBubble')
-		//TODO: cy.get("#inviteLink").should('contain', 'http')
+		cy.get('#newTeamCreatedBubble').then(() => {
+		// AND a JWT was put into the browser's localStorage
+			fix.jwt = localStorage.getItem("LIQUIDO_JWT")
+			assert.isString(fix.jwt, "Expected to find a JWT in localStorage!")
+		})
+		
+		// AND there is an invite link and invite code
+		cy.get("#inviteLink").should('contain', 'http')
 		cy.get('#newTeamInviteCode').invoke('text').should('have.length.of.at.least', 6)
 		cy.get('#newTeamInviteCode').then(inviteCodeElem => {
 			fix.inviteCode = inviteCodeElem.text()
@@ -84,7 +99,20 @@ context('Happy Case', () => {
 
 	})
 
-	//TODO: create test with mocked error response to check error modal
+		//TODO: create test with mocked error response to check error modal
+
+	it('Returning user is automatically logged in', function() {
+		//GIVEN a team and a jwt
+		assert.isString(fix.teamName, "Need to be logged into a team already.")
+		assert.isString(fix.jwt, "Need jwt from last test step.")
+
+		// WHEN we simulate that the jwt is stored in localStorage
+		localStorage.setItem("LIQUIDO_JWT", fix.jwt)
+		//  AND visist the root start page
+		cy.visit("/")
+		// THEN we are automatically forwarded to team-home for that team.
+		cy.get('#team-home').should('contain.text', fix.teamName)
+	})
 	
 	it('Join team', function() {
 		//GIVEN inviteCode and data for new member
@@ -93,6 +121,9 @@ context('Happy Case', () => {
 		assert.isString(fix.userEmail)
 		assert.isString(fix.pollTitle, "Need existing poll to test joinTeam")
 		assert.isString(fix.proposalTitle, "Need existing proposal to test joinTeam")
+
+		//GIVEN user is not logged in
+		cy.clearLocalStorage()   // just to be sure
 
 		//WHEN joining a team
 		cy.visit("/")
@@ -120,8 +151,6 @@ context('Happy Case', () => {
 	it('Show team and its polls', function() {
 		//GIVEN a logged in user
 		cy.visit("/login?email="+fix.userEmail+"&teamName="+fix.teamName)
-		//WHEN  goint to team-home
-		cy.get('#gotoTeamButton').click()
 		//THEN correct team-home is shown
 		cy.get('#team-home').should('contain.text', fix.teamName)
 
@@ -138,7 +167,9 @@ context('Happy Case', () => {
 
 		//GIVEN a logged in user
 		cy.visit("/login?email="+fix.userEmail+"&teamName="+fix.teamName)
-		// AND a poll in elaboration
+		//WHEN going to polls
+		cy.get('#gotoPollsButton').click()
+		//THEN we see our poll in elaboration with the correct title
 		cy.get("#elaborationArrow").click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 		
@@ -155,9 +186,10 @@ context('Happy Case', () => {
 	})
 
 	it("Admin starts voting phase", function() {
-		//GIVEN a logged in user
+		//GIVEN a logged in admin
 		cy.visit("/login?email="+fix.adminEmail+"&teamName="+fix.teamName)
-		// AND the poll in elaboration that was created above
+		// AND the poll in elaboration that was created before
+		cy.get('#gotoPollsButton').click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 
 		// WHEN admin stars voting phase
@@ -174,6 +206,7 @@ context('Happy Case', () => {
 		//GIVEN a logged in user
 		cy.visit("/login?email="+fix.userEmail+"&teamName="+fix.teamName)
 		// AND a poll in voting
+		cy.get('#gotoPollsButton').click()
 		cy.get("#votingArrow").click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 		cy.get("#goToCastVoteButton").click()
@@ -195,9 +228,10 @@ context('Happy Case', () => {
 	})
 	
 	it("Admin finishes voting phase", function() {
-		//GIVEN a logged in user
+		//GIVEN a logged in admin
 		cy.visit("/login?email="+fix.adminEmail+"&teamName="+fix.teamName)
 		// AND the poll in elaboration that was created before
+		cy.get('#gotoPollsButton').click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 
 		// WHEN admin stars voting phase

@@ -87,10 +87,13 @@ export default {
 		}
 	},
 	mounted() {
+
+		// DevLogin navigags to /team ! Tests rely on this!
+
 		if (this.email && this.teamName) {
 			this.$api.devLogin(this.email, this.teamName).then(() => {
 				console.info("devLogin <"+this.email+"> into "+this.teamName)
-				this.$router.push("/polls")
+				this.$router.push("/team")
 			}).catch(err => console.error("DevLogin via params failed!", err))
 		}
 	},

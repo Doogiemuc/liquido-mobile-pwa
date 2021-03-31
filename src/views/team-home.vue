@@ -66,6 +66,18 @@
 				<img id="qrCodeImg" src="" class="qr-code">
 			</div>
 		</b-card>
+
+		<div class="text-center">
+			<b-button
+				id="logoutButton"
+				variant="primary"
+				size="s"
+				class="mt-5"
+				@click="clickLogout()"
+			>
+				{{ $t("logout") }}
+			</b-button>
+		</div>
 	</div>
 </template>
 
@@ -92,6 +104,7 @@ export default {
 				inviteLink: "Einladunglink teilen:",
 				inviteCode: "Einladungscode eingeben:",
 				qrCode: "QR Code scannen:",
+				logout: "Logout"
 			},
 		},
 	},
@@ -140,6 +153,11 @@ export default {
 	methods: {
 		gotoPolls() {
 			this.$router.push({name: "polls"})
+		},
+
+		clickLogout() {
+			this.$api.logout()
+			this.$router.push("/login")  //TODO: Forwared to a polite byebye page
 		}
 	},
 }

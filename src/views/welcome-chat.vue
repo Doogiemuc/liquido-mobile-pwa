@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="mt-3">
+		<div id="welcomeChat" class="mt-3">
 			<b-card id="welcomeBubble" :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm">
 				<b-card-text v-html="$t('welcome')" />
 			</b-card>

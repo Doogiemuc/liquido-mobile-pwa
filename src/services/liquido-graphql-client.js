@@ -1,5 +1,11 @@
 /**
  * LIQUIDO GraphQL client
+ * 
+ * Every call to the backend goes through this class.
+ * Here we also handle data caching.
+ * And login and logout because the currently logged in use with his team is also cached.
+ * 
+ * This is a service class. It does not have a frontend. It does no navigation.
  */
 import axios from "axios"
 import config from "config"
@@ -115,21 +121,26 @@ let graphQlApi = {
 		if (team.admins.find(u => u.id === user.id)) user.isAdmin = true
 		this.teamCache.put(this.CURRENT_USER_KEY, user)
 		this.teamCache.put(this.JWT_KEY, jwt)
+		localStorage.setItem(this.LIQUIDO_JWT_KEY, jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
 		EventBus.$emit(EventBus.LOGIN, {team, user, jwt})
-		console.debug("Login: <"+user.email+"> into team '" + team.teamName  + "'")
+		console.debug("Login <"+user.email+"> into team '" + team.teamName  + "'")
 	},
 
 	logout() {
 		axios.defaults.headers.common["Authorization"] = undefined
-		console.debug("Logout")
-		EventBus.$emit(EventBus.LOGOUT)
+		let userEmail = this.getCachedUser() ? this.getCachedUser().email : ""
+		console.debug("Logout <"+userEmail+">")
+		localStorage.removeItem(this.LIQUIDO_JWT_KEY)
+		axios.defaults.headers.common["Authorization"] = undefined
 		this.teamCache.emptyCache()
 		this.pollsCache.emptyCache()
+		EventBus.$emit(EventBus.LOGOUT, userEmail)
 	},
 
 	/* ===== Synchronous utility methods that do not call the backend ========= */
 
+	/** Check if there currently is an authenticated user. This is called quite often and needs to be sync and fast. */
 	isAuthenticated() {
 		return axios.defaults.headers.common["Authorization"] !== undefined && this.teamCache.getSync(this.CURRENT_USER_KEY) !== undefined
 	},
@@ -363,6 +374,7 @@ let graphQlApi = {
 	CURRENT_USER_KEY: "currentUser",       // key for current user object in teamCache
 	TEAM_KEY: "team",
 	VOTER_TOKEN_KEY: "voterToken",
+	LIQUIDO_JWT_KEY: "LIQUIDO_JWT",        // JWT in localStorage
 
 	/** default JQL queries for common models */
 	JQL: JQL,

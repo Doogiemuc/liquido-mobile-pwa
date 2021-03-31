@@ -14,7 +14,7 @@
 					<span class="liquido" @click="clickLiquidoTitle()" />
 				</div>
 				<div class="col header-right">
-					<i v-if="isLoggedIn" id="gotoTeamButton" class="fas fa-users" @click="gotoTeam()" />
+					<i v-if="isAuthenticated" id="gotoTeamButton" class="fas fa-users" @click="gotoTeam()" />
 				</div>
 			</div>
 		</div>
@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import EventBus from "@/services/event-bus"
-
 export default {
 	name: "LiquidoHeader",
 	i18n: {
@@ -40,18 +38,17 @@ export default {
 	data() {
 		return {
 			filterByStatus: "ELABORATION",
-			isLoggedIn: false,
 		}
 	},
 	computed: {
 		height() {
 			return $("#liquidoHeader").height()
+		},
+		isAuthenticated() {
+			return this.$api.isAuthenticated()
 		}
 	},
 	mounted() {
-		EventBus.$on(EventBus.LOGIN, () => this.isLoggedIn = true)
-		EventBus.$on(EventBus.LOGOUT, () => this.isLoggedIn = false)
-
 		// make header smaller when user scrolls down
 		$("#app").scroll(this.transitionHeader)
 	},
@@ -72,9 +69,12 @@ export default {
 		},
 
 		clickLiquidoTitle() {
-			if (this.$route.path !== "/welcome" && this.$route.path !== "/polls") {
+			/*
+			//TOOD: what todo when clicking header? Where to go?
+			if (this.$route.path !== "/welcome" && this.$route.path !== "/polls" && this.$route.path !== "/login") {
 				this.$router.push({name: "polls"})
 			}
+			*/
 		},
 
 		gotoTeam() {
