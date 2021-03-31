@@ -121,3 +121,6 @@ dist
 
 # Visual Studio Plugin - Vetur
 jsconfig.json
+
+# Cypress JS test runner - screen recordings
+./cypress/videos

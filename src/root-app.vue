@@ -4,7 +4,7 @@
 		<transition :name="transitionName">
 			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
-		<mobile-log-viewer></mobile-log-viewer>
+		<mobile-log-viewer v-if="showDebugLog"></mobile-log-viewer>
 	</div>
 </template>
 
@@ -24,7 +24,6 @@ const page_order = {
 	"addProposal": 7,
 	"castVote": 8,
 }
-
 
 /** Liquido Root App */
 export default {
@@ -59,6 +58,9 @@ export default {
 		showPollsFooter() {
 			return this.$route.path === "/polls"
 		},
+		showDebugLog() {
+			return false
+		}
 	},
 	// watch the `$route` to determine the transition to use
 	// https://router.vuejs.org/guide/advanced/transitions.html#per-route-transition
@@ -72,7 +74,8 @@ export default {
 			else { this.transitionName = "fade" }  // default is fade
 		},
 	},
-	created() {},
+	created() {
+	},
 	mounted() {},
 	methods: {
 		//

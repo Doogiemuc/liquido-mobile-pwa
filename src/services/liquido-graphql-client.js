@@ -19,18 +19,18 @@ const GRAPHQL = "/graphql"
 
 /** Shorthands for JQL return values */
 const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, createdBy { id name email } area { id } }"
-const JQL = {
-	CREATE_OR_JOIN_TEAM_RESULT: `{ team {
+const JQL_TEAM = `team {
 		id
 		teamName
 		inviteCode
 		admins  { id, email, name, website, picture, mobilephone }
 		members { id, email, name, website, picture, mobilephone }
-	}
-	user { id, email, name, website, picture, mobilephone }
-	jwt }`,
+	}`
+const JQL = {
+	TEAM: JQL_TEAM,
 	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
-	//POLL:          `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} }`,
+	CREATE_OR_JOIN_TEAM_RESULT: `{ ${JQL_TEAM} user { id, email, name, website, picture, mobilephone } jwt }`,
+	//POLL_IN_ELABORATION:  `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} }`,
 	POLL: `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} numBallots winner ${JQL_PROPOSAL} duelMatrix { data } }`,
 }
 
@@ -95,7 +95,7 @@ axios.interceptors.response.use(function (response) {
 });
 
 /**
- * exported API methods
+ * ===================== exported API methods =======================
  */
 let graphQlApi = {
 	async pingApi() {
@@ -114,20 +114,21 @@ let graphQlApi = {
 		// Set user.isAdmin = true if user is admin. This must of course also be secured in the backend!
 		if (team.admins.find(u => u.id === user.id)) user.isAdmin = true
 		this.teamCache.put(this.CURRENT_USER_KEY, user)
-		this.teamCache.put("jwt", jwt)
+		this.teamCache.put(this.JWT_KEY, jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
-		EventBus.$emit(EventBus.LOGIN, user)		//TODO: simply emit throug root-up  this$.root.emit(...)
+		EventBus.$emit(EventBus.LOGIN, {team, user, jwt})
 		console.debug("Login: <"+user.email+"> into team '" + team.teamName  + "'")
 	},
 
 	logout() {
 		axios.defaults.headers.common["Authorization"] = undefined
-		this.isLoggedIn = false
 		console.debug("Logout")
 		EventBus.$emit(EventBus.LOGOUT)
 		this.teamCache.emptyCache()
 		this.pollsCache.emptyCache()
 	},
+
+	/* ===== Synchronous utility methods that do not call the backend ========= */
 
 	isAuthenticated() {
 		return axios.defaults.headers.common["Authorization"] !== undefined && this.teamCache.getSync(this.CURRENT_USER_KEY) !== undefined
@@ -137,11 +138,15 @@ let graphQlApi = {
 	 * Synchrounously get the currently logged in user from local cache.
 	 * @return {Object} Currently logged in user from local cache or undefined if no one is logged in
 	 */
-	getCurrentUser() {
+	getCachedUser() {
 		return this.teamCache.getSync(this.CURRENT_USER_KEY)  // get from cache, without calling the backend
 	},
 
-	getCurrentTeam() {
+	/**
+	 * Synchronously get the current user's team from the local cache.
+	 * @returns currently logged in user (if any)
+	 */
+	getCachedTeam() {
 		return this.teamCache.getSync(this.TEAM_KEY)
 	},
 
@@ -150,11 +155,33 @@ let graphQlApi = {
 	 * @return false if no one is logged in or currently logged in user is not the admin
 	 */
 	isAdmin() {
-		let currentUser = this.getCurrentUser()
-		let team        = this.getCurrentTeam()
-		if (!currentUser || !team || !team.admins) return false
-		return team.admins.map(admin => admin.id).includes(currentUser.id)
+		let cachedUser = this.getCachedUser()
+		let team        = this.getCachedTeam()
+		if (!cachedUser || !team || !team.admins) return false
+		return team.admins.map(admin => admin.id).includes(cachedUser.id)
 	},
+	
+
+
+	/* ===== API calls against backend (or cache) ===== */
+
+
+	/**
+	 * Load data about the user's team. This call must be authenticated with a JWT.
+	 * @returns Info about user's team
+	 * @throws When JWT is missing, invalid, expired, ...
+	 */
+	loginWithJwt(jwt) {
+		if (!jwt) throw new Error("Need JWT to login!")
+		let graphQL = `query { loginWithJwt ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
+		return axios.post(GRAPHQL, {query: graphQL})
+			.then(res => {
+				this.login(res.data.loginWithJwt.team, res.data.loginWithJwt.user, res.data.loginWithJwt.jwt)
+				return res.data.loginWithJwt
+			})
+	},
+
 
 	//TODO: loginWithEmailToken(token) {  }
 
@@ -332,6 +359,7 @@ let graphQlApi = {
 	pollsCache: new PopulatingCache(pollsCacheConfig),
 
 	/** Keys for the above caches */
+	JWT_KEY: "jwt",
 	CURRENT_USER_KEY: "currentUser",       // key for current user object in teamCache
 	TEAM_KEY: "team",
 	VOTER_TOKEN_KEY: "voterToken",

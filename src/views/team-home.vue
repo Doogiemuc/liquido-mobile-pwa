@@ -103,8 +103,8 @@ export default {
 	},
 	computed: {
 		currentUserName() { 
-			let currentUser = this.$api.getCurrentUser()
-			return currentUser ? currentUser.name : ""
+			let cachedUser = this.$api.getCachedUser()
+			return cachedUser ? cachedUser.name : ""
 		},
 		isAdmin() {
 			return this.$api.isAdmin()
@@ -114,7 +114,7 @@ export default {
 		},
 	},
 	created() {
-		this.team = this.$api.getCurrentTeam()
+		this.team = this.$api.getCachedTeam()
 	},
 	mounted() {
 		let QRcodeOpts = {

@@ -2,7 +2,8 @@ import Vue from "vue"
 import Router from "vue-router"
 import welcomeChat from "@/views/welcome-chat"
 import loginPage from "@/views/login-page"
-
+import EventBus from "./event-bus"
+//import liquidoApi from "@/services/liquido-graphql-client"
 
 Vue.use(Router)
 
@@ -10,10 +11,7 @@ const routes = [
 	{
 		path: "/",
 		name: "index",
-		redirect: "/welcome", //TODO: redirect depending on auth token
-		meta: {
-			public: true
-		}
+		redirect: "/team"
 	},
 	{
 		path: "/login",
@@ -29,6 +27,7 @@ const routes = [
 	},
 	{
 		path: "/welcome",
+		name: "welcome",
 		component: welcomeChat,
 		meta: {
 			public: true
@@ -98,22 +97,75 @@ const router = new Router({
 	routes,
 })
 
+const LIQUIDO_JWT_KEY  = "LIQUIDO_JWT"
+
 /**
- * Check if routeis public or requires authentication.
- * Forward to /login if required but not authenticated.
+ * Store jwt in localStorage on login.
+ */
+/* eslint-disable no-unused-vars */
+EventBus.$on(EventBus.LOGIN, ({team, user, jwt}) => {
+	//console.log("Storing JWT in local storage", jwt)
+	localStorage.setItem(LIQUIDO_JWT_KEY, jwt)
+})
+
+/**
+ * Remove jwt from localStorage on logout
+ */
+EventBus.$on(EventBus.LOGOUT, () => {
+	localStorage.removeItem(LIQUIDO_JWT_KEY)
+})
+
+async function tryToAuthenticate() {
+	let jwt = localStorage.getItem(LIQUIDO_JWT_KEY);
+	if (jwt) {
+		return router.app.$api.loginWithJwt(jwt)
+			.then(res => {
+				console.log("Successfully authenticated from localStorage")
+				return Promise.resolve(res)
+			})
+			.catch(err => {
+				console.warn("tryToAuthenticate failed", err)
+				return Promise.reject()
+			})
+	}
+	else return Promise.reject()
+}
+
+
+/**
+ * Vue Router - Navigation guard
+ * IF navigating to "/" and not authenticated, 
+ *   
+ * IF route is public, then allow navigation.
+ * ELSE IF user is not yet authenticated
+ *   Check if we can get a JWT from localstorage and try to authenticate with it.
+ *   IF still not authenticated, then forward to /login
  */
 router.beforeEach((routeTo, routeFrom, next) => {
 	// Keep in mind that next() must exactly be called once in this method.
-	if (routeTo.meta.public) {
-		return next()
-	} else	
-	// forward to login if not authenticated.
-	if (!router.app.$api.isAuthenticated()) {
-		console.log("Forwarding to /login")
-		return next("/login")
-	} else {
-		return next()
+
+	let isAuthenticated = router.app.$api.isAuthenticated()
+	
+	if (isAuthenticated) {
+		next()
+	}
+	else if (routeTo.meta.public) {
+		next()
+	} 
+	else {		
+		tryToAuthenticate()
+			.then(() => next())
+			.catch(() => {
+				if (routeTo.path === "/" || routeTo.path === "/index.html") {
+					console.log("Forwarding to welcome")
+					next({name: "welcome"})
+				}	else {
+					console.debug("Forwarding to login")
+					next({name: "login"})
+				}
+			})
 	}
 })
 
 export default router
+

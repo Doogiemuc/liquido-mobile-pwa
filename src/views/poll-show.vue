@@ -157,7 +157,7 @@ export default {
 			if (!this.poll.proposals || this.poll.proposals.length === 0) {
 				return true
 			}
-			let currentUser = this.$api.getCurrentUser()
+			let currentUser = this.$api.getCachedUser()
 			if (currentUser && currentUser.isAdmin) return true
 			return this.poll.proposals.filter((prop) => prop.createdBy.id === currentUser.id).length === 0
 		},
