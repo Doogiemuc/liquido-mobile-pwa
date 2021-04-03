@@ -11,23 +11,7 @@
 			</button>
 		</div>
 
-		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginViaEmail')">
-			<p>{{ $t('LoginViaEmailInfo') }}</p>
-			<liquido-input
-				id="emailInput"
-				v-model="emailInput"
-				:label="$t('yourEMail')"
-				:placeholder="$t('emailPlaceholder')"
-				type="email"
-				:invalid-feedback="$t('emailInvalid')"
-				@statusChange="emailInputStatusChange"
-			/>
-			<button type="button" :disabled="sendLinkButtonDisabled" class="btn btn-primary float-right" @click="requestEmailToken">
-				{{ $t("SendLink") }}
-			</button>
-		</b-card>
-
-		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginViaSms')">
+		<b-card class="chat-bubble input-bubble" :header="$t('LoginViaSms')">
 			<p>{{ $t('LoginViaSmsInfo') }}</p>
 			<liquido-input
 				id="mobilephoneInput"
@@ -36,27 +20,53 @@
 				:label="$t('yourMobilephone')"
 				:placeholder="$t('mobilephonePlaceholder')"
 				:invalid-feedback="$t('mobilephoneInvalid')"
-				@statusChange="mobilephoneInputStatusChange"
+				:state.sync="mobilephoneInputState"
 			/>
 			<div class="text-right">
-				<button id="requestTokenButton" :disabled="requestTokenButtonDisabled" class="btn btn-primary">
-					{{ $t("RequestToken") }}
+				<button id="requestTokenButton" :disabled="requestTokenButtonDisabled" class="btn btn-primary" @click="requestAuthToken">
+					<div v-if="waitUntilNextRequestSecs > 0">
+						{{ $t('TokenSent') }}&nbsp;<b-spinner small />
+					</div>
+					<div v-else>
+						{{ $t('RequestToken') }}
+					</div>
 				</button>
 			</div>
-			<hr />
-			<p class="mt-3">{{ $t('PleaseEnterToken') }}</p>
+			<b-collapse v-model="tokenHasBeenRequested" class="mt-3">
+				<liquido-input
+					id="authToken"
+					v-model="authToken"
+					type="number"
+					placeholder="<123456>"
+					:label="$t('AuthToken')"
+					:invalid-feedback="$t('authTokenInvalid')"
+					:minlength="6"
+					:maxlength="6"
+					:required="true"
+					:show-counter="true"
+					:state.sync="authTokenInputState"
+				></liquido-input>
+			</b-collapse>
+		</b-card>
+		
+
+		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginViaEmail')">
+			<p>{{ $t('LoginViaEmailInfo') }}</p>
 			<liquido-input
-				id="authToken"
-				v-model="authToken"
-				type="number"
-				placeholder="123456"
-				:label="$t('AuthToken')"
-				:invalid-feedback="$t('authTokenInvalid')"
-				:minlength="6"
-				:maxlength="6"
-				:required="true"
-				:show-counter="true"
-			></liquido-input>
+				id="emailInput"
+				v-model="emailInput"
+				type="email"
+				:label="$t('yourEMail')"
+				:placeholder="$t('emailPlaceholder')"
+				:invalid-feedback="$t('emailInvalid')"
+				:state.sync="emailInputState"
+			/>
+			<button type="button" :disabled="sendLinkButtonDisabled" class="btn btn-primary float-right" @click="requestEmailToken">
+				{{ $t("SendLink") }}
+			</button>
+			<b-collapse v-model="emailSent" class="mt-3">
+				<p>{{ $t('emailSentInfo') }}</p>
+			</b-collapse>
 		</b-card>
 	</div>
 </template>
@@ -65,26 +75,32 @@
 import config from "config"
 import liquidoInput from "@/components/liquido-input"
 
+const REQUEST_THROTTLE_SECS = 10
+
 export default {
 	i18n: {
 		messages: {
 			de: {
+				LoginViaSms: "Login per SMS",
+				LoginViaSmsInfo: "Ich kann dir einen Code per SMS schicken. Damit kannst du dich dann ganz einfach einloggen.",
+				yourMobilephone: "Deine Handynummer",
+				mobilephonePlaceholder: "+49 151 1111111",
+				mobilephoneInvalid: "Handynummer ungültig",
+				RequestToken: "Login Code anfordern",
+				TokenSent: "SMS verschickt ...",
+				AuthToken: "Login-Code aus SMS",
+				authTokenInvalid: "Der SMS Code hat genau sechs Ziffern.",
+				// error modal
+				authTokenInvalidTitle: "Login-Code ungültig",
+				authTokenInvalidMsg: "Der eingegebene Login-Code wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Versuche es bitte noch einmal.",				
+
 				LoginViaEmail: "Login per Email",
 				yourEMail: "Deine Email",
-				LoginViaEmailInfo: "Ich kann dir einen magischen Link per E-Mail schicken. Mit diesem kannst du dich dann ganz einfach einloggen.",
+				LoginViaEmailInfo: "Ich kann dir einen magischen Link per E-Mail schicken. Klicke in der E-Mail auf den Link um dich einzuloggen.",
 				SendLink: "Link zuschicken",
 				emailPlaceholder: "info@domain.de",
 				emailInvalid: "E-Mail ungültig",
-
-				LoginViaSms: "Login per SMS",
-				yourMobilephone: "Deine Handynummer",
-				LoginViaSmsInfo: "Ich kann dir einen einmal gültigen Code per SMS schicken. Das ist besonders sicher.",
-				RequestToken: "Login Code anfordern",
-				mobilephonePlaceholder: "+49 151 1234567",
-				mobilephoneInvalid: "Handynummer ungültig",
-				AuthToken: "SMS Code",
-				authTokenInvalid: "Der SMS Code hat genau sechs Ziffern.",
-				PleaseEnterToken: "Gib dann den 6-stelligen Code aus der SMS hier ein:",
+				emailSentInfo: "Ok, die Email mit deinem Login Link wurde verschickt.",
 
 				DevLoginAdmin: "devLogin: Admin",
 				DevLoginMember: "devLogin: Member",
@@ -101,14 +117,35 @@ export default {
 			emailInput: "",
 			mobilephone: "",
 			authToken: undefined,
-			sendLinkButtonDisabled: true,
-			requestTokenButtonDisabled: true,
+			// synced states from liquido-inputs
+			emailInputState: null,
+			mobilephoneInputState: null,
+			authTokenInputState: null,
+			// Throttling: Only allow request auth token once every few seconds
+			waitUntilNextRequestSecs: 0,
+			tokenHasBeenRequested: false,
+			emailSent: false,
 		}
 	},
 	computed: {
 		showDevLogin() {
 			return process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
 		},
+		sendLinkButtonDisabled() {
+			return this.emailInputState !== true
+		},
+		requestTokenButtonDisabled() {
+			return this.mobilephoneInputState !== true || this.waitUntilNextRequestSecs > 0
+		},
+	},
+	watch: {
+		/** UX: When auth token format is valid, then immideately try to login with it. No extra "login" button step. */
+		authTokenInputState: function(newVal) {
+			if (newVal === true) {
+				console.log("Token format is valid")
+				this.loginWithAuthToken()
+			}
+		}
 	},
 	mounted() {
 		if (this.email && this.teamName) {
@@ -118,15 +155,7 @@ export default {
 			}).catch(err => console.error("DevLogin via params failed!", err))
 		}
 	},
-
 	methods: {
-		emailInputStatusChange(newStatus) {
-			this.sendLinkButtonDisabled = (newStatus !== true)
-		},
-		mobilephoneInputStatusChange(newStatus) {
-			this.requestTokenButtonDisabled = (newStatus !== true)
-		},
-
 		devLoginAdmin() {
 			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname).then(() => {
 				this.$router.push("/team")
@@ -144,20 +173,37 @@ export default {
 			this.$api.requestEmailToken(this.emailInput)
 				.then(() => {
 					console.log("Email login link sent successfully")
+					this.emailSent = true
 				})
 				.catch(err => {
 					console.log("Could not send email link!", err)
+					this.emailSent = false
 				})
 		},
 
-		loginWithSmsToken() {
-			this.$api.loginWithAuthToken(this.authToken)
+		requestAuthToken() {
+			this.tokenHasBeenRequested = true
+			if (this.waitUntilNextRequestSecs > 0) return
+			this.waitUntilNextRequestSecs = REQUEST_THROTTLE_SECS
+			let requestThrottler = setInterval(() => {
+				if (this.waitUntilNextRequestSecs > 0) {
+					this.waitUntilNextRequestSecs--
+				} else {
+					clearInterval(requestThrottler)
+					this.waitUntilNextRequestSecs = 0
+				}
+			}, 1000);
+			console.log("requestAuthToken", this.mobilephone)
+		},
+
+		loginWithAuthToken() {
+			this.$api.loginWithAuthToken(this.mobilephone, this.authToken)
 				.then(() => {
 					this.$router.push({name: "teamHome"})
 				})
 				.catch(err => {
 					console.log("Login with authToken failed", err)
-					//TODO: show error modal
+					
 				})
 		}
 	},

@@ -13,7 +13,7 @@
 					<i class="fas fa-university" />&nbsp;
 					<span class="liquido" @click="clickLiquidoTitle()" />
 				</div>
-				<div class="col header-right">
+				<div class="col header-right" :class="headerRightClass">
 					<i v-if="isAuthenticated" id="gotoTeamButton" class="fas fa-users" @click="gotoTeam()" />
 				</div>
 			</div>
@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import EventBus from "@/services/event-bus"
+
 export default {
 	name: "LiquidoHeader",
 	i18n: {
@@ -38,19 +40,24 @@ export default {
 	data() {
 		return {
 			filterByStatus: "ELABORATION",
+			isAuthenticated: false
 		}
 	},
 	computed: {
 		height() {
 			return $("#liquidoHeader").height()
 		},
-		isAuthenticated() {
-			return this.$api.isAuthenticated()
+		headerRightClass() {
+			return this.$route.path === "/team" ? "text-muted" : ""
 		}
 	},
 	mounted() {
 		// make header smaller when user scrolls down
 		$("#app").scroll(this.transitionHeader)
+
+		// Cannot simply do this without EventBus instead with a computed property, becasue this.$api.isAuthenticated is not reactive. Can we make it ?
+		EventBus.$on(EventBus.LOGIN, () => this.isAuthenticated = true)
+		EventBus.$on(EventBus.LOGOUT, () => this.isAuthenticated = false)
 	},
 	methods: {
 		transitionHeader() {

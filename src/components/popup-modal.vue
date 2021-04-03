@@ -13,14 +13,14 @@
 					<slot name="modal-header">
 						<i :class="headerIconClass" class="bounce-anim-icon"></i>
 						<div class="header-icon-shadow bounce-anim-shadow">&nbsp;</div>
-						<h5 v-if="title" id="modalLabel" class="modal-title">{{ titel }}</h5>
+						<h5 v-if="myTitle" id="modalLabel" class="modal-title">{{ myTitle }}</h5>
 						<button v-if="showHeaderClose" type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</slot>
 				</div>
 				<div class="modal-body">
-					<slot>{{ message }}</slot>
+					<slot>{{ myMessage }}</slot>
 				</div>
 				<div class="modal-footer">
 					<slot name="modal-footer">
@@ -61,12 +61,14 @@ export default {
 	},
 	data() {
 		return {
-			currentMessage: this.message
+			myMessage: this.message,
+			myTitle: this.title,
+			myType: this.type
 		}
 	},
 	computed: {
 		headerIconClass() {
-			switch (this.type) {
+			switch (this.myType) {
 				case "primary":
 					return "far fa-check-circle header-icon header-icon-primary"
 				case "success":
@@ -82,7 +84,7 @@ export default {
 			}
 		},
 		modalContentClass() {
-			switch (this.type) {
+			switch (this.myType) {
 				case "primary":
 					return "bg-primary text-white " + this.contentClass
 				case "success":
@@ -100,8 +102,21 @@ export default {
 	},
 	methods: {
 		/** Show the modal. Can optionally pass a message. */
-		show(msg) {
-			if (msg) this.currentMessage = msg
+		show(msg, title) {
+			if (title) this.myTitle = title
+			if (msg) this.myMessage = msg
+			$("#"+this.id).modal("show")
+		},
+		showSuccess(msg, title) {
+			if (title) this.myTitle = title
+			if (msg) this.myMessage = msg
+			this.myType = "success"
+			$("#"+this.id).modal("show")
+		},
+		showError(msg, title) {
+			if (title) this.myTitle = title
+			if (msg) this.myMessage = msg
+			this.myType = "error"
 			$("#"+this.id).modal("show")
 		},
 		hide() {
@@ -134,7 +149,7 @@ export default {
 		z-index: 2020;
 		position: absolute;
 		text-align: center;
-		top: -3.5rem;
+		top: -4rem;
 		left: 0;
 		right: 0;
 		width: 6rem;
@@ -144,10 +159,10 @@ export default {
 	}
 
 	/* 
-	This is an unbelievable cool animated 3D shadow below the bouncing header icon. CSS ftw :-) 
+	This is an unbelievable cool animated 3D shadow below the bouncing header icon. CSS @keyframes ftw :-) 
 	The object that casts the shadow is a transparent oval.
 	The actual shadow is well below the oval. So that the oval does not cover the shadow.
-	And it is behind the icon, but above the modal.
+	The oval layer is behind the icon, but above the modal.
 	*/
 	.header-icon-shadow {
 		z-index: 2010;

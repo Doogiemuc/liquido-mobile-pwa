@@ -4,13 +4,26 @@
 		<transition :name="transitionName">
 			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
+		<popup-modal 
+			id="rootPopupModal"
+			ref="rootPopupModal"
+			:type="modalType"
+			:title="modalTitle"
+			:message="modalMessage"
+			:content-class="modalContentClass"
+			:primary-button-text="modalPrimaryButtonText"
+			:secondary-button-text="modalSecondaryButtonText"
+		>
+		</popup-modal>
 		<mobile-log-viewer v-if="showDebugLog"></mobile-log-viewer>
 	</div>
 </template>
 
 <script>
 import liquidoHeader from "@/components/liquido-header"
+import popupModal from "@/components/popup-modal"
 import mobileLogViewer from "@/components/mobile-debug-log.vue"
+
 
 /** Pages will slide from right to left in this order */
 const page_order = {
@@ -25,14 +38,26 @@ const page_order = {
 	"castVote": 8,
 }
 
+// This is how you can show an error in a component
+//TODO: this.$root.$refs.rootPopupModal.showError(this.$t("msg"), this.$t("title"))
+
+
 /** Liquido Root App */
 export default {
 	name: "LiquidoApp",
-	components: { liquidoHeader, mobileLogViewer },
+	components: { liquidoHeader, popupModal, mobileLogViewer },
 	// All these data attributes are reactive and available in every sub-component as e.g. this.$root.transitionName
 	data() { 
 		return {
 			transitionName: "", 	// CSS sliding transition between page components
+
+			// Global popup-modal
+			modalType: "success",
+			modalTitle: "",
+			modalMessage: "",
+			modalContentClass: undefined,
+			modalPrimaryButtonText: undefined,
+			modalSecondaryButtonText: undefined,
 		}
 	},
 	computed: {

@@ -4,14 +4,25 @@
  * Every call to the backend goes through this class.
  * Here we also handle data caching.
  * And login and logout because the currently logged in use with his team is also cached.
- * 
- * This is a service class. It does not have a frontend. It does no navigation.
  */
 import axios from "axios"
 import config from "config"
 import PopulatingCache from "populating-cache"
 import EventBus from "@/services/event-bus"
 import log from "@/components/mobile-debug-log.js"
+
+/*
+  # Architecture design decisions in liquido-graphql-client.js
+
+	We do not do (much) error handling here. This lies in the responsibility of the caller
+	We only do simple sanity checks where we can prevent unneccessary calls to the backend.
+
+	The class handles transparent caching of fetched data. Clients do not directly access the cache.
+	Clients can `force` a refetch when needed.
+
+	This is a service class. It does not have a frontend. It does no navigation.
+*/
+
 
 //TODO: refactor out local-cache.js and liquido-auth.js  <= not that easy!
 
@@ -152,7 +163,7 @@ let graphQlApi = {
 
 	/** Check if there currently is an authenticated user. This is called quite often and needs to be sync and fast. */
 	isAuthenticated() {
-		return axios.defaults.headers.common["Authorization"] !== undefined && this.teamCache.getSync(this.CURRENT_USER_KEY) !== undefined
+		return axios.defaults.headers.common["Authorization"] !== undefined && this.getCachedUser() !== undefined
 	},
 
 	/** 
@@ -226,9 +237,10 @@ let graphQlApi = {
 	/**
 	 * try to login with they authToken that the user has entered.
 	 */
-	loginWithAuthToken(authToken, mobilephone) {
+	loginWithAuthToken(mobilephone, authToken) {
+		if (!mobilephone) throw new Error("Need mobilephone to log in!")
 		if (!authToken) throw new Error("Need authToken to log in!")
-		let graphQL = `query { loginWithAuthToken(authToken: "${authToken}", mobilephone: "${mobilephone}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		let graphQL = `query { loginWithAuthToken(mobilephone: "${mobilephone}", authToken: "${authToken}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
 		return axios.post(GRAPHQL, {query: graphQL}).then(res => {
 			this.login(res.data.loginWithAuthToken.team, res.data.loginWithAuthToken.user, res.data.loginWithAuthToken.jwt)
 			return res.data.loginWithAuthToken

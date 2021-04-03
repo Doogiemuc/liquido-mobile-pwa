@@ -180,7 +180,7 @@ export default {
 	},
 	watch: {
 		"state": function() {
-			this.$emit("statusChange", this.state)
+			this.$emit("update:state", this.state)
 		}
 	},
 	created() {
