@@ -13,6 +13,8 @@ import PopulatingCache from "populating-cache"
 import EventBus from "@/services/event-bus"
 import log from "@/components/mobile-debug-log.js"
 
+//TODO: refactor out local-cache.js and liquido-auth.js  <= not that easy!
+
 if (!config || !config.LIQUIDO_API_URL) {
 	log.error("liquido-graphql-client: ERROR I have no config!")
 } else {
@@ -35,27 +37,37 @@ const JQL_TEAM = `team {
 const JQL = {
 	TEAM: JQL_TEAM,
 	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
-	CREATE_OR_JOIN_TEAM_RESULT: `{ ${JQL_TEAM} user { id, email, name, website, picture, mobilephone } jwt }`,
+	CREATE_OR_JOIN_TEAM_RESULT: `{ ${JQL_TEAM} user { id, email, name, website, picture, mobilephone } jwt }`,  // login data
 	//POLL_IN_ELABORATION:  `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} }`,
 	POLL: `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} numBallots winner ${JQL_PROPOSAL} duelMatrix { data } }`,
 }
 
-/** 
- * Client side local cache for all data about team, current user and jwt 
+
+
+/**
+ * Client side cache for team data   with fetchFunc
  */
-const shouldNotBeCalled = function(path) {
-	console.error("This fetch function should not have been called", path)
-	throw new Error("This fetch function should not be called! path="+JSON.stringify(path))
+const fetchTeamFunc = function(path) {
+	if (path === "team") {
+		console.debug("fetchTeamFunc: Fetch own team from backend")
+		let graphQL = `query { team ${JQL.TEAM} }`
+		return axios.post(GRAPHQL, {query: graphQL}).then(res => res.data.team)
+	} else {
+		return Promise.reject(new Error("Invalid path fetchTeamFunc(path="+JSON.stringify(path)+")"))
+	}
 }
+
 const teamsCacheConfig = {
-	fetchFunc: shouldNotBeCalled,
+	fetchFunc: fetchTeamFunc,
 	ttl: 10*60*1000,		// 10 minutes for team cache
 	referencedPathAttr: "$ref",
 	idAttr: "id",
 }
 
+
+
 /**
- * fetch function for polls or one pollByID
+ * Client side cache for all polls in team   with fetchFunc
  */
 const fetchPollFunc = function(path) {
 	if (path[0] === "polls") {
@@ -71,9 +83,7 @@ const fetchPollFunc = function(path) {
 		return Promise.reject(new Error("Cannot fetch poll(s) at path: "+JSON.stringify(path)))
 	}
 }
-/**
- * Cache for polls
- */
+
 const pollsCacheConfig = {
 	fetchFunc: fetchPollFunc,
 	ttl: 60*1000,				// 60 seconds for polls Cache
@@ -174,8 +184,11 @@ let graphQlApi = {
 	
 
 
-	/* ===== API calls against backend (or cache) ===== */
-
+	/****************************************************************
+	 * API calls against backend
+	 * that can be executed anonymously, eg. for logging in
+	 * create or join a team
+	 *****************************************************************/
 
 	/**
 	 * Load data about the user's team. This call must be authenticated with a JWT.
@@ -193,10 +206,38 @@ let graphQlApi = {
 			})
 	},
 
+	requestEmailToken(email) {
+		if (!email) throw new Error("Need email to log in!")
+		let graphQL = `query { requestEmailToken(email: "${email}") { loginLink } }`
+		return axios.post(GRAPHQL, {query: graphQL})
+			.then(res => res.data.requestEmailToken.oneTimeToken)
+	},
 
-	//TODO: loginWithEmailToken(token) {  }
+	//TODO: loginWithEmailToken
 
-	/** Quick development login. Only available in dev and test env!!! */
+	/**
+	 * Request auth token for login. This will send an SMS.
+	 */
+	requestAuthToken(mobilephone) {
+		let graphQL = `query { authToken(mobilephone: "${mobilephone}") }`
+		return axios.post(GRAPHQL, {query: graphQL})
+	},
+
+	/**
+	 * try to login with they authToken that the user has entered.
+	 */
+	loginWithAuthToken(authToken, mobilephone) {
+		if (!authToken) throw new Error("Need authToken to log in!")
+		let graphQL = `query { loginWithAuthToken(authToken: "${authToken}", mobilephone: "${mobilephone}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		return axios.post(GRAPHQL, {query: graphQL}).then(res => {
+			this.login(res.data.loginWithAuthToken.team, res.data.loginWithAuthToken.user, res.data.loginWithAuthToken.jwt)
+			return res.data.loginWithAuthToken
+		})
+	},
+
+	/** 
+	 * [DEV] Quick development login. Only available in dev and test env!!! This goes to the REST backend. 
+	 */
 	async devLogin(email, teamName) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
@@ -256,6 +297,10 @@ let graphQlApi = {
 				return team
 			})
 	},
+
+	/****************************************************************
+	 * API calls against backend that need to be authenticated with JWT
+	 *****************************************************************/
 
 	async createPoll(pollTitle) {
 		let graphQL = `mutation {	createPoll(title: "${pollTitle}") ${JQL.POLL}	}`
