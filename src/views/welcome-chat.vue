@@ -81,23 +81,6 @@
 						tabindex="1"
 					/>
 
-					<!-- TODO: ask for mobile phone already here or later?
-					<liquido-input
-						id="mobilephoneInput"
-						ref="mobilephoneInput"
-						v-model="user.mobilephone"
-						:label="$t('yourMobilephone')"
-						:placeholder="$t('mobilephonePlaceholder')"
-						:valid-func="isMobilephoneValid"
-						type="tel"
-						pattern="[\+0-9 -/]{3,50}"
-						:maxlength="100"
-						:invalid-feedback="$t('mobilephoneInvalid')"
-						:disabled="flowState !== 10"
-						tabindex="2"
-					/>
-					-->
-
 					<liquido-input
 						id="emailInput"
 						ref="emailInput"
@@ -165,6 +148,19 @@
 					/>
 
 					<liquido-input
+						id="adminMobilephoneInput"
+						ref="adminMobilephoneInput"
+						v-model="user.mobilephone"
+						:label="$t('yourMobilephone')"
+						:placeholder="$t('mobilephonePlaceholder')"
+						:valid-func="isMobilephoneValid"
+						:maxlength="100"
+						:invalid-feedback="$t('mobilephoneInvalid')"
+						:disabled="flowState !== 20"
+						tabindex="2"
+					/>
+
+					<liquido-input
 						id="adminEmailInput"
 						ref="adminEmailInput"
 						v-model="user.email"
@@ -174,7 +170,7 @@
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
 						:disabled="flowState !== 20"
-						tabindex="2"
+						tabindex="3"
 						@keyup.enter="createNewTeam()"
 					/>
 
@@ -386,10 +382,15 @@ export default {
 	},
 	computed: {
 		joinTeamOkButtonDisabled() {
-			return !this.isInviteCodeValid(this.inviteCode) || !this.isEmailValid(this.user.email) || this.flowState > 10
+			return !this.isInviteCodeValid(this.inviteCode) || 
+						!this.isEmailValid(this.user.email) || 
+						this.flowState > 10
 		},
 		createNewTeamOkButtonDisabled() {
-			return !this.isTeamNameValid(this.team.teamName) || !this.isAdminEmailValid(this.user.email) || this.flowState > 20
+			return !this.isTeamNameValid(this.team.teamName) || 
+						!this.isMobilephoneValid(this.user.mobilephone) || 
+						!this.isAdminEmailValid(this.user.email)  || 
+						this.flowState > 20
 		},
 		errorModalClasses() {
 			switch (this.errorVariant) {
@@ -423,10 +424,16 @@ export default {
 	mounted() {
 		$("html, body").scrollTop(0)
 		this.flowState = 0
-		this.$api.pingApi().catch(() => {
-			this.errorTitle = this.$t("Attention")
-			this.errorMessage = this.$t("areYouOffline")
-			this.$refs["welcomeChatErrorModal"].show()
+		this.$api.pingApi().catch((err) => {
+			if (err.response.data.liquidoErrorName === "JWT_TOKEN_EXPIRED") {
+				console.debug("JWT expired. Forwarding to login ...")
+				//Bug: UI: Need to prevent automatic scroll down from chat animation. *seufz*
+				this.$router.push("/login")
+			} else {
+				this.errorTitle = this.$t("Attention")
+				this.errorMessage = this.$t("areYouOffline")
+				this.$refs["welcomeChatErrorModal"].show()
+			}
 		})
 
 		if (this.$root.isBottomInView("#welcomeBubble")) {
@@ -518,6 +525,7 @@ export default {
 			let newTeamRequest = {
 				teamName: this.team.teamName,
 				adminName: this.user.name,
+				adminMobilephone: this.user.mobilephone,
 				adminEmail: this.user.email,
 			}
 			this.$api.createNewTeam(newTeamRequest)

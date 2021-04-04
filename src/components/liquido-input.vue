@@ -219,15 +219,17 @@ export default {
 				evt.preventDefault()
 				evt.stopPropagation()
 				return false
+			} else {
+				this.$emit("keydown", evt) // let event bubble up
 			}
 		},
 
 		/** by default validate field's value immideately on every keyup, ie. after a keypress */
-		keyup() {
+		keyup(evt) {
 			if (this.validateOn === "keyup") {
 				this.validateField()
 			}
-			//this.$emit("keyup", evt) // let event bubble up
+			this.$emit("keyup", evt) // let event bubble up (make it possible for parent component to also reacht to a @keyup event.)
 		},
 
 		blur(evt) {

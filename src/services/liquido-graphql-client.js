@@ -102,6 +102,8 @@ const pollsCacheConfig = {
 	idAttr: "id",
 }
 
+
+
 /**
  * Sophisticated logging of HTTP error messages is crucial!
  */
@@ -117,7 +119,6 @@ axios.interceptors.response.use(function (response) {
 			msg += "\n" + JSON.stringify(error.response.data.liquidoErrorPayload)
 		console.debug(msg, error.response.data)
 	}
-
 	return Promise.reject(error);
 });
 
@@ -276,8 +277,8 @@ let graphQlApi = {
 	 * @param {Object} newTeam teamName, adminName, adminEmail and adminMobilephone
 	 */
 	async createNewTeam(newTeam) {
-		let graphQL = `mutation { createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}", adminEmail: "${newTeam.adminEmail}") ` +
-			JQL.CREATE_OR_JOIN_TEAM_RESULT + "}"
+		let graphQL = `mutation { createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}",` +
+			`adminMobilephone: "${newTeam.adminMobilephone}", adminEmail: "${newTeam.adminEmail}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
 		return axios.post(GRAPHQL, {query: graphQL})
 			.then(res => {
 				let team = res.data.createNewTeam.team

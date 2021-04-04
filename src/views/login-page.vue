@@ -34,18 +34,24 @@
 			</div>
 			<b-collapse v-model="tokenHasBeenRequested" class="mt-3">
 				<liquido-input
-					id="authToken"
+					id="authTokenInput"
 					v-model="authToken"
 					type="number"
 					placeholder="<123456>"
 					:label="$t('AuthToken')"
-					:invalid-feedback="$t('authTokenInvalid')"
+					:invalid-feedback="$t('authTokenInputInvalid')"
 					:minlength="6"
 					:maxlength="6"
 					:required="true"
 					:show-counter="true"
 					:state.sync="authTokenInputState"
 				></liquido-input>
+				<div 
+					v-if="tokenErrorMessage" 
+					class="alert alert-danger mt-3"
+					v-html="tokenErrorMessage"
+				>
+				</div>
 			</b-collapse>
 		</b-card>
 		
@@ -53,7 +59,7 @@
 		<b-card class="chat-bubble shadow-sm input-bubble" :header="$t('LoginViaEmail')">
 			<p>{{ $t('LoginViaEmailInfo') }}</p>
 			<liquido-input
-				id="emailInput"
+				id="loginEmailInput"
 				v-model="emailInput"
 				type="email"
 				:label="$t('yourEMail')"
@@ -89,10 +95,9 @@ export default {
 				RequestToken: "Login Code anfordern",
 				TokenSent: "SMS verschickt ...",
 				AuthToken: "Login-Code aus SMS",
-				authTokenInvalid: "Der SMS Code hat genau sechs Ziffern.",
-				// error modal
-				authTokenInvalidTitle: "Login-Code ungültig",
-				authTokenInvalidMsg: "Der eingegebene Login-Code wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Versuche es bitte noch einmal.",				
+				authTokenInputInvalid: "Der SMS Code hat genau sechs Ziffern.",
+				MobilephoneNotFound: "Tut mir leid, ich kenne diese Telefonnummer in LIQUIDO nicht. Bitte <a href='/'>registriere dich zuerst.</a>",
+				LoginWithTokenFailed: "Der eingegebene Login-Code wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Bitte versuche es bitte noch einmal.",
 
 				LoginViaEmail: "Login per Email",
 				yourEMail: "Deine Email",
@@ -117,13 +122,18 @@ export default {
 			emailInput: "",
 			mobilephone: "",
 			authToken: undefined,
-			// synced states from liquido-inputs
-			emailInputState: null,
-			mobilephoneInputState: null,
-			authTokenInputState: null,
-			// Throttling: Only allow request auth token once every few seconds
-			waitUntilNextRequestSecs: 0,
+
+			// auth token (via SMS)
+			mobilephoneInputState: null,    // synced states from liquido-inputs
+			authTokenInputState: null,      // synced states from liquido-inputs
+			waitUntilNextRequestSecs: 0,    // Throttling: Only allow request auth token once every few seconds
 			tokenHasBeenRequested: false,
+			tokenErrorMessage: undefined,
+
+			//TODO: count failed login attempts and then offer additional help
+
+			// magic link via email
+			emailInputState: null,		// synced states from liquido-inputs
 			emailSent: false,
 		}
 	},
@@ -157,12 +167,14 @@ export default {
 	},
 	methods: {
 		devLoginAdmin() {
+			this.$api.logout()
 			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname).then(() => {
 				this.$router.push("/team")
 			}).catch(err => console.error("DevLogin Admin failed!", err))
 		},
 
 		devLoginMember() {
+			this.$api.logout()
 			this.$api.devLogin(config.devLogin.memberEmail, config.devLogin.memberTeamname).then(() => {
 				this.$router.push("/team")
 			}).catch(err => console.error("DevLogin Member failed!", err))
@@ -170,6 +182,7 @@ export default {
 
 		/** Send a magic link that the user can login with for the next n hours. */
 		requestEmailToken() {
+			this.$api.logout()
 			this.$api.requestEmailToken(this.emailInput)
 				.then(() => {
 					console.log("Email login link sent successfully")
@@ -181,10 +194,15 @@ export default {
 				})
 		},
 
+		/** 
+		 * Request a on time token for authentication. 
+		 * Be nice to our backend API. We only allow this request once every n seconds.
+		 */
 		requestAuthToken() {
 			this.tokenHasBeenRequested = true
 			if (this.waitUntilNextRequestSecs > 0) return
 			this.waitUntilNextRequestSecs = REQUEST_THROTTLE_SECS
+
 			let requestThrottler = setInterval(() => {
 				if (this.waitUntilNextRequestSecs > 0) {
 					this.waitUntilNextRequestSecs--
@@ -193,35 +211,40 @@ export default {
 					this.waitUntilNextRequestSecs = 0
 				}
 			}, 1000);
+
+			this.$api.logout()
+			this.authToken = undefined
+			this.tokenErrorMessage = undefined
 			console.log("requestAuthToken", this.mobilephone)
+			this.$api.requestAuthToken(this.mobilephone)
+				.then(res => {
+					console.debug("Auth token requested successfully.", res)
+				})
+				.catch(err => {
+					if (err.response &&
+							err.response.data &&
+							err.response.data.liquidoErrorName === "CANNOT_LOGIN_MOBILE_NOT_FOUND") {
+						this.waitUntilNextRequestSecs = 0
+						this.tokenErrorMessage = this.$t("MobilephoneNotFound")
+					} else {
+						console.error("Cannot requestAuthToken", err)
+					}
+				})
 		},
 
 		loginWithAuthToken() {
+			this.tokenErrorMessage = undefined
 			this.$api.loginWithAuthToken(this.mobilephone, this.authToken)
 				.then(() => {
 					this.$router.push({name: "teamHome"})
 				})
 				.catch(err => {
 					console.log("Login with authToken failed", err)
-					
+					this.tokenErrorMessage = this.$t("LoginWithTokenFailed")
 				})
 		}
 	},
 }
 </script>
 
-<style lang="scss" scoped>
-.digit-group {
-	white-space: nowrap;
-	text-align: center;
-}
-.digit {
-	width: 30pt;
-	height: 30pt;
-	line-height: 24pt;
-	padding: 0;
-	font-size: 18pt;
-	text-align: center;
-	display: inline-block; /* prevent wrapping also on narrow mobile view */
-}
-</style>
+<style></style>

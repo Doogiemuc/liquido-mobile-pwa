@@ -11,6 +11,10 @@ module.exports = {
 					"@babel/env"
 				]
 			],
+			"plugins": [
+				// does not work yet :-( parent?.child === undefiend and does not throw when parent is null. )
+				"@babel/plugin-proposal-optional-chaining"
+			],
 			"comments": false
 		},
 		"test": {
@@ -19,7 +23,10 @@ module.exports = {
 					"@babel/env",
 					{"targets": {"node": "current"}}
 				]
-			]
+			],
+			"plugins": [
+				"@babel/plugin-proposal-optional-chaining"
+			],
 		}
 	}
 }
