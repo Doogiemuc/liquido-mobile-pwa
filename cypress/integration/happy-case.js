@@ -20,11 +20,18 @@ afterEach(function() {
   }
 });
 
+
 context('Happy Case', () => {
+
+	/** 
+	 * Create test fixtures for this test run. 
+	 * Each happy case run creates a new admin in a new team.
+	 */
 	before(() => {
 		fix.userName   = 'Cypress User-'+now
 		fix.userEmail  = 'cypressUser-'+now+'@liquido.me'
 		fix.adminName  = 'Cypress Admin-'+now
+		fix.adminMobilephone = '+49151555'+now
 		fix.adminEmail = 'cypressAdmin-'+now+'@liquido.me'
 		fix.teamName   = 'Cypress Team '+now
 		fix.inviteCode = undefined
@@ -49,10 +56,11 @@ context('Happy Case', () => {
 
 		//WHEN we create a new team
 		cy.visit("/")
-		cy.get("#welcomeChat")
+		cy.get("#welcome-chat")
 		cy.get('#userNameInput', {timeout: 8000}).type(fix.adminName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
 		cy.get('#createNewTeamButton').click()
 		cy.get('#teamNameInput').type(fix.teamName)
+		cy.get('#adminMobilephoneInput').type(fix.adminMobilephone)
 		cy.get('#adminEmailInput').type(fix.adminEmail)
 		cy.get('#createNewTeamOkButton').click()
 
@@ -81,7 +89,7 @@ context('Happy Case', () => {
 		cy.get('#pollTitleInput').type(fix.pollTitle)
 		cy.get('#createPollButton').click()
 		//THEN newly created poll should be shown
-		cy.get('#poll-show-page')
+		cy.get('#poll-show')
 		cy.get('.poll-panel-title').should('contain.text', fix.pollTitle)
 		cy.get('#addProposalButton').should('be.visible')
 
@@ -94,7 +102,7 @@ context('Happy Case', () => {
 		cy.get('#saveProposalButton').click()
 		cy.get('#proposalSuccessfullyAddedModal #modalPrimaryButton').click()
 		//THEN the poll is shown with that proposal
-		cy.get('#poll-show-page')
+		cy.get('#poll-show')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle)
 
 	})
@@ -181,7 +189,7 @@ context('Happy Case', () => {
 		cy.get('#proposalSuccessfullyAddedModal #modalPrimaryButton').click()
 		
 		//THEN the poll is shown with that proposal
-		cy.get('#poll-show-page')
+		cy.get('#poll-show')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle2)
 	})
 

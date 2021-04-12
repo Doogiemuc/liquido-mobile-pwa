@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div id="welcomeChat" class="mt-3">
+		<div id="welcome-chat" class="mt-3">
 			<b-card id="welcomeBubble" :class="{ 'hide-left': flowState < 1 }" class="chat-bubble shadow-sm">
 				<b-card-text v-html="$t('welcome')" />
 			</b-card>
@@ -234,21 +234,6 @@
 				</b-button>
 			</b-card>
 		</div> <!-- end of container -->
-
-		<!-- Error modal -->
-		<b-modal 
-			id="welcomeChatErrorModal"
-			ref="welcomeChatErrorModal"
-			:title="errorTitle"
-			centered
-			ok-only
-			no-close-on-esc
-			no-close-on-backdrop
-			hide-header-close
-			:content-class="errorModalClasses"
-		>
-			{{ errorMessage }}
-		</b-modal>
 	</div>
 </template>
 
@@ -323,10 +308,10 @@ export default {
 					"Wahlvorschlag (<i class='fas fa-vote-yea'></i>) hinzufügen.",
 				createPoll: "Abstimmung anlegen",
 
-				areYouOffline: "Der LIQUIDO Server ist nicht erreichbar. Bist vielleicht du offline? Bitte schalte dein WLAN ein.",
+				areYouOffline: "Der LIQUIDO Server ist gerade nicht erreichbar. Bist du vielleicht gerade offline? Bitte schalte dein WLAN ein.",
 				teamWithSameNameExists: "Ein Teamm mit diesem Namen existiert bereits. Bitte wählen einen anderen Namen für dein Team.",
 				cannotCreateNewTeam: "Es tut uns sehr leid, das neue Team konnt nicht angelegt werden. Bitte versuche es später noch einmal.",
-				cannotJoinTeam: "Du kannst diesem Team nicht beitreten. {errorDetails}"
+				cannotJoinTeam: "Du kannst diesem Team nicht beitreten."  //TODO: show more detailed error description: invote code invalid, already member etc.
 			},
 		},
 	},
@@ -373,11 +358,6 @@ export default {
 
 			//Semaphore so that the chat animation is only started once. This is for example relevant when the window is reloaded in the browser
 			chatAnimationStarted: false,
-
-			// localized message in the error modal popup
-			errorTitle: this.$t("Error"),
-			errorMessage: "",
-			errorVariant: "info",
 		}
 	},
 	computed: {
@@ -391,16 +371,6 @@ export default {
 						!this.isMobilephoneValid(this.user.mobilephone) || 
 						!this.isAdminEmailValid(this.user.email)  || 
 						this.flowState > 20
-		},
-		errorModalClasses() {
-			switch (this.errorVariant) {
-				case "error":
-					return "bg-danger text-white"
-				case "warning": 
-					return "bg-warning text-dark"
-				default:
-					return "bg-info text-white"
-			}
 		},
 		inviteLinkURL() {
 			return config.inviteLinkPrefix + this.team.inviteCode
@@ -417,6 +387,10 @@ export default {
 		
 	},
 	/**
+	 * Here we check if the backend is available.
+	 * If not, then we show an error modal.
+	 * If the backend is available, but the user's browser has an expired JWT,
+	 * this means that the user is registered. Then we forward him to the login page.
 	 * By default scroll to the top of the page (e.g. when reloading the page)
 	 * When the bottom of the #welcomeBubble becomes visible (or already is visible on larger screens)
 	 * then start the chat animation ONCE
@@ -424,18 +398,6 @@ export default {
 	mounted() {
 		$("html, body").scrollTop(0)
 		this.flowState = 0
-		this.$api.pingApi().catch((err) => {
-			if (err.response.data.liquidoErrorName === "JWT_TOKEN_EXPIRED") {
-				console.debug("JWT expired. Forwarding to login ...")
-				//Bug: UI: Need to prevent automatic scroll down from chat animation. *seufz*
-				this.$router.push("/login")
-			} else {
-				this.errorTitle = this.$t("Attention")
-				this.errorMessage = this.$t("areYouOffline")
-				this.$refs["welcomeChatErrorModal"].show()
-			}
-		})
-
 		if (this.$root.isBottomInView("#welcomeBubble")) {
 			this.startChatAnimation()
 		} else {
@@ -543,14 +505,11 @@ export default {
 					// https://babeljs.io/docs/en/babel-plugin-proposal-optional-chaining  Here Babel is cool. Ey, you need this cool top notch language feature. Just "install" it :-)
 					//MAYBE:  let errCode = err?.response?.data?.liquidoErrorCode  
 					if (errCode === this.$api.err.TEAM_WITH_SAME_NAME_EXISTS) {
-						this.errorTitle = this.$t("Error")
-						this.errorMessage = this.$t("teamWithSameNameExists")
+						this.$root.$refs.rootPopupModal.showError(this.$t("Error"), this.$t("teamWithSameNameExists"))
 					} else {
-						this.errorTitle = this.$t("Error")
-						this.errorMessage = this.$t("cannotCreateNewTeam")
+						this.$root.$refs.rootPopupModal.showError(this.$t("Error"), this.$t("cannotCreateNewTeam"))
 						log.error("Cannot create new team", err)
 					}
-					this.$refs["welcomeChatErrorModal"].show()
 					this.flowState = 20
 				})
 		},
@@ -585,9 +544,10 @@ export default {
 					})
 				})
 				.catch(err => {
-					log.error("Cannot join team", err)
-					this.errorMessage = this.$t("cannotJoinTeam", {errorDetails: err.err })
-					this.$bvModal.show("errorModal")
+					//let errCode = err && err.response && err.response && err.response.data ? err.response.data.liquidoErrorCode : undefined
+					//if (errCode === this.$api.err.CANNOT_JOIN_TEAM_INVITE_CODE_INVALID) {
+					log.info("Cannot join team", err)
+					this.$root.$refs.rootPopupModal.showError(this.$t("Error"), this.$t("cannotJoinTeam"))
 					this.flowState = 10
 				})
 		},

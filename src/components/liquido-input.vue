@@ -16,10 +16,7 @@
 			:maxlength="maxlength"
 			:pattern="pattern"
 			class="form-control"
-			@keyup="keyup"
-			@keydown="keydown"
-			@input="$emit('input', $event.target.value)"
-			@blur="blur"
+			v-on="inputListeners"
 		>
 		<div class="iconRight">
 			<slot name="iconRight" />
@@ -159,6 +156,28 @@ export default {
 		}
 	},
 	computed: {
+		/**
+		 * Connect all listeners from the parnet directly to our INNER input element.
+		 * https://vuejs.org/v2/guide/components-custom-events.html#Binding-Native-Events-to-Components
+		 */
+		inputListeners: function () {
+			let vm = this
+			return Object.assign({},
+				// We add all the listeners from the parent
+				this.$listeners,
+				// Then we can add custom listeners or override the
+				// behavior of some listeners.
+				{
+					// This ensures that the component works with v-model
+					input: function (event) {
+						vm.$emit("input", event.target.value)
+					},
+					keyup: this.keyup,
+					keydown: this.keydown,
+					blur: this.blur,
+				}
+			)
+		},
 		/**
 		 * Compute wether to add the is-valid or is-invalid pseudo class depending on the input's "state"
 		 * If state == null, e.g. when the field was not validated at all yet, then no pseudo class is added.

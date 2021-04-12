@@ -111,6 +111,9 @@ axios.interceptors.response.use(function (response) {
 	// Any status code that lie within the range of 2xx cause this function to trigger
 	return response;
 }, function (error) {
+
+	//TODO: handle general connection errors.
+
 	// Any status codes that falls outside the range of 2xx cause this function to trigger
 	if (error.response.status >= 500) console.error("liquido-graphql-api ERROR:", error)
 	if (error.response && error.response.data) {
@@ -218,11 +221,18 @@ let graphQlApi = {
 			})
 	},
 
+	/**
+	 * When an already registered user wants to login, 
+	 * LIQUIDO can send him a magic link via email.
+	 * The user MUST have access to his own email inbox.
+	 * 
+	 * @param {String} email email of a registered user
+	 * @returns Promise.resolve(), when email was sent successfully
+	 */
 	requestEmailToken(email) {
 		if (!email) throw new Error("Need email to log in!")
-		let graphQL = `query { requestEmailToken(email: "${email}") { loginLink } }`
-		return axios.post(GRAPHQL, {query: graphQL})
-			.then(res => res.data.requestEmailToken.oneTimeToken)
+		let graphQL = `query { requestEmailToken(email: "${email}") }`
+		return axios.post(GRAPHQL, {query: graphQL})  // no return value
 	},
 
 	//TODO: loginWithEmailToken
@@ -250,8 +260,9 @@ let graphQlApi = {
 
 	/** 
 	 * [DEV] Quick development login. Only available in dev and test env!!! This goes to the REST backend. 
+	 * @return login data with team, user and jwt
 	 */
-	async devLogin(email, teamName) {
+	async devLogin(email, teamName, token) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
 			throw Error("devLogin is only allowed in NODE_ENV development or test")
 		return axios({
@@ -260,7 +271,7 @@ let graphQlApi = {
 			params: {
 				email: email,
 				teamName: teamName,
-				token: config.devLogin.token
+				token: token
 			}
 		}).then(res => {
 			console.log("API: devLogin for <"+email+"> in team '"+teamName+"'", res.data)
@@ -417,10 +428,55 @@ let graphQlApi = {
 		return axios.post(GRAPHQL, {query: graphQL})
 	},
 
-	/** Liquido backend error codes.  LiquidoException.java */
+	/** Liquido backend error codes. See LiquidoException.java */
 	err: {
-		CANNOT_CREATE_NEW_TEAM: 1,
-		TEAM_WITH_SAME_NAME_EXISTS: 2,
+		TEAM_WITH_SAME_NAME_EXISTS: 1,
+
+		//Join Team errors
+		CANNOT_JOIN_TEAM_INVITE_CODE_INVALID: 10, 
+		CANNOT_JOIN_TEAM_ALREADY_MEMBER: 11, 						// there already is a member : or admin) with the same email
+		CANNOT_JOIN_TEAM_ALREADY_ADMIN: 12, 
+		CANNOT_REGISTER_NEED_EMAIL: 13, 
+		CANNOT_REGISTER_NEED_MOBILEPHONE: 14, 
+		CANNOT_CREATE_TWILIO_USER: 15, 
+		USER_EMAIL_EXISTS: 16,                           // user with that email  already exists
+		USER_MOBILEPHONE_EXISTS: 17,                     // user with that mobilephone already exists
+
+		//Login Errors
+		CANNOT_LOGIN_MOBILE_NOT_FOUND: 20, 					// when requesting an SMS login token and mobile number is not known
+		CANNOT_LOGIN_EMAIL_NOT_FOUND: 21,    				// when requesting a login email and email is not known
+		CANNOT_LOGIN_TOKEN_INVALID: 22,      				// when a email or sms login token is invalid or expired
+		CANNOT_LOGIN_INTERNAL_ERROR: 23, 		        // when sending of email is not possible
+
+		//JWT Erros
+		JWT_TOKEN_INVALID: 24, 
+		JWT_TOKEN_EXPIRED: 25, 
+
+		// use case errors
+		INVALID_VOTER_TOKEN: 50, 
+		CANNOT_CREATE_POLL: 51, 
+		CANNOT_JOIN_POLL: 52, 
+		CANNOT_ADD_PROPOSAL: 53, 
+		CANNOT_START_VOTING_PHASE: 54, 
+		CANNOT_SAVE_PROXY: 55, 								// assign or remove
+		CANNOT_ASSIGN_CIRCULAR_PROXY: 56, 
+		CANNOT_CAST_VOTE: 57, 
+		CANNOT_GET_TOKEN: 58, 
+		CANNOT_FINISH_POLL: 59, 
+		NO_DELEGATION: 60, 
+		NO_BALLOT: 61,   												// 204: voter has no ballot yet. This is OK and not an error.
+		INVALID_POLL_STATUS: 62, 
+		PUBLIC_CHECKSUM_NOT_FOUND: 63, 
+		CANNOT_ADD_SUPPORTER: 64, 							// e.g. when user tries to support his own proposal
+
+		CANNOT_CALCULATE_UNIQUE_RANKED_PAIR_WINNER: 70, 		// this is only used in the exceptional situation, that no unique winner can be calculated in RankedPairVoting
+		CANNOT_VERIFY_CHECKSUM: 80, 							// ballot's checksum could not be verified
+
+		// general errors
+		GRAPHQL_ERROR: 400, 											// e.g. missing required fields, invalid GraphQL query, ...
+		UNAUTHORIZED: 401,           					  // when client tries to call something without being authenticated!
+		CANNOT_FIND_ENTITY: 404,    								// 404: cannot find entity
+		INTERNAL_ERROR: 500,
 	},
 
 	/** client side caches */

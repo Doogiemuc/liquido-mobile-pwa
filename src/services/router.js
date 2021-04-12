@@ -11,7 +11,9 @@ const routes = [
 	{
 		path: "/",
 		name: "index",
-		// Will forward to /welcome or /team if authenticated
+		// Will forward anonymous to /welcome 
+		// With valid JWT to /team
+		// and with expired JWT to /login
 	},
 	{
 		path: "/login",
@@ -97,7 +99,22 @@ const router = new Router({
 	routes,
 })
 
+const IS_ALREADY_AUTHENTICATED = -1
+const IS_ANONYMOUS = -99
+
+/**
+ * On every request we try to authenticate the current user.
+ * IF the user is already successfully authenticated (JWT, team & user info is loaded)
+ * THEN return immideately (even if the JWT might be expired)
+ * IF there is a stored JWT in localStorage, 
+ * THEN try to authenticate with it against the backend.
+ * IF this fails, then remove the (expired or invalid) JWT from localstorage
+ * ELSE return login information
+ * 
+ * @return A Promise that will resolve to the login data or reject when no or invalid JWT.
+ */
 async function tryToAuthenticate() {
+	if (router.app.$api.isAuthenticated()) return Promise.resolve(IS_ALREADY_AUTHENTICATED);  // although JWT could be expired, but this way we save one backend call
 	let jwt = localStorage.getItem(router.app.$api.LIQUIDO_JWT_KEY);
 	if (jwt) {
 		return router.app.$api.loginWithJwt(jwt)
@@ -106,46 +123,56 @@ async function tryToAuthenticate() {
 				return Promise.resolve(res)
 			})
 			.catch(err => {
-				console.warn("tryToAuthenticate failed", err)
-				return Promise.reject()
+				// return liquido error code, eg. JWT_TOKEN_EXPIRED or JWT_TOKEN_INVALID
+				let errCode = err.response &&	err.response.data ? err.response.data.liquidoErrorCode : -1
+				if (errCode === router.app.$api.err.JWT_TOKEN_EXPIRED || errCode === router.app.$api.err.JWT_TOKEN_INVALID) {
+					console.debug("Deleting expired JWT from localStorage")
+					localStorage.removeItem(router.app.$api.LIQUIDO_JWT_KEY);  // delete expired JWT
+				}
+				return Promise.reject(errCode)
 			})
 	}
-	else return Promise.reject()
+	else return Promise.reject(IS_ANONYMOUS) // no JWT, not authenticated at all
 }
 
 
 /**
  * Vue Router - Navigation guard
  * 
- * IF user is already authenticated, do normal navigation
- * ELSE IF route is public, then also allow navigation.
- * ELSE try to authenticate from localStorage
- *   IF that is successful THEN allow navigation ELSE 
- *     IF navigation to root "/", forward to "/welcome"   <= first time visitor
- *     ELSE forard to "/login"    <= unauthenticated user used deepLink
+ * 1) Try to authenticate
+ *
+ * IF user is already authenticated THEN continue
+ * ELSE IF there is a stored JWT in localStorage
+ * THEN try to login with it at the backend.
+ * 
+ * IF user is now authenticated
+ * 	IF an authenticated user navigates to '/'
+ *  THEN forard him directly to his team-home page.
+ *  ELSE let him continue
+ * 
+ * IF user is still not authenticated
+ *   IF route is public then continue
+ *   ELSE IF he navigates to "/" forward him to "/welcome"
+ *   ELSE forward to "/login"
  */
 router.beforeEach((routeTo, routeFrom, next) => {
 	// Keep in mind that next() must exactly be called once in this method.
-
-	if (routeTo.path === "/" || routeTo.path === "/index.html") {
-		tryToAuthenticate()
-			.then(() => next({name: "teamHome"}))
-			.catch(() => next({name: "welcome"}))
-	}
-	else if (router.app.$api.isAuthenticated()) {
-		next()
-	}
-	else if (routeTo.meta.public) {
-		next()
-	} 
-	else {		
-		tryToAuthenticate()
-			.then(() => next())
-			.catch(() => {
-				console.debug("Forwarding to login")
-				next({name: "login"})
-			})
-	}
+	tryToAuthenticate().then(() => {
+		if (routeTo.path === "/" || routeTo.path === "/index.html") {
+			next({name: "teamHome"})
+		} else {
+			next()
+		}
+	}).catch(() => {
+		if (routeTo.meta.public) {
+			next()
+		} else if (routeTo.path === "/" || routeTo.path === "/index.html") {
+			next({name: "welcome"})
+		}	else {		
+			console.debug("Forwarding to login")
+			next({name: "login"})
+		}
+	})	
 })
 
 export default router

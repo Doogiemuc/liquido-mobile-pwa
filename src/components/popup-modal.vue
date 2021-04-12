@@ -39,12 +39,14 @@
  * 
  * Use like this:
  * 
- * <popup-modal id="successModal" ref="successModal" type="success" :showCancel="true" >
+ * <popup-modal id="successModal" ref="successModal" type="success" :primaryButtonText="Ok" >
  *  <div>Any HTML content</div>
  * </popup-modal>
  * 
  * And then open e.g. like this
  * this.$refs["successModal"].open()
+ * 
+ * Will emit an event "clickPrimary", when primary button is clicked
  */
 export default {
 	name: "PopupModal",
@@ -61,6 +63,7 @@ export default {
 	},
 	data() {
 		return {
+			// the (unmutuable!) props set the initial values. These data values are then used in templates and can be updated.
 			myMessage: this.message,
 			myTitle: this.title,
 			myType: this.type
@@ -102,27 +105,28 @@ export default {
 	},
 	methods: {
 		/** Show the modal. Can optionally pass a message. */
-		show(msg, title) {
+		show(msg, title, type) {
 			if (title) this.myTitle = title
 			if (msg) this.myMessage = msg
+			this.myType = type || "info"
 			$("#"+this.id).modal("show")
 		},
 		showSuccess(msg, title) {
-			if (title) this.myTitle = title
-			if (msg) this.myMessage = msg
-			this.myType = "success"
-			$("#"+this.id).modal("show")
+			this.show(msg, title, "success")
 		},
 		showError(msg, title) {
-			if (title) this.myTitle = title
-			if (msg) this.myMessage = msg
-			this.myType = "error"
-			$("#"+this.id).modal("show")
+			this.show(msg, title, "error")
+		},
+		showInfo(msg, title) {
+			this.show(msg, title, "info")
+		},
+		showWarning(msg, title) {
+			this.show(msg, title, "warning")
 		},
 		hide() {
 			$("#"+this.id).modal("hide")
 		},
-		close() {   // be nice to your callers :-)
+		close() {   // be nice to your callers :-) offer hide and close
 			$("#"+this.id).modal("hide")
 		},
 		toggle() {

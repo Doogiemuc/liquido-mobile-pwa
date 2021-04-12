@@ -1,5 +1,5 @@
 <template>
-	<div class="team-home">
+	<div>
 		<h2 id="team-home" class="page-title">
 			{{ team.teamName }}
 		</h2>

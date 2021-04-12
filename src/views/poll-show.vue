@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2 id="poll-show-page" class="page-title">
+		<h2 id="poll-show" class="page-title">
 			{{ pageTitleLoc }}
 		</h2>
 
