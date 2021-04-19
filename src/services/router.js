@@ -2,8 +2,7 @@ import Vue from "vue"
 import Router from "vue-router"
 import welcomeChat from "@/views/welcome-chat"
 import loginPage from "@/views/login-page"
-//import EventBus from "./event-bus"
-//import liquidoApi from "@/services/liquido-graphql-client"
+import config from "config"
 
 Vue.use(Router)
 
@@ -83,9 +82,10 @@ const routes = [
 	},
 ]
 
+//console.log("Starting vue-router. BASE_URL="+config.BASE_URL)
 const router = new Router({
 	mode: "history",   //TODO: Router History mode needs server configuration
-	base: process.env.BASE_URL,
+	base: config.BASE_URL || "/",
 	/*
 	scrollBehavior(to, from, savedPosition) {
 		if (savedPosition) {

@@ -55,7 +55,7 @@ context('Login Test', () => {
 		cy.get("#NotFoundPage")
 	})
 
-	it('Login via SMS', function() {
+	it('(Simulate) Login via SMS', function() {
 		//GIVEN on login page
 		cy.visit("/login")
 		cy.get("#login-page")
@@ -69,12 +69,31 @@ context('Login Test', () => {
 		cy.get("#tokenSuccessMessage").should("exist")
 		cy.get("#tokenErrorMessage").should("not.exist")
 
+		//WHEN enter (mock) SMS authToken
+		cy.get("#authTokenInput").type(this.fix.devLogin.token).type("{enter}")
+		//THEN user is logged in and teamHome is shown
+		cy.get("#team-home")
+	})
+
+	it('(Simulate) Login via Email', function() {
+		//GIVEN on login page
+		cy.visit("/login")
+		cy.get("#login-page")
+
+		//WHEN enter mobile phone of test admin user
+		cy.get("#loginEmailInput").type(this.fix.admin.email)
+		// AND click request SMS token button
+		cy.get("#requestEmailButton").click()
+
+		//THEN SMS token is sent
+		cy.get("#tokenSuccessMessage").should("exist")
+		cy.get("#tokenErrorMessage").should("not.exist")
+
 		//WHEN enter mock SMS code
 		cy.get("#authTokenInput").type(this.fix.devLogin.token).type("{enter}")
 		//THEN user is logged in and teamHome is shown
 		cy.get("#team-home")
 
 	})
-
 
 })

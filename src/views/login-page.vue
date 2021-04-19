@@ -30,17 +30,17 @@
 						{{ $t('TokenSent') }}&nbsp;<b-spinner small />
 					</div>
 					<div v-else>
-						{{ $t('RequestToken') }}
+						{{ $t('RequestTokenButton') }}
 					</div>
 				</button>
 			</div>
-			<b-collapse v-model="tokenHasBeenRequested" class="mt-3">
+			<b-collapse v-model="tokenRequestSent" class="mt-3">
 				<liquido-input
 					id="authTokenInput"
 					v-model="authToken"
 					type="text"
 					placeholder="<123456>"
-					:label="$t('AuthToken')"
+					:label="$t('AuthTokenLabel')"
 					:invalid-feedback="$t('authTokenInputInvalid')"
 					:minlength="6"
 					:maxlength="6"
@@ -49,11 +49,12 @@
 					:state.sync="authTokenInputState"
 				></liquido-input>
 				<div 
-					v-if="tokenSuccessMessage" 
+					v-if="tokenRequestedSuccessfully" 
 					id="tokenSuccessMessage"
 					class="alert alert-success mt-3"
-					v-html="tokenSuccessMessage"
-				></div>
+				>
+					{{ $t("AuthTokenRequestedSuccessfully") }}
+				</div>
 				<div 
 					v-if="tokenErrorMessage" 
 					id="tokenErrorMessage"
@@ -78,15 +79,22 @@
 				@keypress.enter="requestEmailToken"
 			/>
 			<div class="text-right">
-				<button type="button" :disabled="sendLinkButtonDisabled" class="btn btn-primary" @click="requestEmailToken">
+				<button id="requestEmailButton" type="button" :disabled="sendLinkButtonDisabled" class="btn btn-primary" @click="requestEmailToken">
 					{{ $t("SendLink") }}
 				</button>
 			</div>
 			<div 
-				v-if="emailMessage" 
-				class="alert mt-3"
-				:class="emailMessageClass"
-				v-html="emailMessage"
+				v-if="emailSentSuccessfully"
+				id="emailSuccessMessage"
+				class="alert alert-success mt-3"
+			>
+				{{ $t("EmailSentSuccessfully") }}
+			</div>
+			<div 
+				v-if="emailErrorMessage"
+				id="emailErrorMessage"
+				class="alert alert-danger mt-3"
+				v-html="emailErrorMessage"
 			></div>
 		</b-card>
 	</div>
@@ -107,14 +115,14 @@ export default {
 				yourMobilephone: "Deine Handynummer",
 				mobilephonePlaceholder: "+49 151 1111111",
 				mobilephoneInvalid: "Handynummer ungültig",
-				RequestToken: "Login-Token anfordern",
+				RequestTokenButton: "Login-Token anfordern",
 				TokenSent: "SMS verschickt ...",
-				AuthToken: "Login-Token aus SMS",
+				AuthTokenLabel: "Login-Token aus SMS",
 				authTokenInputInvalid: "Der Login-Token hat genau sechs Ziffern.",
 				MobilephoneNotFound: "Tut mir leid, ich kenne diese Telefonnummer in LIQUIDO nicht. Bitte <a href='/'>registriere dich zuerst.</a>",
 				TokenInvalid: "Der eingegebene Login-Token wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Bitte versuche es bitte noch einmal.",
-				SmsTokenRequestedSuccessfully: "Ok, die SMS wurde verschickt. Bitte gib den Login-Code aus der SMS ein.",
-				RequestAuthTokenError: "Login-Token konnte nicht angefordert werden. Bitte versuche es noch einmal.",
+				AuthTokenRequestedSuccessfully: "Ok, die SMS wurde verschickt. Bitte gib den Login-Code aus der SMS ein.",
+				AuthTokenRequestError: "Login-Code konnte nicht angefordert werden. Bitte versuche es noch einmal.",
 
 				LoginViaEmail: "Login per Email",
 				yourEMail: "Deine Email",
@@ -122,7 +130,7 @@ export default {
 				SendLink: "Link zuschicken",
 				emailPlaceholder: "info@domain.de",
 				emailInvalid: "E-Mail ungültig",
-				emailSentSuccessfully: "Ok, die Email mit deinem Login Link wurde verschickt.",
+				EmailSentSuccessfully: "Ok, die Email mit deinem Login Link wurde verschickt.",
 				CouldNotSendEmail: "Es gab ein Problem beim Verschicken der E-Mail. Bitte versuche es später noch einmal.",
 				UserWithThatEmailNotFound: "Tut mir leid, ich kenne niemanden mit dieser E-Mail Adresse. Möchtest du dich <a href='/welcome'>zuerst registrieren</a>?",
 
@@ -140,8 +148,9 @@ export default {
 		return {
 			// Login via email
 			emailInput: "",
-			emailMessage: undefined,
-			emailMessageClass: "alert-success",
+			emailInputState: null,		// synced states from liquido-inputs
+			emailSentSuccessfully: false,
+			emailErrorMessage: undefined,
 
 			// auth token (via SMS)
 			mobilephone: "",
@@ -149,15 +158,11 @@ export default {
 			mobilephoneInputState: null,    // synced states from liquido-inputs
 			authTokenInputState: null,      // synced states from liquido-inputs
 			waitUntilNextRequestSecs: 0,    // Throttling: Only allow request auth token once every few seconds
-			tokenHasBeenRequested: false,
-			tokenSuccessMessage: undefined,
-			tokenErrorMessage: undefined,
+			tokenRequestSent: false,						// when SMS authToken has been requested at least once, then show input field.
+			tokenRequestedSuccessfully: false,  // token request returned success from backend. SMS should have been sent successfully
+			tokenErrorMessage: undefined,       // we show different error messages, depending on error code from backend
 
 			//TODO: count failed login attempts and then offer additional help
-
-			// magic link via email
-			emailInputState: null,		// synced states from liquido-inputs
-			emailSent: false,
 		}
 	},
 	computed: {
@@ -189,6 +194,7 @@ export default {
 		}
 	},
 	methods: {
+		/** Quickly login as an admin user. This is available as a button in the mobile UI when in DEV env.  */
 		devLoginAdmin() {
 			this.$api.logout()
 			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname, config.devLogin.token).then(() => {
@@ -196,6 +202,7 @@ export default {
 			}).catch(err => console.error("DevLogin Admin failed!", err))
 		},
 
+		/** Quickly login as a team member. This is available as a button in the mobile UI when in DEV env.  */
 		devLoginMember() {
 			this.$api.logout()
 			this.$api.devLogin(config.devLogin.memberEmail, config.devLogin.memberTeamname, config.devLogin.token).then(() => {
@@ -211,22 +218,22 @@ export default {
 			this.$api.requestEmailToken(this.emailInput)
 				.then(() => {
 					console.log("Email login link sent successfully")
-					this.emailMessageClass = "alert-success"
-					this.emailMessage = this.$t("emailSentSuccessfully")
+					this.emailErrorMessage = undefined
+					this.emailSentSuccessfully = true
 				})
 				.catch(err => {
 					this.$root.scrollToBottom()
 					if (err.response &&	
-							err.response.data &
+							err.response.data &&
 							err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_EMAIL_NOT_FOUND) 
 					{
 						console.log("There is no user with email: "+this.emailInput)
-						this.emailMessageClass = "alert-danger"
-						this.emailMessage = this.$t("UserWithThatEmailNotFound")
+						this.emailSentSuccessfully = false
+						this.emailErrorMessage = this.$t("UserWithThatEmailNotFound")
 					} else {
 						console.error("Could not send email link!", err)
-						this.emailMessageClass = "alert-danger"
-						this.emailMessage = this.$t("CouldNotSendEmail")
+						this.emailSentSuccessfully = false
+						this.emailErrorMessage = this.$t("CouldNotSendEmail")
 					}
 				})
 		},
@@ -236,7 +243,8 @@ export default {
 		 * Be nice to our backend API. We only allow this request once every n seconds.
 		 */
 		requestAuthToken() {
-			this.tokenHasBeenRequested = true
+			this.tokenRequestSent = true
+			
 			if (this.waitUntilNextRequestSecs > 0) return
 			this.waitUntilNextRequestSecs = REQUEST_THROTTLE_SECS
 
@@ -251,13 +259,13 @@ export default {
 
 			this.$api.logout()
 			this.authToken = undefined
-			this.tokenSuccessMessage = undefined
 			this.tokenErrorMessage = undefined
 			console.debug("requestAuthToken", this.mobilephone)
+
 			this.$api.requestAuthToken(this.mobilephone)
 				.then(res => {
 					console.debug("Auth token requested successfull.", res)
-					this.tokenSuccessMessage = this.$t("SmsTokenRequestedSuccessfully")
+					this.tokenRequestedSuccessfully = true
 					this.tokenErrorMessage = undefined
 				})
 				.catch(err => {
@@ -265,11 +273,12 @@ export default {
 							err.response.data &&
 							err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_MOBILE_NOT_FOUND) {
 						this.waitUntilNextRequestSecs = 0
-						this.tokenSuccessMessage = undefined
+						this.tokenRequestedSuccessfully = false
 						this.tokenErrorMessage = this.$t("MobilephoneNotFound")
 					} else {
 						console.error("Cannot requestAuthToken", err)
 						this.waitUntilNextRequestSecs = 1
+						this.tokenRequestedSuccessfully = false
 						this.tokenErrorMessage = this.$t("RequestAuthTokenError")
 					}
 				})

@@ -5,9 +5,9 @@ import _ from "lodash"
 import commonConfig from "./config.common.js"
 
 let config = {
-	//default is: LIQUIDO_API_URL: "/liquido/v2",  // will be proxied by Vue devServer. See vue.config.js
-	voterTokenSecret: "dummyVoterTokenSecretDev",
-	inviteLinkPrefix: "http://localhost:3001/invite?inviteCode=",
+	configSource: "development",
+	//default from config.common.js: LIQUIDO_API_URL: "/liquido/v2",  // will be proxied by Vue devServer. See vue.config.js
+	
 	devLogin: {
 		// default logins for login page only available in NODE_ENV=development
 		adminEmail: "admin@TeamOne.org",
@@ -18,6 +18,4 @@ let config = {
 	}
 }
 
-_.merge(config, commonConfig)
-
-export default config
+export default _.merge(commonConfig, config)  // Mind the parameter order _merge(target, sources...)

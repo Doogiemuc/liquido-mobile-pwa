@@ -362,10 +362,12 @@ let graphQlApi = {
 	},
 
 	async startVotingPhase(pollId) {
+		
 		let graphQL = `mutation { startVotingPhase(pollId: "${pollId}") ${JQL.POLL} }`
 		return axios.post(GRAPHQL, {query: graphQL})
 			.then(res => {
 				let poll = res.data.startVotingPhase
+				//TODO: invalidate cache for pollId
 				console.debug("Started voting phase of poll", poll)
 				return poll
 			})

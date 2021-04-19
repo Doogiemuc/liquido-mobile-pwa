@@ -6,7 +6,7 @@ module.exports = {
 					"@vue/app",
 					{
 						// "modules": false,
-						"targets": ["ie >= 9"]
+						// "targets": ["ie >= 9"]
 					},
 					"@babel/env"
 				]

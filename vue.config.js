@@ -6,6 +6,9 @@ const path = require("path")
 
 const vueConfig = {
 	lintOnSave: undefined,
+	publicPath: process.env.NODE_ENV === 'production'
+    ? '/liquido-mobile/'
+    : '/',
 	devServer: {
 		port: 3001,   // Port for frontend when developing.
 		proxy: {      // Problems with CORS? Vue Dev serve can proxy API requests for your: https://cli.vuejs.org/config/#devserver-proxy
@@ -75,10 +78,13 @@ const vueConfig = {
 console.log("==================================================")
 console.log("===> LIQUIDO Mobile Progressive Web App (PWA) <===")
 console.log("==================================================")
-console.log("NODE_ENV:  "+process.env.NODE_ENV)
-console.log("config.js: "+vueConfig.configureWebpack.resolve.alias.config)
-console.log("devServer: http://localhost:"+vueConfig.devServer.port)
-console.log("API proxy: "+JSON.stringify(vueConfig.devServer.proxy))
+console.log("NODE_ENV:        "+process.env.NODE_ENV)
+console.log("BASE_URL:        "+process.env.BASE_URL)
+console.log("config.js:       "+vueConfig.configureWebpack.resolve.alias.config)
+if (process.env.NODE_ENV === "development") {
+  console.log("devServer:       http://localhost:"+vueConfig.devServer.port)
+	console.log("API proxy:       "+JSON.stringify(vueConfig.devServer.proxy))
+}
 console.log("==================================================")
 
 module.exports = vueConfig

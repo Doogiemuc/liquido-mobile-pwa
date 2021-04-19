@@ -269,9 +269,9 @@ export default {
 			})
 		},
 
-		getLawPanelClass(idx) {
-			if (idx === 0 && this.isFirstVote) return { "simulate-drag": true}
-			else return {}
+		getLawPanelClass(/*idx*/) {
+			/* if (idx === 0 && this.isFirstVote) return "simulate-drag" else */ 
+			return ""
 		},
 
 	},
@@ -304,6 +304,7 @@ export default {
 
 
 	.law-panel.simulate-drag {
+		z-index: 500;  // above second proposal
 		transition: all 1s;
 		animation: slide-down 0.5s ease 1s 2 alternate;
 	}

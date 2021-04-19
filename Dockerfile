@@ -1,3 +1,5 @@
+##### THIS IS OUTDATED / HAS NEVER BEEN USED YET ... but planning to :-)  ... one day ....
+
 # ---- Base Node ----
 FROM node:13.8.0-alpine AS BASE
 WORKDIR /app

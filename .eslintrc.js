@@ -10,15 +10,18 @@ module.exports = {
 		jquery: true,
 	},
 	rules: {
+		/*
+		 * These are my (very impinionated) settings for clean code.
+		 */
 		"max-len": ["warn", { "code": 200 }], // we do have 4K monitors nowadays!
 		"arrow-parens": 0,
 		"generator-star-spacing": 0,
-		"no-console": process.env.NODE_ENV === "production" ? "error" : "off",
+		"no-console": "off",   // I love console output. Also in PROD  :-)    process.env.NODE_ENV === "production" ? "error" : "off",
 		"no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-		indent: ["error", "tab", { SwitchCase: 1 }],
+		indent: ["error", "tab", { SwitchCase: 1 }],   // Tabs, Tabs and only with tabs, each individual developer can decide his indent size on his screen.
 		eqeqeq: 1,
 		"no-var": 2,
-		quotes: [
+		quotes: [    // Allow only double quoted strings. Phhew this one drove me nuts. But I think it was worth it.
 			"error",
 			"double",
 			{

@@ -8,6 +8,4 @@ let config = {
 	LIQUIDO_API_URL: 'http://liquido-int-env.aws:8080/liquido-api/',  // will be proxied by Vue devServer. See vue.config.js
 }
 
-_.merge(config, commonConfig)
-
-export default config
+export default _.merge(commonConfig, config)
