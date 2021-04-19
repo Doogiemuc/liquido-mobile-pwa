@@ -123,5 +123,6 @@ dist
 jsconfig.json
 
 # Cypress JS test runner - screen recordings
-./cypress/videos
-cypress/videos/happy-case.js.mp4
+cypress/videos
+cypress/videos/*
+
