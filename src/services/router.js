@@ -82,9 +82,11 @@ const routes = [
 	},
 ]
 
-//console.log("Starting vue-router. BASE_URL="+config.BASE_URL)
+console.log("Starting vue-router. BASE_URL="+config.BASE_URL)
 const router = new Router({
-	mode: "history",   //TODO: Router History mode needs server configuration
+	//vue-router History mode needs web-server configuration https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations
+	//TODO: mode: "history",   
+	mode: "hash",
 	base: config.BASE_URL || "/",
 	/*
 	scrollBehavior(to, from, savedPosition) {
@@ -156,6 +158,9 @@ async function tryToAuthenticate() {
  *   ELSE forward to "/login"
  */
 router.beforeEach((routeTo, routeFrom, next) => {
+
+	console.log("vue-router: routeTo.path="+routeTo.path, routeTo)
+
 	// Keep in mind that next() must exactly be called once in this method.
 	tryToAuthenticate().then(() => {
 		if (routeTo.path === "/" || routeTo.path === "/index.html") {

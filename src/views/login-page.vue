@@ -34,7 +34,7 @@
 					</div>
 				</button>
 			</div>
-			<b-collapse v-model="tokenRequestSent" class="mt-3">
+			<b-collapse v-model="tokenRequestedSuccessfully" class="mt-3">
 				<liquido-input
 					id="authTokenInput"
 					v-model="authToken"
@@ -48,20 +48,20 @@
 					:show-counter="true"
 					:state.sync="authTokenInputState"
 				></liquido-input>
-				<div 
-					v-if="tokenRequestedSuccessfully" 
-					id="tokenSuccessMessage"
-					class="alert alert-success mt-3"
-				>
-					{{ $t("AuthTokenRequestedSuccessfully") }}
-				</div>
-				<div 
-					v-if="tokenErrorMessage" 
-					id="tokenErrorMessage"
-					class="alert alert-danger mt-3"
-					v-html="tokenErrorMessage"
-				></div>
 			</b-collapse>
+			<div 
+				v-if="tokenRequestedSuccessfully" 
+				id="tokenSuccessMessage"
+				class="alert alert-success mt-3"
+			>
+				{{ $t("AuthTokenRequestedSuccessfully") }}
+			</div>
+			<div 
+				v-if="tokenErrorMessage" 
+				id="tokenErrorMessage"
+				class="alert alert-danger mt-3"
+				v-html="tokenErrorMessage"
+			></div>
 		</b-card>
 		
 		<!-- Login via Email -->
@@ -121,6 +121,7 @@ export default {
 				authTokenInputInvalid: "Der Login-Token hat genau sechs Ziffern.",
 				MobilephoneNotFound: "Tut mir leid, ich kenne diese Telefonnummer in LIQUIDO nicht. Bitte <a href='/'>registriere dich zuerst.</a>",
 				TokenInvalid: "Der eingegebene Login-Token wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Bitte versuche es bitte noch einmal.",
+				TokenDoesNotBelongToMobilephone: "Dieser Login-Token gehört jemand anderem. Du darfst dich nur mit dem <b>deinem Token, von deinem Handy</b> einloggen.",
 				AuthTokenRequestedSuccessfully: "Ok, die SMS wurde verschickt. Bitte gib den Login-Code aus der SMS ein.",
 				AuthTokenRequestError: "Login-Code konnte nicht angefordert werden. Bitte versuche es noch einmal.",
 
@@ -158,7 +159,6 @@ export default {
 			mobilephoneInputState: null,    // synced states from liquido-inputs
 			authTokenInputState: null,      // synced states from liquido-inputs
 			waitUntilNextRequestSecs: 0,    // Throttling: Only allow request auth token once every few seconds
-			tokenRequestSent: false,						// when SMS authToken has been requested at least once, then show input field.
 			tokenRequestedSuccessfully: false,  // token request returned success from backend. SMS should have been sent successfully
 			tokenErrorMessage: undefined,       // we show different error messages, depending on error code from backend
 
@@ -243,8 +243,6 @@ export default {
 		 * Be nice to our backend API. We only allow this request once every n seconds.
 		 */
 		requestAuthToken() {
-			this.tokenRequestSent = true
-			
 			if (this.waitUntilNextRequestSecs > 0) return
 			this.waitUntilNextRequestSecs = REQUEST_THROTTLE_SECS
 
@@ -291,15 +289,24 @@ export default {
 					this.$router.push({name: "teamHome"})
 				})
 				.catch(err => {
-					if (err.response &&
-							err.response.data &&
-							err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_TOKEN_INVALID) {
-						console.log("The entered auth token was invalid.")
-						this.tokenErrorMessage = this.$t("TokenInvalid")
+					// Show a usefull, human readable error message that actually describes what happend
+					if (err.response &&	err.response.data) {
+						if(err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_TOKEN_INVALID) {
+							console.log("The entered auth token was invalid.")
+							this.tokenErrorMessage = this.$t("TokenInvalid")
+						} else
+						if(err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_MOBILE_NOT_FOUND) {
+							console.log("No user with that mobilephone.")
+							this.tokenErrorMessage = this.$t("TokenDoesNotBelongToMobilephone")
+						} else
+						if(err.httpStatus === 401 || err.response.data.liquidoErrorCode === this.$api.err.UNAUTHORIZED) {
+							console.log("Cannot login with token. User is not authorized.")
+							this.tokenErrorMessage = this.$t("TokenInvalid") 
+						}
 					} else {
 						console.error("Something is wrong with our auth backend", err)
-					}
-					
+						this.tokenErrorMessage = this.$t("TokenInvalid") 
+					}					
 				})
 		}
 	},

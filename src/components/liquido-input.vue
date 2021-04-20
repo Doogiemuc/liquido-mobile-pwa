@@ -276,7 +276,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .liquido-input {
 	position: relative;
 	padding-top: 12px;
