@@ -3,6 +3,7 @@ import Router from "vue-router"
 import welcomeChat from "@/views/welcome-chat"
 import loginPage from "@/views/login-page"
 import config from "config"
+const log = require("loglevel")
 
 Vue.use(Router)
 
@@ -84,13 +85,12 @@ const routes = [
 
 const router = new Router({
 	//vue-router History mode needs web-server configuration https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations
-	//TODO: mode: "history",   
-	mode: "hash",
+	mode: "history",     // hash -> with "#" in URL    or "history" -> needs web server configuration
 	base: config.BASE_URL || "/",
 	/*
 	scrollBehavior(to, from, savedPosition) {
 		if (savedPosition) {
-			console.log("Returning to saved scroll position", savedPosition)
+			log.debug("Returning to saved scroll position", savedPosition)
 			return savedPosition
 		} else {
 			return { x: 0, y: 0 }
@@ -120,14 +120,14 @@ async function tryToAuthenticate() {
 	if (jwt) {
 		return router.app.$api.loginWithJwt(jwt)
 			.then(res => {
-				console.log("Successfully authenticated from localStorage")
+				log.info("Successfully authenticated from localStorage")
 				return Promise.resolve(res)
 			})
 			.catch(err => {
 				// return liquido error code, eg. JWT_TOKEN_EXPIRED or JWT_TOKEN_INVALID
 				let errCode = err.response &&	err.response.data ? err.response.data.liquidoErrorCode : -1
 				if (errCode === router.app.$api.err.JWT_TOKEN_EXPIRED || errCode === router.app.$api.err.JWT_TOKEN_INVALID) {
-					console.debug("Deleting expired JWT from localStorage")
+					log.debug("Deleting expired JWT from localStorage")
 					localStorage.removeItem(router.app.$api.LIQUIDO_JWT_KEY);  // delete expired JWT
 				}
 				return Promise.reject(errCode)
@@ -157,9 +157,7 @@ async function tryToAuthenticate() {
  *   ELSE forward to "/login"
  */
 router.beforeEach((routeTo, routeFrom, next) => {
-
-	console.log("vue-router: routeTo.path="+routeTo.path, routeTo)
-
+	log.debug("vue-router: routeTo.path="+routeTo.path)
 	// Keep in mind that next() must exactly be called once in this method.
 	tryToAuthenticate().then(() => {
 		if (routeTo.path === "/" || routeTo.path === "/index.html") {
@@ -173,7 +171,7 @@ router.beforeEach((routeTo, routeFrom, next) => {
 		} else if (routeTo.path === "/" || routeTo.path === "/index.html") {
 			next({name: "welcome"})
 		}	else {		
-			console.debug("Forwarding to login")
+			log.debug("Forwarding to login")
 			next({name: "login"})
 		}
 	})	

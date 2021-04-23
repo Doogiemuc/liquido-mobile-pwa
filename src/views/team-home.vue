@@ -161,7 +161,7 @@ export default {
 
 		clickLogout() {
 			this.$api.logout()
-			this.$router.push("/login")  //TODO: Forwared to a polite byebye page
+			this.$router.push({name: "login"})  //TODO: Forward to a polite "byebye" page.
 		}
 	},
 }

@@ -189,7 +189,7 @@ $proposal_img_size: 32px;
 
 	// law-panel inside poll panel - list of proposals in poll
 	.proposal-list-group-item {
-		height: 8rem;  // 30px + 25px + $proposal_img_size + 15px; // title + subtitle + avatar_img + padding
+		height: 8rem;
 		overflow: hidden;
 		padding: 10px;
 		background-color: $proposal-bg;

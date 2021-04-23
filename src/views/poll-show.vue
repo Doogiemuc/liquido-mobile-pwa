@@ -95,7 +95,7 @@
 <script>
 import pollPanel from "../components/poll-panel"
 import popupModal from "@/components/popup-modal"
-const log = require("loglevel").getLogger("poll-show")
+const log = require("loglevel")
 
 export default {
 	i18n: {

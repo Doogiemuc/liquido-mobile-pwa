@@ -241,7 +241,7 @@
 import config from "config"
 import QRCode from "qrcode"
 import liquidoInput from "@/components/liquido-input"
-const log = require("loglevel").getLogger("welcome-chat")
+const log = require("loglevel")
 
 const eMailRegEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}$/
 

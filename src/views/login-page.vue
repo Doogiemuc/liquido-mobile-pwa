@@ -34,7 +34,7 @@
 					</div>
 				</button>
 			</div>
-			<b-collapse v-model="tokenRequestedSuccessfully" class="mt-3">
+			<b-collapse v-model="tokenSentSuccessfully" class="mt-3">
 				<liquido-input
 					id="authTokenInput"
 					v-model="authToken"
@@ -50,11 +50,11 @@
 				></liquido-input>
 			</b-collapse>
 			<div 
-				v-if="tokenRequestedSuccessfully" 
+				v-if="tokenSentSuccessfully" 
 				id="tokenSuccessMessage"
 				class="alert alert-success mt-3"
 			>
-				{{ $t("AuthTokenRequestedSuccessfully") }}
+				{{ $t("AuthtokenSentSuccessfully") }}
 			</div>
 			<div 
 				v-if="tokenErrorMessage" 
@@ -122,7 +122,7 @@ export default {
 				MobilephoneNotFound: "Tut mir leid, ich kenne diese Telefonnummer in LIQUIDO nicht. Bitte <a href='/'>registriere dich zuerst.</a>",
 				TokenInvalid: "Der eingegebene Login-Token wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Bitte versuche es bitte noch einmal.",
 				TokenDoesNotBelongToMobilephone: "Dieser Login-Token gehört jemand anderem. Du darfst dich nur mit dem <b>deinem Token, von deinem Handy</b> einloggen.",
-				AuthTokenRequestedSuccessfully: "Ok, die SMS wurde verschickt. Bitte gib den Login-Code aus der SMS ein.",
+				AuthtokenSentSuccessfully: "Ok, die SMS wurde verschickt. Bitte gib den Login-Code aus der SMS ein.",
 				AuthTokenRequestError: "Login-Code konnte nicht angefordert werden. Bitte versuche es noch einmal.",
 
 				LoginViaEmail: "Login per Email",
@@ -159,7 +159,7 @@ export default {
 			mobilephoneInputState: null,    // synced states from liquido-inputs
 			authTokenInputState: null,      // synced states from liquido-inputs
 			waitUntilNextRequestSecs: 0,    // Throttling: Only allow request auth token once every few seconds
-			tokenRequestedSuccessfully: false,  // token request returned success from backend. SMS should have been sent successfully
+			tokenSentSuccessfully: false,  // token request returned success from backend. SMS should have been sent successfully
 			tokenErrorMessage: undefined,       // we show different error messages, depending on error code from backend
 
 			//TODO: count failed login attempts and then offer additional help
@@ -179,7 +179,6 @@ export default {
 	watch: {
 		/** UX: When auth token format is valid, then immideately try to login with it. No extra "login" button step. */
 		authTokenInputState: function(newVal) {
-			console.log("authTokenInputState update", newVal)
 			if (newVal === true) {
 				this.loginWithAuthToken()
 			}
@@ -189,7 +188,7 @@ export default {
 		if (this.email && this.teamName) {
 			this.$api.devLogin(this.email, this.teamName, config.devLogin.token).then(() => {
 				console.info("devLogin <"+this.email+"> into "+this.teamName)
-				this.$router.push("/team")		// DevLogin navigags to /team ! Tests rely on this!
+				this.$router.push({name: "teamHome"})		// DevLogin navigags to /team ! Tests rely on this!
 			}).catch(err => console.error("DevLogin via params failed!", err))
 		}
 	},
@@ -198,7 +197,7 @@ export default {
 		devLoginAdmin() {
 			this.$api.logout()
 			this.$api.devLogin(config.devLogin.adminEmail, config.devLogin.adminTeamname, config.devLogin.token).then(() => {
-				this.$router.push("/team")
+				this.$router.push({name: "teamHome"})
 			}).catch(err => console.error("DevLogin Admin failed!", err))
 		},
 
@@ -206,7 +205,7 @@ export default {
 		devLoginMember() {
 			this.$api.logout()
 			this.$api.devLogin(config.devLogin.memberEmail, config.devLogin.memberTeamname, config.devLogin.token).then(() => {
-				this.$router.push("/team")
+				this.$router.push({name: "teamHome"})
 			}).catch(err => console.error("DevLogin Member failed!", err))
 		},
 
@@ -263,7 +262,7 @@ export default {
 			this.$api.requestAuthToken(this.mobilephone)
 				.then(res => {
 					console.debug("Auth token requested successfull.", res)
-					this.tokenRequestedSuccessfully = true
+					this.tokenSentSuccessfully = true
 					this.tokenErrorMessage = undefined
 				})
 				.catch(err => {
@@ -271,12 +270,12 @@ export default {
 							err.response.data &&
 							err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_MOBILE_NOT_FOUND) {
 						this.waitUntilNextRequestSecs = 0
-						this.tokenRequestedSuccessfully = false
+						this.tokenSentSuccessfully = false
 						this.tokenErrorMessage = this.$t("MobilephoneNotFound")
 					} else {
 						console.error("Cannot requestAuthToken", err)
 						this.waitUntilNextRequestSecs = 1
-						this.tokenRequestedSuccessfully = false
+						this.tokenSentSuccessfully = false
 						this.tokenErrorMessage = this.$t("RequestAuthTokenError")
 					}
 				})
@@ -290,10 +289,12 @@ export default {
 				})
 				.catch(err => {
 					// Show a usefull, human readable error message that actually describes what happend
+					this.tokenSentSuccessfully = false
 					if (err.response &&	err.response.data) {
 						if(err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_TOKEN_INVALID) {
 							console.log("The entered auth token was invalid.")
 							this.tokenErrorMessage = this.$t("TokenInvalid")
+
 						} else
 						if(err.response.data.liquidoErrorCode === this.$api.err.CANNOT_LOGIN_MOBILE_NOT_FOUND) {
 							console.log("No user with that mobilephone.")

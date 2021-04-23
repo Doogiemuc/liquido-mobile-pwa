@@ -10,7 +10,7 @@ let config = {
 	
 	devLogin: {
 		// default logins for login page only available in NODE_ENV=development
-		adminEmail: "admin@TeamOne.org",
+		adminEmail: "adminTeamOne@liquido.me",
 		adminTeamname: "TeamOne",
 		memberEmail: "member0@TeamOne.org",
 		memberTeamname: "TeamOne",

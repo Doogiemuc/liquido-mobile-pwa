@@ -68,7 +68,7 @@ if (process.env.NODE_ENV === "development") {
   console.log("devServer:       http://localhost:"+vueConfig.devServer.port)
 	console.log("API proxy:       "+JSON.stringify(vueConfig.devServer.proxy))
 }
-console.log("===== " + vueConfig.configureWebpack.resolve.alias.config + " =====")
+console.log("config:          " + vueConfig.configureWebpack.resolve.alias.config)
 //console.log(JSON.stringify(effectiveConfig, null, 2))
 
 module.exports = vueConfig

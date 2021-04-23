@@ -113,7 +113,7 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
 
 	//TODO: handle general connection errors.
-
+	
 	// Any status codes that falls outside the range of 2xx cause this function to trigger
 	if (error.response.status >= 500) console.error("liquido-graphql-api ERROR:", error)
 	if (error.response && error.response.data) {
@@ -121,6 +121,7 @@ axios.interceptors.response.use(function (response) {
 		if (error.response.data.liquidoErrorPayload)
 			msg += "\n" + JSON.stringify(error.response.data.liquidoErrorPayload)
 		console.debug(msg, error.response.data)
+		log.error(msg)
 	}
 	return Promise.reject(error);
 });
@@ -264,7 +265,9 @@ let graphQlApi = {
 	 */
 	async devLogin(email, teamName, token) {
 		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
-			throw Error("devLogin is only allowed in NODE_ENV development or test")
+			return Promise.reject("devLogin is only allowed in NODE_ENV development or test")
+		if (!email || !teamName || !token) 
+			return Promise.reject("Need email, teamName and devlogin.token!")
 		return axios({
 			method: "GET", 
 			url: "/dev/getJWT",
@@ -278,8 +281,8 @@ let graphQlApi = {
 			this.login(res.data.team, res.data.user, res.data.jwt)
 			return res.data
 		}).catch(err => { 
-			console.error(err.response ? err.response : err)
-			return Promise.reject(err.response ? err.response : err)
+			console.error("devLogin failed: ", err.response ? err.response : err)
+			return Promise.reject("devLogin failed")
 		})
 	},
 

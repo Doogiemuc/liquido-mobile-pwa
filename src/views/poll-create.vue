@@ -42,7 +42,7 @@
 <script>
 import config from "config"
 import liquidoInput from "../components/liquido-input"
-const log = require("loglevel").getLogger("poll-create");
+const log = require("loglevel")
 
 export default {
 	i18n: {

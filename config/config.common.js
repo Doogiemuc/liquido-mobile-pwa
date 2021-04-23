@@ -8,7 +8,7 @@
  * LiQUIDO Config is "statically" imported into the scripts.
  */
 
-exports.default = {
+export default {
 	configSource: "common",
 	BASE_URL: "/",                   // URL path to index.html
 	LIQUIDO_API_URL: "/liquido-api/v3",  // will be proxied by Vue devServer. See vue.config.js

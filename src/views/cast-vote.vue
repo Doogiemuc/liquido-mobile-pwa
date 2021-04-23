@@ -110,7 +110,7 @@ import popupModal from "@/components/popup-modal"
 //import Sortable from 'sortablejs'
 import draggable from "vuedraggable"
 import _ from "lodash"
-const log = require("loglevel").getLogger("cast-vote");
+const log = require("loglevel")
 
 export default {
 	i18n: {
