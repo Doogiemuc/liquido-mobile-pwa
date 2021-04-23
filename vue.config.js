@@ -2,17 +2,17 @@ const fs = require("fs")
 const PurgecssPlugin = require("purgecss-webpack-plugin")
 const glob = require("glob-all")
 const path = require("path")
-
+//const effectiveConfig = require(path.join(__dirname, "config/config."+process.env.NODE_ENV)).default
 
 const vueConfig = {
 	lintOnSave: undefined,
 	publicPath: process.env.NODE_ENV === 'production'
-    ? '/liquido-mobile/'
+    ? '/liquido-mobile'
     : '/',
 	devServer: {
 		port: 3001,   // Port for frontend when developing.
 		proxy: {      // Problems with CORS? Vue Dev serve can proxy API requests for your: https://cli.vuejs.org/config/#devserver-proxy
-			"/liquido/v2": {
+			"/liquido-api/v3": {
 				target: "http://localhost:8080",    // the matched path will be appended to this!
 				//ws: true,
 				//changeOrigin: true
@@ -38,25 +38,10 @@ const vueConfig = {
 					path.join(__dirname, "./**/*.vue"),
 					path.join(__dirname, "./src/**/*.js"),
 				]),
-				whitelist: [
-					"notices",
-					"snackbar",
-					"notification",
-					"toast",
-					"is-top",
-					"action",
-					"is-info",
-					"is-warning",
-					"is-success",
-					"is-danger",
-					"is-dark",
-					"message",
-					"delete",
-					"button",
-					"loading-overlay",
-					"is-valid",
-					"is-invalid",
-				],
+				//BUGFIX: Make PurgecssPlugin keep "scoped" vue styles   (That was a nasty one that took me 2 days to find out :-( Need to switch to VUE 3 soon :-)
+				// https://github.com/FullHuman/purgecss/issues/361    
+				// https://purgecss.com/guides/vue.html#use-the-vue-cli-plugin
+				safelist: [ /-(leave|enter|appear)(|-(to|from|active))$/, /^(?!(|.*?:)cursor-move).+-move$/, /^router-link(|-exact)-active$/, /data-v-.*/ ],
 			}),
 		],
 	},
@@ -79,12 +64,11 @@ console.log("==================================================")
 console.log("===> LIQUIDO Mobile Progressive Web App (PWA) <===")
 console.log("==================================================")
 console.log("NODE_ENV:        "+process.env.NODE_ENV)
-console.log("BASE_URL:        "+process.env.BASE_URL)
-console.log("config.js:       "+vueConfig.configureWebpack.resolve.alias.config)
 if (process.env.NODE_ENV === "development") {
   console.log("devServer:       http://localhost:"+vueConfig.devServer.port)
 	console.log("API proxy:       "+JSON.stringify(vueConfig.devServer.proxy))
 }
-console.log("==================================================")
+console.log("===== " + vueConfig.configureWebpack.resolve.alias.config + " =====")
+//console.log(JSON.stringify(effectiveConfig, null, 2))
 
 module.exports = vueConfig

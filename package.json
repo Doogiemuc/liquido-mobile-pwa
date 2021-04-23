@@ -31,7 +31,6 @@
 		"moment": "^2.29.1",
 		"path": "^0.12.7",
 		"populating-cache": "^5.2.1",
-		"purgecss-webpack-plugin": "^4.0.2",
 		"qrcode": "^1.4.4",
 		"regenerator-runtime": "^0.13.7",
 		"register-service-worker": "^1.7.2",
@@ -59,7 +58,9 @@
 		"lint-staged": "^10.5.4",
 		"mocha": "^8.3.0",
 		"node-sass": "^5.0.0",
+		"purgecss-webpack-plugin": "^4.0.3",
 		"sass-loader": "^10.1.1",
+		"serve": "^11.3.2",
 		"vue-template-compiler": "^2.6.12"
 	},
 	"lint-staged": {

@@ -31,14 +31,14 @@
 		<h3 class="my-3">
 			{{ $t('teamMembers') }}
 		</h3>
-		<b-card-group id="memberCards" deck>
-			<b-card v-for="admin in team.admins" :key="admin.id" :img-src="admin.picture" img-alt="Avatar" img-top>
+		<b-card-group id="memberCards" class="mb-3" deck>
+			<b-card v-for="admin in team.admins" :key="admin.id" :img-src="getImgUrl(admin.picture)" img-alt="Avatar" img-top>
 				<i class="fas fa-shield-alt admin-shield"></i>
 				<b-card-text class="text-center">
 					<b>{{ admin.name }}</b>
 				</b-card-text>
 			</b-card>
-			<b-card v-for="member in team.members" :key="member.id" :img-src="member.picture" img-alt="Avatar" img-top>
+			<b-card v-for="member in team.members" :key="member.id" :img-src="getImgUrl(member.picture)" img-alt="Avatar" img-top>
 				<b-card-text class="text-center">
 					{{ member.name }}
 				</b-card-text>
@@ -151,6 +151,10 @@ export default {
 	},
 	
 	methods: {
+		getImgUrl(imgFile) {
+			return config.avatarPath + "/" + imgFile
+		},
+
 		gotoPolls() {
 			this.$router.push({name: "polls"})
 		},
@@ -168,17 +172,6 @@ export default {
 	background-color: white;
 }
 
-#adminCards {
-	.card {
-		width: 30%;
-		max-width: 110px;
-		.card-text {
-			color: $primary;
-		}
-		
-	}
-}
-
 .admin-shield {
 	color: $primary;
 	position: absolute;
@@ -187,22 +180,23 @@ export default {
 }
 
 @media (min-width: 320px) {
-	#memberCards, #adminCards {
+	#memberCards {
+		// Keep three columns down to 320px
 		display: -ms-flexbox;
-		display: -webkit-box;
-		display: flex;
-		-ms-flex-flow: row wrap;
-		-webkit-box-orient: horizontal;
-		-webkit-box-direction: normal;
-		flex-flow: row wrap;
+    display: -webkit-box;
+    display: flex;
+    -ms-flex-flow: row wrap;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-flow: row wrap;
 		justify-content: space-between;
-		//margin-right: -15px;
-		//margin-left: -15px;
 		.card {
 			width: 30%;
-			//margin-right: 10px;
+			max-width: 30%;
+			min-width: 30%;
+			margin: 0 0 20px 0;
 			.card-body {
-				padding: 0.5rem 0;
+				padding: 5px;
 			}
 		}
 	}

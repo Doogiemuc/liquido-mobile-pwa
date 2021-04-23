@@ -1,4 +1,6 @@
-/* eslint-disable no-console */
+/*
+
+//TODO: enable service worker
 
 import { register } from "register-service-worker"
 
@@ -26,3 +28,5 @@ if (process.env.NODE_ENV === "production") {
 		},
 	})
 }
+
+*/

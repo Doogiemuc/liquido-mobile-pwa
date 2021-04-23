@@ -8,14 +8,15 @@
  * LiQUIDO Config is "statically" imported into the scripts.
  */
 
-export default {
+exports.default = {
 	configSource: "common",
 	BASE_URL: "/",                   // URL path to index.html
-	LIQUIDO_API_URL: "/liquido/v2",  // will be proxied by Vue devServer. See vue.config.js
+	LIQUIDO_API_URL: "/liquido-api/v3",  // will be proxied by Vue devServer. See vue.config.js
 	usernameMinLength: 5,
 	inviteCodeLength: 6,			       // used for validating inviteCodes in welcome-chat.vue
 	pollTitleMinLength: 10,
 	voterTokenSecret: "dummyVoterTokenSecret",  // change this for production builds !!!
+	avatarPath: "./img/avatars",
 	inviteLinkPrefix: "http://www.liquido.me/invite?inviteCode=",
 
 	//TODO: implement these settings per Team!

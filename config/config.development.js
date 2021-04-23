@@ -6,7 +6,7 @@ import commonConfig from "./config.common.js"
 
 let config = {
 	configSource: "development",
-	//default from config.common.js: LIQUIDO_API_URL: "/liquido/v2",  // will be proxied by Vue devServer. See vue.config.js
+	//default from config.common.js: LIQUIDO_API_URL: "/liquido-api/v3",  // will be proxied by Vue devServer. See vue.config.js
 	
 	devLogin: {
 		// default logins for login page only available in NODE_ENV=development

@@ -82,7 +82,6 @@ const routes = [
 	},
 ]
 
-console.log("Starting vue-router. BASE_URL="+config.BASE_URL)
 const router = new Router({
 	//vue-router History mode needs web-server configuration https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations
 	//TODO: mode: "history",   
