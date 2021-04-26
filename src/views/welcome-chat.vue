@@ -377,11 +377,11 @@ export default {
 		},
 	},
 	watch: {
-		
+		/*
 		"flowState": function(newVal, oldVal) {
 			log.debug(" ====>>> flowState", oldVal, "=>", newVal)
 		}
-		
+		*/		
 	},
 	created() {
 		
@@ -484,13 +484,14 @@ export default {
 			if (this.createNewTeamOkButtonDisabled) return
 			//TODO: show loading icon
 			this.flowState = 21
-			let newTeamRequest = {
-				teamName: this.team.teamName,
-				adminName: this.user.name,
-				adminMobilephone: this.user.mobilephone,
-				adminEmail: this.user.email,
+			let admin = {
+				name: this.user.name,
+				mobilephone: this.user.mobilephone,
+				email: this.user.email,
+				picture: "Avatar1.png",      //TODO: let user change his Avatar later
+				//website: ...
 			}
-			this.$api.createNewTeam(newTeamRequest)
+			this.$api.createNewTeam(this.team.teamName, admin)
 				.then((team) => {
 					this.team = team
 					this.createTeamQRCode()
@@ -534,7 +535,7 @@ export default {
 		joinTeam() {
 			this.flowState = 11
 			log.info(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
-			this.$api.joinTeam(this.inviteCode, this.user.name, this.user.email, this.user.mobilephone)
+			this.$api.joinTeam(this.inviteCode, this.user.name, this.user.email, this.user.mobilephone, "Avatar1.png")
 				.then(team => {
 					this.flowState = 12
 					this.team = team

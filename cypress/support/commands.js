@@ -23,3 +23,11 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+
+
+Cypress.Commands.add("devLogin", (email, teamName, token) => {
+	cy.visit("/devLogin?email="+email+"&teamName="+teamName+"&token="+token).then((res => {
+		console.log("Cypress command devLogin", res)
+	}))
+})

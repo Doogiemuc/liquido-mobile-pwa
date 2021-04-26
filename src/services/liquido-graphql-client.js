@@ -260,12 +260,15 @@ let graphQlApi = {
 	},
 
 	/** 
-	 * [DEV] Quick development login. Only available in dev and test env!!! This goes to the REST backend. 
-	 * @return login data with team, user and jwt
+	 * [DEV] Quick development login. Only available in development, test and int env!!! This goes to the REST backend.
+	 * @param email users email. User must exist in team
+	 * @param teamName team to login
+	 * @param token valid and correct devLogin.token. Will be validated in backend. This is like a simulated SMS token.
+	 * @return login data with team, user and jwt (same as a joinTeam calls)
 	 */
 	async devLogin(email, teamName, token) {
-		if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test")
-			return Promise.reject("devLogin is only allowed in NODE_ENV development or test")
+		if (!["development", "test", "int"].includes(process.env.NODE_ENV))
+			return Promise.reject("devLogin is only allowed in NODE_ENV development, test or int")
 		if (!email || !teamName || !token) 
 			return Promise.reject("Need email, teamName and devlogin.token!")
 		return axios({
@@ -281,7 +284,7 @@ let graphQlApi = {
 			this.login(res.data.team, res.data.user, res.data.jwt)
 			return res.data
 		}).catch(err => { 
-			console.error("devLogin failed: ", err.response ? err.response : err)
+			console.error("API: devLogin failed: ", err.response ? err.response : err)
 			return Promise.reject("devLogin failed")
 		})
 	},
@@ -290,9 +293,14 @@ let graphQlApi = {
 	 * Create a new team. 
 	 * @param {Object} newTeam teamName, adminName, adminEmail and adminMobilephone
 	 */
-	async createNewTeam(newTeam) {
-		let graphQL = `mutation { createNewTeam(teamName: "${newTeam.teamName}", adminName: "${newTeam.adminName}",` +
-			`adminMobilephone: "${newTeam.adminMobilephone}", adminEmail: "${newTeam.adminEmail}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+	async createNewTeam(teamName, admin) {
+		//TODO: pass admin as one object
+		//let adminJson = JSON.stringify(admin)
+		//let graphQL = `mutation { createNewTeam(teamName: "${teamName}", admin: ${adminJson}) ` + 
+		//	`${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+
+		let graphQL = `mutation { createNewTeam(teamName: "${teamName}", adminName: "${admin.name}",` +
+			`adminMobilephone: "${admin.mobilephone}", adminEmail: "${admin.email}", adminPicture: "${admin.picture}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
 		return axios.post(GRAPHQL, {query: graphQL})
 			.then(res => {
 				let team = res.data.createNewTeam.team

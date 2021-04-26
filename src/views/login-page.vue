@@ -184,14 +184,6 @@ export default {
 			}
 		}
 	},
-	mounted() {
-		if (this.email && this.teamName) {
-			this.$api.devLogin(this.email, this.teamName, config.devLogin.token).then(() => {
-				console.info("devLogin <"+this.email+"> into "+this.teamName)
-				this.$router.push({name: "teamHome"})		// DevLogin navigags to /team ! Tests rely on this!
-			}).catch(err => console.error("DevLogin via params failed!", err))
-		}
-	},
 	methods: {
 		/** Quickly login as an admin user. This is available as a button in the mobile UI when in DEV env.  */
 		devLoginAdmin() {

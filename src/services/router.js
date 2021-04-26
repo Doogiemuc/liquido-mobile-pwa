@@ -19,9 +19,18 @@ const routes = [
 		path: "/login",
 		name: "login",
 		component: loginPage,
+		meta: {
+			public: true
+		}
+	},
+	{
+		path: "/devLogin",
+		name: "devLogin",
+		component: () => import("@/views/dev-login"),
 		props: route => ({ 
 			email: route.query.email,
-			teamName: route.query.teamName
+			teamName: route.query.teamName,
+			token: route.query.token
 		}),
 		meta: {
 			public: true
@@ -158,7 +167,7 @@ async function tryToAuthenticate() {
  */
 router.beforeEach((routeTo, routeFrom, next) => {
 	log.debug("vue-router: routeTo.path="+routeTo.path)
-	// Keep in mind that next() must exactly be called once in this method.
+	//Keep in mind that next() must exactly be called once in this method.
 	tryToAuthenticate().then(() => {
 		if (routeTo.path === "/" || routeTo.path === "/index.html") {
 			next({name: "teamHome"})
