@@ -38,9 +38,6 @@ const page_order = {
 	"castVote": 8,
 }
 
-// This is how you can show an error in a component
-//TODO: this.$root.$refs.rootPopupModal.showError(this.$t("msg"), this.$t("title"))
-
 
 /** Liquido Root App */
 export default {

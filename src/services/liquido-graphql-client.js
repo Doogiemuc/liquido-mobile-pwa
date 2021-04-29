@@ -260,7 +260,7 @@ let graphQlApi = {
 	},
 
 	/** 
-	 * [DEV] Quick development login. Only available in development, test and int env!!! This goes to the REST backend.
+	 * [DEV] Quick development login. This calls the REST backend!
 	 * @param email users email. User must exist in team
 	 * @param teamName team to login
 	 * @param token valid and correct devLogin.token. Will be validated in backend. This is like a simulated SMS token.
@@ -284,8 +284,8 @@ let graphQlApi = {
 			this.login(res.data.team, res.data.user, res.data.jwt)
 			return res.data
 		}).catch(err => { 
-			console.error("API: devLogin failed: ", err.response ? err.response : err)
-			return Promise.reject("devLogin failed")
+			console.error("API: devLogin failed: ", err.response)
+			return Promise.reject("devLogin failed"+JSON.stringify(err.response))
 		})
 	},
 

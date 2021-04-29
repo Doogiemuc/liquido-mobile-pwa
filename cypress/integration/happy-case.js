@@ -33,12 +33,15 @@ context('Happy Case', () => {
 		fix.adminEmail = 'cypressAdmin-'+now+'@liquido.me'
 		fix.teamName   = 'Cypress Team '+now
 		fix.devLoginToken = Cypress.env("devLoginToken")
-		fix.inviteCode = undefined
 		fix.pollTitle  = 'Cypress Poll '+now
 		fix.proposalTitle  = 'Cypress Proposal '+now
 		fix.proposalDescription = now + ' lorem ipsum best description ever that needs to be a bit longer because we want to test things like clipping and many more useless UX magic'
 		fix.proposalTitle2  = 'Second Proposal '+now
 		fix.proposalDescription2 = now + ' Description of Second proposal. lorem ipsum best description ever that needs to be a bit long'
+		// These values will be set during test steps
+		fix.inviteCode = undefined
+		fix.userJWT    = undefined
+		fix.adminJWT   = undefined
 
 		localStorage.removeItem("LIQUIDO_JWT")  // Make sure no one is logged in at the start
 	})
@@ -56,7 +59,7 @@ context('Happy Case', () => {
 	})
 	*/
 
-	it('Create new team, poll and add first proposal', function() {
+	it('[Admin] Create new team, poll and add first proposal', function() {
 		//GIVEN some prepared test data
 		assert.isString(fix.adminName)
 		assert.isString(fix.teamName)
@@ -77,8 +80,8 @@ context('Happy Case', () => {
 		cy.get('#newTeamCreatedBubble').should(($div) => {
 			// AND a JWT was put into the browser's localStorage
 			// (Cypress is async and crazy: This should()-block is retried until jwt is there.)
-			fix.jwt = localStorage.getItem("LIQUIDO_JWT")
-			expect(fix.jwt, "Expected to find a JWT in localStorage!").to.have.length.of.at.least(10)
+			fix.adminJWT = localStorage.getItem("LIQUIDO_JWT")
+			expect(fix.adminJWT, "Expected to find a JWT in localStorage!").to.have.length.of.at.least(10)
 		})
 		
 		// AND there is an invite link and invite code
@@ -118,13 +121,13 @@ context('Happy Case', () => {
 
 	//TODO: create test with mocked error response to check error modal
 
-	it('Returning admin is automatically logged in', function() {
+	it('[Admin] Returning admin is automatically logged in', function() {
 		//GIVEN a team and a jwt
 		assert.isString(fix.teamName, "Need to be logged into a team already.")
-		assert.isString(fix.jwt, "Need jwt from last test step.")
+		assert.isString(fix.adminJWT, "Need adminJWT from last test step.")
 
 		// WHEN we simulate that the jwt is stored in localStorage
-		localStorage.setItem("LIQUIDO_JWT", fix.jwt)
+		localStorage.setItem("LIQUIDO_JWT", fix.adminJWT)
 		//  AND admin visits the root start page
 		cy.visit("/")
 		// THEN we are automatically forwarded to correct team-home.
@@ -138,7 +141,7 @@ context('Happy Case', () => {
 		})
 	})
 	
-	it('Joins team', function() {
+	it('[User] Join team', function() {
 		//GIVEN inviteCode and data for new member
 		assert.isString(fix.inviteCode, "Need inviteCode to test joinTeam")
 		assert.isString(fix.userName)
@@ -161,7 +164,12 @@ context('Happy Case', () => {
 		cy.get('#joinedTeamBubble').should('contain.text', fix.teamName)
 		cy.get('#joinedTeamGoToTeamButton').click()
 		cy.get("#team-home.page-title").should('contain.text', fix.teamName)
-		cy.get("#team-home-user-welcome").should("contain.text", fix.userName)
+		cy.get("#team-home-user-welcome").should("contain.text", fix.userName).and(() => {
+			// AND a JWT was put into the browser's localStorage
+			// (Cypress is async and crazy: This should()-block is retried until jwt is there.)
+			fix.userJWT = localStorage.getItem("LIQUIDO_JWT")
+			expect(fix.userJWT, "Expected to find a JWT in localStorage!").to.have.length.of.at.least(10)
+		})
 
 		//WHEN navigating to team's polls
 		cy.get("#gotoPollsButton").click()
@@ -173,9 +181,15 @@ context('Happy Case', () => {
 	})
 
 	
-	it("Show team and polls", function() {
+	it("[User] Show team and polls", function() {
 		//GIVEN logged in user from that joined team
-		cy.devLogin(fix.userEmail, fix.teamName, fix.devLoginToken)
+		assert.isString(fix.userJWT, "Need userJWT to show team and polls")
+		localStorage.setItem("LIQUIDO_JWT", fix.userJWT)
+
+		//TODO: replace this with setJWT and the normal cy.visit("/")
+		//cy.devLogin(fix.userEmail, fix.teamName, fix.devLoginToken)
+		//WHEN logged in user opens the mobile app
+		cy.visit("/")
 		
 		//THEN correct team-home is shown
 		cy.get('#team-home').should('contain.text', fix.teamName)
@@ -189,11 +203,14 @@ context('Happy Case', () => {
 		//cy.get('.poll-panel div.list-group').children('.proposal-list-group-item').should('have.length', 1)
 	})
 
-	it("Member adds proposal", function() {
+	it("[User] Member adds proposal", function() {
 		assert.isString(fix.pollTitle, "Need existing poll to test joinTeam")
+		assert.isString(fix.userJWT, "Need userJWT to show team and polls")
 
 		//GIVEN a logged in member
-		cy.devLogin(fix.userEmail, fix.teamName, fix.devLoginToken)
+		localStorage.setItem("LIQUIDO_JWT", fix.userJWT)
+		cy.visit("/")
+
 		//WHEN going to polls
 		cy.get('#gotoPollsButton').click()
 		//THEN we see our poll in elaboration with the correct title
@@ -212,9 +229,13 @@ context('Happy Case', () => {
 		cy.get('.law-title').should('contain.text', fix.proposalTitle2)
 	})
 
-	it("Admin starts voting phase", function() {
+	it("[Admin] Admin starts voting phase", function() {
+		assert.isString(fix.adminJWT, "Need adminJWT to show team and polls")
+
 		//GIVEN a logged in admin
-		cy.devLogin(fix.adminEmail, fix.teamName, fix.devLoginToken)
+		localStorage.setItem("LIQUIDO_JWT", fix.adminJWT)
+		cy.visit("/")
+
 		// AND the poll in elaboration that was created before
 		cy.get('#gotoPollsButton').click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
@@ -229,10 +250,13 @@ context('Happy Case', () => {
 	})
 
 	
-	it("User casts vote", function() {
-		//GIVEN a logged in user
-		cy.devLogin(fix.userEmail, fix.teamName, fix.devLoginToken)
+	it("[User] User casts vote", function() {
+		assert.isString(fix.userJWT, "Need userJWT to show team and polls")
 
+		//GIVEN a logged in member
+		localStorage.setItem("LIQUIDO_JWT", fix.userJWT)
+		cy.visit("/")
+		
 		// AND a poll in voting
 		cy.get('#gotoPollsButton').click()
 		cy.get("#votingArrow").click()
@@ -255,9 +279,12 @@ context('Happy Case', () => {
 		cy.get("#ballotIsVerifiedInfo").should("be.visible")
 	})
 	
-	it("Admin finishes voting phase", function() {
+	it("[Admin] Admin finishes voting phase", function() {
+		assert.isString(fix.adminJWT, "Need adminJWT to show team and polls")
+
 		//GIVEN a logged in admin
-		cy.devLogin(fix.adminEmail, fix.teamName, fix.devLoginToken)
+		localStorage.setItem("LIQUIDO_JWT", fix.adminJWT)
+		cy.visit("/")
 		// AND the poll in elaboration that was created before
 		cy.get('#gotoPollsButton').click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()

@@ -24,6 +24,7 @@ const routes = [
 		}
 	},
 	{
+		// Development login that can be used in testing
 		path: "/devLogin",
 		name: "devLogin",
 		component: () => import("@/views/dev-login"),

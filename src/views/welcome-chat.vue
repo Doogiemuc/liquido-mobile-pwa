@@ -42,8 +42,8 @@
 						id="joinTeamButton"
 						:class="{
 							'btn-primary': true,
-							'moveToCenterFromLeft active': flowState === 7,
-							opacity0: flowState >= 8,
+							'moveToCenterFromLeft active': flowState === 10,
+							opacity0: ![6,10,11,12].includes(flowState),
 						}"
 						class="btn"
 						@click="chooseJoinTeam()"
@@ -54,8 +54,8 @@
 						id="createNewTeamButton"
 						:class="{
 							'btn-primary': true,
-							'moveToCenterFromRight active': flowState >= 8,
-							opacity0: flowState === 7,
+							'moveToCenterFromRight active': flowState === 20,
+							opacity0: [10,11,12].includes(flowState),
 						}"
 						class="btn"
 						@click="chooseCreateNewTeam()"
@@ -245,8 +245,8 @@ const log = require("loglevel")
 
 const eMailRegEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,64}$/
 
-// but see https://github.com/google/libphonenumber/blob/master/FALSEHOODS.md    :-)
-const mobilephoneRegEx = /^(\+[1-9]{1}[0-9]{1,14})|(0[0-9]{3} *[-/][0-9 ]{1,50})$/
+//Kinda relaxed check for mobilephone number. But see https://github.com/google/libphonenumber/blob/master/FALSEHOODS.md    :-)
+const mobilephoneRegEx = /(^\+[1-9]{2}[0-9 ]{1,20}$)|(^0[0-9]{3,5} *[-/]? *[0-9 ]{1,50}$)/
 
 export default {
 	i18n: {
@@ -352,6 +352,8 @@ export default {
 				 21 - create new team form
 				 22 - clicked on createTeam button,  waiting for server reply
 				 23 - new team created successfully
+
+				 TODO: 24 - add first poll in new team (optional)
 				 
 			*/
 			flowState: 0,
@@ -506,9 +508,9 @@ export default {
 					// https://babeljs.io/docs/en/babel-plugin-proposal-optional-chaining  Here Babel is cool. Ey, you need this cool top notch language feature. Just "install" it :-)
 					//MAYBE:  let errCode = err?.response?.data?.liquidoErrorCode  
 					if (errCode === this.$api.err.TEAM_WITH_SAME_NAME_EXISTS) {
-						this.$root.$refs.rootPopupModal.showError(this.$t("Error"), this.$t("teamWithSameNameExists"))
+						this.$root.$refs.rootPopupModal.showError(this.$t("teamWithSameNameExists"), this.$t("Error"),)
 					} else {
-						this.$root.$refs.rootPopupModal.showError(this.$t("Error"), this.$t("cannotCreateNewTeam"))
+						this.$root.$refs.rootPopupModal.showError(this.$t("cannotCreateNewTeam"), this.$t("Error"))
 						log.error("Cannot create new team", err)
 					}
 					this.flowState = 20
@@ -548,7 +550,7 @@ export default {
 					//let errCode = err && err.response && err.response && err.response.data ? err.response.data.liquidoErrorCode : undefined
 					//if (errCode === this.$api.err.CANNOT_JOIN_TEAM_INVITE_CODE_INVALID) {
 					log.info("Cannot join team", err)
-					this.$root.$refs.rootPopupModal.showError(this.$t("Error"), this.$t("cannotJoinTeam"))
+					this.$root.$refs.rootPopupModal.showError(this.$t("cannotJoinTeam"), this.$t("Error"))
 					this.flowState = 10
 				})
 		},
