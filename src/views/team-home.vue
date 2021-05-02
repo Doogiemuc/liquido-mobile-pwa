@@ -100,7 +100,7 @@ export default {
 				teamMembers: "Teammitglieder",
 				teamAdmins: "Team Admin | Team Admin | Team Admins",
 				gotoPolls: "Zu euren Abstimmungen",
-				inviteNewMembers: "Neue Teammitglieder einladen",
+				inviteNewMembers: "Teammitglieder einladen",
 				inviteLink: "Einladunglink teilen:",
 				inviteCode: "Einladungscode eingeben:",
 				qrCode: "QR Code scannen:",

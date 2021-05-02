@@ -14,7 +14,7 @@
 					<span class="liquido" @click="clickLiquidoTitle()" />
 				</div>
 				<div class="col header-right" :class="headerRightClass">
-					<i v-if="isAuthenticated" id="gotoTeamButton" class="fas fa-users" @click="gotoTeam()" />
+					<i id="gotoTeamButton" class="fas fa-users" @click="clickTeamIcon()" />
 				</div>
 			</div>
 		</div>
@@ -84,8 +84,10 @@ export default {
 			*/
 		},
 
-		gotoTeam() {
-			if (this.$route.path !== "/welcome" && this.$route.path !== "/team") {
+		clickTeamIcon() {
+			if (this.$route.path === "/welcome") {
+				this.$router.push({name: "login"})
+			} else if (this.$route.path !== "/team") {
 				this.$router.push({name: "teamHome"})
 			}
 		},

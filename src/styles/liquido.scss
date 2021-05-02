@@ -57,9 +57,14 @@ html {
 		font-family: 'Libre Baskerville', serif;
 	}
 
-	h3 {
-		font-size: 1.4rem;
-	}
+	/* The bootstrap defaults are way to big on mobile screens! */
+	h1 { font-size: 2.00rem }
+  h2 { font-size: 1.75rem; }
+	h3 { font-size: 1.50rem; }
+	h4 { font-size: 1.25rem; }
+	h5 { font-size: 1rem; }
+	h6 { font-size: 1rem; }
+	
 
 	.alert {
 		padding: 0.5rem;

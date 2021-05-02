@@ -1,7 +1,6 @@
 <template>
 	<div>
 		<h2 id="poll-create" class="page-title">
-			<i class="fas fa-poll" />
 			{{ $t("newPoll") }}
 		</h2>
 

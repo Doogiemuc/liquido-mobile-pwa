@@ -153,7 +153,7 @@ export default {
 		z-index: 2020;
 		position: absolute;
 		text-align: center;
-		top: -4rem;
+		top: -5rem;
 		left: 0;
 		right: 0;
 		width: 6rem;
@@ -171,7 +171,7 @@ export default {
 	.header-icon-shadow {
 		z-index: 2010;
 		position: absolute;
-		top: 0;
+		top: -1rem;
 		left: 0;
 		right: 0;
 		width: 5rem;
@@ -180,7 +180,7 @@ export default {
 		background-color: rgba(0, 0, 0, 0);
 		border-radius: 50%;
 		//border: 1px solid red; // for debugging :-)
-		box-shadow: -5px 1.2rem 10px 2px rgba(0, 0, 0, 0.5);
+		box-shadow: -5px 1.5rem 10px 2px rgba(0, 0, 0, 0.5);
 	}
 	.header-icon-danger {
 		color: darkred;

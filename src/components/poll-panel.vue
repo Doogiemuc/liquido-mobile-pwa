@@ -1,15 +1,15 @@
 <template>
 	<b-card :id="pollCardId" :pollid="poll.id" :data-poll-status="poll.status" no-body class="poll-panel shadow-sm mb-3">
 		<template #header>
-			<h4 v-if="readOnly" class="read-only poll-panel-title">
+			<h1 v-if="readOnly" class="read-only poll-panel-title">
 				<i :class="iconForPoll" />
 				&nbsp;{{ poll.title }}
-			</h4>
-			<h4 v-else class="poll-panel-title" @click="goToPoll(poll.id)">
+			</h1>
+			<h1 v-else class="poll-panel-title" @click="goToPoll(poll.id)">
 				<i class="fas fa-angle-double-right goto-poll-icon" />
 				<i :class="iconForPoll" />
 				&nbsp;{{ poll.title }}
-			</h4>
+			</h1>
 		</template>
 		<div
 			v-if="!poll.proposals || poll.proposals.length === 0"
@@ -28,14 +28,14 @@
 
 		<b-list-group v-else flush>
 			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item" :class="proposalListGroupItemClasses(law.id)">
-				<div class="d-flex" @click="goToPoll(poll.id)">
+				<div class="proposal-header d-flex" @click="goToPoll(poll.id)">
 					<div>
 						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
 					</div>
-					<div class="proposal-header d-flex flex-column text-truncate">
-						<h4 class="law-title">
+					<div class="proposal-header-text d-flex flex-column text-truncate">
+						<h2 class="law-title">
 							{{ law.title }}
-						</h4>
+						</h2>
 						<div class="law-subtitle">
 							<div :class="{ supported: law.supportedByCurrentUser }" class="like-button">
 								<i :class="{
@@ -52,6 +52,7 @@
 					</div>
 				</div>
 				<div class="law-description" v-html="law.description"></div>
+				<div class="proposal-separator"></div>
 			</b-list-group-item>
 		</b-list-group>
 		<a
@@ -119,7 +120,7 @@ export default {
 		proposalListGroupItemClasses(propId) {
 			let isWinner = this.poll.winner && propId === this.poll.winner.id
 			return {
-				"collapse-law-panel" : this.collapsed,
+				"collapsed-law-panel" : this.collapsed,
 				"winner": this.poll.status === "FINISHED" && isWinner,
 				"lost": this.poll.status === "FINISHED" && !isWinner,
 			}
@@ -149,37 +150,31 @@ $proposal_img_size: 32px;
 		margin: 0;
 		padding: 0;
 		background-color: $secondary-bg;
-		h4 {
+		border-bottom: none;
+		.poll-panel-title {
 			// same as .law-title
 			color: $primary;
 			margin: 8px 10px;
-			font-size: 14px;
+			font-size: 1.0rem !important;
 			font-weight: bold;
-			/* bootstraps .text-truncate does this for us
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			*/
 		}
 		.read-only {
 			color: black;
 		}
 	}
-	.poll-proposal {
-		margin: 0 10px;
-		padding: 10px 0;
-	}
-	.poll-proposal:not(:last-child) {
-		border-bottom: 1px dotted rgba(0, 0, 0, 0.125);
-	}
+		
 	.goto-poll-icon {
 		line-height: 1.2; // same as .card-header > h3
 		float: right;
 	}
 	.collapse-icon {
 		position: absolute;
-		bottom: 5px;
-		right: 10px;
+		font-size: 1.2rem;
+		bottom: 0;
+		right: 3px;
 		opacity: 0.5;
 	}
 
@@ -194,17 +189,19 @@ $proposal_img_size: 32px;
 		padding: 10px;
 		background-color: $proposal-bg;
 		transition: height 0.5s;
-		&.collapse-law-panel {
+		border-bottom: none;
+		//box-shadow: inset 0 1px 3px rgba(0,0,0, 0.125);
+		&.collapsed-law-panel {
 			height: 18px + $proposal_img_size;
-		}
-		.proposal-header {
+		}			
+		.proposal-header-text {
 			margin-bottom: 5px;
 		}
 		.law-title {
 			margin-bottom: 0px;
 			padding: 0;
-			font-size: 14px;
-			line-height: 19px;
+			font-size: 0.8rem !important;
+			line-height: 18px;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -254,17 +251,19 @@ $proposal_img_size: 32px;
 		.law-image {
 			opacity: 0.5;
 		}
-		&.collapse-law-panel {
+		&.collapsed-law-panel {
 			height: 0;
 			margin: 0;
 			padding: 0;
 		}
 	}
 
-	.proposal-separator {
-		width: 100%;
-		margin: 5px auto;
-		border-top: 1px solid lightgrey;
+	.proposal-list-group-item:not(:first-child):not(.collapsed-law-panel) .proposal-separator {
+		position: absolute;
+		left: 10px;
+		right: 10px;
+		top: 1px;
+		border-top: 1px solid rgba(0,0,0, 0.1)
 	}
 }
 

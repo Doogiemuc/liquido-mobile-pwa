@@ -42,7 +42,7 @@
 						id="joinTeamButton"
 						:class="{
 							'btn-primary': true,
-							'moveToCenterFromLeft active': flowState === 10,
+							'moveToCenterFromLeft active': flowState >= 10 && flowState <= 12,
 							opacity0: ![6,10,11,12].includes(flowState),
 						}"
 						class="btn"
@@ -54,7 +54,7 @@
 						id="createNewTeamButton"
 						:class="{
 							'btn-primary': true,
-							'moveToCenterFromRight active': flowState === 20,
+							'moveToCenterFromRight active': flowState >= 20,
 							opacity0: [10,11,12].includes(flowState),
 						}"
 						class="btn"
@@ -304,14 +304,15 @@ export default {
 				scanQrCode: "Oder lass sie diesen QR code scannen:",
 				teamInfo: "Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class='fas fa-users'></i>) oben rechts.",
 				pollInfo: 
-					"Erstelle jetzt die erste Abstimung (<i class='fas fa-poll'></i>) für dein Team. Jedes Teammitglied kann dann seinen eigenen "+
-					"Wahlvorschlag (<i class='fas fa-vote-yea'></i>) hinzufügen.",
+					"Möchtest du jetzt gleich eine erste Abstimung (<i class='fas fa-poll'></i>) für dein Team erstellen. Jedes Teammitglied kann dann " +
+					"seinen eigenen Wahlvorschlag (<i class='fas fa-vote-yea'></i>) hinzufügen.",
 				createPoll: "Abstimmung anlegen",
 
 				areYouOffline: "Der LIQUIDO Server ist gerade nicht erreichbar. Bist du vielleicht gerade offline? Bitte schalte dein WLAN ein.",
-				teamWithSameNameExists: "Ein Teamm mit diesem Namen existiert bereits. Bitte wählen einen anderen Namen für dein Team.",
+				teamWithSameNameExists: "Ein Team mit diesem Namen existiert bereits. Bitte wählen einen anderen Namen für dein Team.",
 				cannotCreateNewTeam: "Es tut uns sehr leid, das neue Team konnt nicht angelegt werden. Bitte versuche es später noch einmal.",
-				cannotJoinTeam: "Du kannst diesem Team nicht beitreten."  //TODO: show more detailed error description: invote code invalid, already member etc.
+				cannotJoinTeam: "Du kannst diesem Team nicht beitreten.",
+				cannotJoinTeamInviteCodeInvalid: "Dieser Einladungscode ist ungültig. Hast du dich vielleicht nur vertippt?",
 			},
 		},
 	},
@@ -349,9 +350,9 @@ export default {
 				 11 - clicked on joinTeam button, waiting for server reply
 				 12 - new team joined successfully
 
-				 21 - create new team form
-				 22 - clicked on createTeam button,  waiting for server reply
-				 23 - new team created successfully
+				 20 - create new team form
+				 21 - clicked on createTeam button,  waiting for server reply
+				 22 - new team created successfully
 
 				 TODO: 24 - add first poll in new team (optional)
 				 
@@ -547,10 +548,13 @@ export default {
 					})
 				})
 				.catch(err => {
-					//let errCode = err && err.response && err.response && err.response.data ? err.response.data.liquidoErrorCode : undefined
-					//if (errCode === this.$api.err.CANNOT_JOIN_TEAM_INVITE_CODE_INVALID) {
-					log.info("Cannot join team", err)
-					this.$root.$refs.rootPopupModal.showError(this.$t("cannotJoinTeam"), this.$t("Error"))
+					let errCode = err && err.response && err.response && err.response.data ? err.response.data.liquidoErrorCode : undefined
+					if (errCode === this.$api.err.CANNOT_JOIN_TEAM_INVITE_CODE_INVALID) {
+						this.$root.$refs.rootPopupModal.showError(this.$t("cannotJoinTeamInviteCodeInvalid"), this.$t("Error"))	
+					} else {
+						log.info("Cannot join team", err)
+						this.$root.$refs.rootPopupModal.showError(this.$t("cannotJoinTeam"), this.$t("Error"))
+					}					
 					this.flowState = 10
 				})
 		},
@@ -605,6 +609,13 @@ export default {
 </script>
 
 <style lang="scss">
+
+.loginLink {
+	font-size: 0.8rem;
+	position: absolute;
+	left: 10px;
+	bottom: 10px;
+}
 
 .createOrJoinTable {
 	td {

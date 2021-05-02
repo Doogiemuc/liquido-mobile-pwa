@@ -97,6 +97,12 @@
 				v-html="emailErrorMessage"
 			></div>
 		</b-card>
+
+		<div class="text-center mt-5">
+			<button id="registerButton" type="button" class="btn btn-primary" @click="clickRegister()">
+				{{ $t("Register") }}
+			</button>
+		</div>
 	</div>
 </template>
 
@@ -120,10 +126,10 @@ export default {
 				AuthTokenLabel: "Login-Token aus SMS",
 				authTokenInputInvalid: "Der Login-Token hat genau sechs Ziffern.",
 				MobilephoneNotFound: "Tut mir leid, ich kenne diese Telefonnummer in LIQUIDO nicht. Bitte <a href='/'>registriere dich zuerst.</a>",
-				TokenInvalid: "Der eingegebene Login-Token wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Bitte versuche es bitte noch einmal.",
-				TokenDoesNotBelongToMobilephone: "Dieser Login-Token gehört jemand anderem. Du darfst dich nur mit dem <b>deinem Token, von deinem Handy</b> einloggen.",
-				AuthtokenSentSuccessfully: "Ok, die SMS wurde verschickt. Bitte gib den Login-Code aus der SMS ein.",
-				AuthTokenRequestError: "Login-Code konnte nicht angefordert werden. Bitte versuche es noch einmal.",
+				TokenInvalid: "Der eingegebene Login-Token wurde nicht akzeptiert. Hast du dich vielleicht einfach nur vertippt? Bitte versuche es noch einmal.",
+				TokenDoesNotBelongToMobilephone: "Dieser Login-Token gehört jemand anderem. Du darfst dich nur mit <b>deinem Token von deinem Handy</b> einloggen.",
+				AuthtokenSentSuccessfully: "Ok, die SMS wurde verschickt. Bitte gib den Login-Token aus der SMS ein.",
+				RequestAuthTokenError: "Login-Token konnte nicht angefordert werden. Bitte versuche es noch einmal.",
 
 				LoginViaEmail: "Login per Email",
 				yourEMail: "Deine Email",
@@ -135,6 +141,8 @@ export default {
 				CouldNotSendEmail: "Es gab ein Problem beim Verschicken der E-Mail. Bitte versuche es später noch einmal.",
 				UserWithThatEmailNotFound: "Tut mir leid, ich kenne niemanden mit dieser E-Mail Adresse. Möchtest du dich <a href='/welcome'>zuerst registrieren</a>?",
 
+				Register: "Registrieren",
+				
 				DevLoginAdmin: "devLogin: Admin",
 				DevLoginMember: "devLogin: Member",
 			}

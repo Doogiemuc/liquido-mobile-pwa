@@ -1,42 +1,40 @@
 <template>
 	<footer>
-		<div class="container">
-			<ul id="navArrows" class="nav nav-arrows">
-				<li
-					:class="{
-						active: activeStatus === 'ELABORATION',
-						'none-selected': activeStatus === undefined,
-					}"
-				>
-					<a id="elaborationArrow" href="#" @click="clickFooter('ELABORATION')">
-						<i class="far fa-comments" />
-						<div class="icon-title">{{ $t("Elaboration") }}</div>
-					</a>
-				</li>
-				<li
-					:class="{
-						active: activeStatus === 'VOTING',
-						'none-selected': activeStatus === undefined,
-					}"
-				>
-					<a id="votingArrow" href="#" @click="clickFooter('VOTING')">
-						<i class="fas fa-person-booth" />
-						<div class="icon-title">{{ $t("InVoting") }}</div>
-					</a>
-				</li>
-				<li
-					:class="{
-						active: activeStatus === 'FINISHED',
-						'none-selected': activeStatus === undefined,
-					}"
-				>
-					<a id="finishedArrow" href="#" @click="clickFooter('FINISHED')">
-						<i class="fas fa-check" />
-						<div class="icon-title">{{ $t("Finished") }}</div>
-					</a>
-				</li>
-			</ul>
-		</div>
+		<ul id="navArrows" class="nav nav-arrows">
+			<li
+				:class="{
+					active: activeStatus === 'ELABORATION',
+					'none-selected': activeStatus === undefined,
+				}"
+			>
+				<a id="elaborationArrow" href="#" @click="clickFooter('ELABORATION')">
+					<i class="far fa-comments" />
+					<div class="icon-title">{{ $t("Elaboration") }}</div>
+				</a>
+			</li>
+			<li
+				:class="{
+					active: activeStatus === 'VOTING',
+					'none-selected': activeStatus === undefined,
+				}"
+			>
+				<a id="votingArrow" href="#" @click="clickFooter('VOTING')">
+					<i class="fas fa-person-booth" />
+					<div class="icon-title">{{ $t("InVoting") }}</div>
+				</a>
+			</li>
+			<li
+				:class="{
+					active: activeStatus === 'FINISHED',
+					'none-selected': activeStatus === undefined,
+				}"
+			>
+				<a id="finishedArrow" href="#" @click="clickFooter('FINISHED')">
+					<i class="fas fa-check" />
+					<div class="icon-title">{{ $t("Finished") }}</div>
+				</a>
+			</li>
+		</ul>
 	</footer>
 </template>
 
@@ -68,11 +66,9 @@ footer {
 	left: 0;
 	right: 0;
 	z-index: 999;
-	//transform: translateY(calc(100% - 40px));
-	//transition: all .3s ease;
 	font-size: 1.7rem;
-	border-top: 1px solid rgba(0, 0, 255, 0.3);
-	background-color: rgba(220, 236, 255, 1);
+	border-top: 1px solid $primary; // rgba(0, 0, 255, 0.3);
+	background-color: $header-bg;
 }
 
 $inactiveNavArrowBg: #fdfdff;
@@ -80,17 +76,14 @@ $arrowSize: 28px;
 
 #navArrows {
 	flex-wrap: nowrap;
-	padding: 0;
-	//min-width: 350px;
+	padding: 10px 10px;	
 	text-align: center;
-	//justify-content: center;
-	font-family: "Libre Baskerville", serif;
-	font-size: 1.7rem;
-	margin: 5px 0;
-	transition: 0.3s;
+	//font-family: "Libre Baskerville", serif;
+	transition: 0.5s;
 	.icon-title {
-		font-size: 10px;
+		font-size: 12px;
 		line-height: 1;
+		text-decoration: none;
 	}
 }
 
@@ -112,7 +105,7 @@ $arrowSize: 28px;
 	white-space: nowrap;
 	overflow: hidden;
 	//text-overflow: ellipsis;
-	color: lightgrey;
+	color: $header-bg;
 	height: 2 * $arrowSize;
 	line-height: 40px; // vertically center text in arrows
 	background-color: $inactiveNavArrowBg;
@@ -131,12 +124,13 @@ $arrowSize: 28px;
 	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg
 		transparent;
 	z-index: 150;
-	transition: 0.3s;
+	transition: 0.5s;
 }
 /* Rounded corners for first element at the left */
 #navArrows > li:first-child > a {
 	border-top-left-radius: $arrowSize * 0.3;
 	border-bottom-left-radius: $arrowSize * 0.3;
+	transition: 0.5s;
 }
 
 /* Arrowhead after each element */
@@ -157,26 +151,22 @@ $arrowSize: 28px;
 #navArrows > li:last-child > a {
 	border-top-right-radius: $arrowSize * 0.3;
 	border-bottom-right-radius: $arrowSize * 0.3;
+	transition: 0.5s;
 }
 
 /* Navbar arrows when active */
 #navArrows li.active a {
 	color: white;
 	background-color: $primary;
-	transition: 0.5s;
 }
 #navArrows li.active a:before {
 	border-color: $primary $primary $primary transparent;
-	transition: 0.5s;
 }
 #navArrows li.active a:after {
 	border-color: transparent transparent transparent $primary;
-	transition: 0.5s;
 }
-
 #navArrows li.none-selected a {
 	color: $primary;
-	transition: 0.5s;
 }
 
 /*

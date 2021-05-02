@@ -28,8 +28,8 @@ import mobileLogViewer from "@/components/mobile-debug-log.vue"
 /** Pages will slide from right to left in this order */
 const page_order = {
 	"index": 0,
-	"login": 1,
-	"welcome": 2,
+	"welcome": 1,
+	"login": 2,
 	"teamHome": 3,
 	"polls": 4,
 	"createPoll": 5,

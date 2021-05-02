@@ -55,7 +55,9 @@ We use Cypress.io to for automated end-2-end tests. Cypress is like Selenium and
 
 MAYBE: Simulate test on mobile phone with this very nice mobile simulator: http://mobiletest.me/apple_iphone_6s/8028826 
 
+# Documentation
 
+Very nice GHOST.org theme for documentation https://ghost.franktheme.com/documentation-and-knowledge-base-ghost-theme/
 
 
 

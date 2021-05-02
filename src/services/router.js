@@ -137,8 +137,9 @@ async function tryToAuthenticate() {
 				// return liquido error code, eg. JWT_TOKEN_EXPIRED or JWT_TOKEN_INVALID
 				let errCode = err.response &&	err.response.data ? err.response.data.liquidoErrorCode : -1
 				if (errCode === router.app.$api.err.JWT_TOKEN_EXPIRED || errCode === router.app.$api.err.JWT_TOKEN_INVALID) {
-					log.debug("Deleting expired JWT from localStorage")
-					localStorage.removeItem(router.app.$api.LIQUIDO_JWT_KEY);  // delete expired JWT
+					//TODO: Can I refresh the token in this case? Or should I forward returning user to login page?
+					log.debug("Removing expired JWT from localStorage")
+					router.app.$api.logout()
 				}
 				return Promise.reject(errCode)
 			})
