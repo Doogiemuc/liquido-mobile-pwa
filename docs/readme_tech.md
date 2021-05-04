@@ -12,6 +12,21 @@ Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.v
  * Local data store/cache for polls with proposals => liquido-store or VueApollo InMemoryStore
  * Replace Jquery with Bootstrap.native Javascript http://thednp.github.io/bootstrap.native/index.html
 
+# User Interface (UI) / User Experience (UX)
+
+Title bar at the top
+ * <  (GoBack)
+ * LIQUIDO (Title)  => could link to something?
+ * Team Icon (goto teamHome)
+
+Taskbar at the bottom (5 icons!)
+ * Team Home
+ * Polls in Discussion => add proposal
+ * Polls in Voting (with number of polls in voting as badge) => if only one poll in voting, then jump directly to its cast vote page
+ * ????  MAYBE: Finished Polls => check result of poll
+ * Menu (Settings, Switch Team, Join Another Team, overview of admin tasks, eg. start/finish running polls, accept new team members, )
+
+
 ## Screenflow
 
 See ./doc/screenshots

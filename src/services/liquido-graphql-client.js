@@ -36,6 +36,29 @@ if (!config || !config.LIQUIDO_API_URL) {
 axios.defaults.baseURL = config.LIQUIDO_API_URL
 const GRAPHQL = "/graphql"
 
+/**
+ * This is the central API client that calls the backend.
+ * Errors are logged here. But must be handled by the caller!
+ * 
+ * @param {String} graphql GraphQL Query. This is NOT JSON! This is GraphQL syntax!
+ * @returns GraphQL result as specified by GraphQL-spec { data: {}, errors: [] }
+ */
+const graphQlQuery = function(query) {
+	return axios.post(GRAPHQL, {query: query})
+		.then(res => {
+			if (res.errors && res.errors.length > 0) {
+				log.error("graphQlQueryy errors: ", JSON.stringify(res.errors))   // graphQL's way of returning errors
+			}
+			return res.data // This is the axios HTTP "data". The graphQL response contains another "data" (and an "error") attribute. I know, it's confusing.
+		})  
+		.catch(err => {
+			log.error("graphQlQuery throws: ", err)
+			return Promise.reject(err)
+		})
+}
+
+
+
 /** Shorthands for JQL return values */
 const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, createdBy { id name email } area { id } }"
 const JQL_TEAM = `team {
@@ -62,7 +85,7 @@ const fetchTeamFunc = function(path) {
 	if (path === "team") {
 		console.debug("fetchTeamFunc: Fetch own team from backend")
 		let graphQL = `query { team ${JQL.TEAM} }`
-		return axios.post(GRAPHQL, {query: graphQL}).then(res => res.data.team)
+		return graphQlQuery(graphQL).then(res => res.data.team)
 	} else {
 		return Promise.reject(new Error("Invalid path fetchTeamFunc(path="+JSON.stringify(path)+")"))
 	}
@@ -84,12 +107,12 @@ const fetchPollFunc = function(path) {
 	if (path[0] === "polls") {
 		console.debug("fetchPollFunc: Fetch all poll of team from backend")
 		let graphQL = `query { polls ${JQL.POLL} }`
-		return axios.post(GRAPHQL, {query: graphQL}).then(res => res.data.polls)
+		return graphQlQuery(graphQL).then(res => res.data.polls)
 	} else if (path[0].polls) {
 		console.debug("Fetch Poll from backend: "+JSON.stringify(path))
 		let pollId = path[0].polls
 		let graphQL = `query { poll(pollId:${pollId}) ${JQL.POLL} }`
-		return axios.post(GRAPHQL, {query: graphQL}).then(res => res.data.poll)
+		return graphQlQuery(graphQL).then(res => res.data.poll)
 	} else {
 		return Promise.reject(new Error("Cannot fetch poll(s) at path: "+JSON.stringify(path)))
 	}
@@ -104,6 +127,9 @@ const pollsCacheConfig = {
 
 
 
+
+
+
 /**
  * Sophisticated logging of HTTP error messages is crucial!
  */
@@ -112,7 +138,8 @@ axios.interceptors.response.use(function (response) {
 	return response;
 }, function (error) {
 
-	//TODO: handle general connection errors.
+	//handle general connection errors.
+	if (error.data && error.data.includes("ECONNREFUSED")) return Promise.reject(error)
 	
 	// Any status codes that falls outside the range of 2xx cause this function to trigger
 	if (error.response.status >= 500) console.error("liquido-graphql-api ERROR:", error)
@@ -215,7 +242,7 @@ let graphQlApi = {
 		if (!jwt) throw new Error("Need JWT to login!")
 		let graphQL = `query { loginWithJwt ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				this.login(res.data.loginWithJwt.team, res.data.loginWithJwt.user, res.data.loginWithJwt.jwt)
 				return res.data.loginWithJwt
@@ -233,7 +260,7 @@ let graphQlApi = {
 	requestEmailToken(email) {
 		if (!email) throw new Error("Need email to log in!")
 		let graphQL = `query { requestEmailToken(email: "${email}") }`
-		return axios.post(GRAPHQL, {query: graphQL})  // no return value
+		return graphQlQuery(graphQL)  // no return value
 	},
 
 	//TODO: loginWithEmailToken
@@ -243,7 +270,7 @@ let graphQlApi = {
 	 */
 	requestAuthToken(mobilephone) {
 		let graphQL = `query { authToken(mobilephone: "${mobilephone}") }`
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 	},
 
 	/**
@@ -253,7 +280,7 @@ let graphQlApi = {
 		if (!mobilephone) throw new Error("Need mobilephone to log in!")
 		if (!authToken) throw new Error("Need authToken to log in!")
 		let graphQL = `query { loginWithAuthToken(mobilephone: "${mobilephone}", authToken: "${authToken}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
-		return axios.post(GRAPHQL, {query: graphQL}).then(res => {
+		return graphQlQuery(graphQL).then(res => {
 			this.login(res.data.loginWithAuthToken.team, res.data.loginWithAuthToken.user, res.data.loginWithAuthToken.jwt)
 			return res.data.loginWithAuthToken
 		})
@@ -294,14 +321,13 @@ let graphQlApi = {
 	 * @param {Object} newTeam teamName, adminName, adminEmail and adminMobilephone
 	 */
 	async createNewTeam(teamName, admin) {
-		//TODO: pass admin as one object
-		//let adminJson = JSON.stringify(admin)
-		//let graphQL = `mutation { createNewTeam(teamName: "${teamName}", admin: ${adminJson}) ` + 
-		//	`${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		let adminJson = JSON.stringify(admin)
+		let graphQL = `mutation { createNewTeam(teamName: "${teamName}", admin: ${adminJson}) ` + 
+			`${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
 
-		let graphQL = `mutation { createNewTeam(teamName: "${teamName}", adminName: "${admin.name}",` +
-			`adminMobilephone: "${admin.mobilephone}", adminEmail: "${admin.email}", adminPicture: "${admin.picture}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
-		return axios.post(GRAPHQL, {query: graphQL})
+		//let graphQL = `mutation { createNewTeam(teamName: "${teamName}", adminName: "${admin.name}",` +
+		//	`adminMobilephone: "${admin.mobilephone}", adminEmail: "${admin.email}", adminPicture: "${admin.picture}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		return graphQlQuery(graphQL)
 			.then(res => {
 				let team = res.data.createNewTeam.team
 				this.login(
@@ -320,7 +346,7 @@ let graphQlApi = {
 	async joinTeam(inviteCode, userName, userEmail) {
 		let graphQL = `mutation {	joinTeam(inviteCode: "${inviteCode}", userName: "${userName}", userEmail: "${userEmail}") ` +
 			JQL.CREATE_OR_JOIN_TEAM_RESULT + "}"
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				let team = res.data.joinTeam.team
 				this.login(
@@ -339,7 +365,7 @@ let graphQlApi = {
 
 	async createPoll(pollTitle) {
 		let graphQL = `mutation {	createPoll(title: "${pollTitle}") ${JQL.POLL}	}`
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				let poll = res.data.createPoll
 				this.pollsCache.put("polls/"+poll.id, poll)
@@ -355,15 +381,22 @@ let graphQlApi = {
 		})
 	},
 
+	/** get all polls from cache. Will at least return an empty array. */
 	async getPolls(force = false) {
 		return this.pollsCache.get("polls", {
 			callBackend: force ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
-		})
+		}).then(polls => polls || [])
+	},
+
+	getPollsByStatusSync(status) {
+		let polls = this.pollsCache.getSync("polls")
+		if (!Array.isArray(polls)) return []
+		return polls.filter(poll => poll.status === status)
 	},
 
 	async addProposal(pollId, propTitle, propDescription) {
 		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") ${JQL.POLL} }`
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				let poll = res.data.addProposal
 				this.pollsCache.put("polls/"+poll.id, poll)
@@ -373,9 +406,8 @@ let graphQlApi = {
 	},
 
 	async startVotingPhase(pollId) {
-		
 		let graphQL = `mutation { startVotingPhase(pollId: "${pollId}") ${JQL.POLL} }`
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				let poll = res.data.startVotingPhase
 				//TODO: invalidate cache for pollId
@@ -391,7 +423,7 @@ let graphQlApi = {
 	 */
 	async finishVotingPhase(pollId) {
 		let graphQL = `mutation { finishVotingPhase(pollId: "${pollId}") ${JQL.PROPOSAL} }`
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				console.debug(`Finsihed voting phase of poll.id=${pollId}`)
 				return res.data.finishVotingPhase
@@ -403,7 +435,7 @@ let graphQlApi = {
 		return this.teamCache.get(this.VOTER_TOKEN_KEY, {
 			fetchFunc: async function() {
 				let graphQL = `query { voterToken(tokenSecret: "${tokenSecret}", becomePublicProxy: ${becomePublicProxy}) }`
-				const res = await axios.post(GRAPHQL, { query: graphQL });
+				const res = await graphQlQuery(graphQL);
 				console.debug("GetVoterToken: OK, received valid voterToken from backend."); // SECURITY: Do not log secret voterToken!
 				return res.data.voterToken;
 			}
@@ -415,7 +447,7 @@ let graphQlApi = {
 		console.debug("Cast vote in poll(id="+pollId+") => ", voteOrderStr)
 		let graphQL = `mutation { castVote(pollId: "${pollId}", voteOrderIds: ${voteOrderStr}, voterToken: "${voterToken}") ` +
 			`{ voteCount ballot { level checksum voteOrder { id } } } }`
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				console.debug("CastVote: Ballot was casted successfully.")
 				return res.data.castVote
@@ -426,7 +458,7 @@ let graphQlApi = {
 	async getBallot(pollId, voterToken) {
 		let graphQL = `query { ballot(pollId: "${pollId}", voterToken: "${voterToken}") ` +
 			`{ level checksum voteOrder { id } area { id } } }`
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 			.then(res => {
 				console.debug("User's ballot in poll(id="+pollId+") is", res.data.ballot)
 				return res.data.ballot
@@ -438,7 +470,7 @@ let graphQlApi = {
 		let graphQL = `query { verifyBallot(pollId: "${pollId}", checksum: "${checksum}") ` +
 			`{ level checksum voteOrder { id } } }`  
 		// returns user's ballot if found
-		return axios.post(GRAPHQL, {query: graphQL})
+		return graphQlQuery(graphQL)
 	},
 
 	/** Liquido backend error codes. See LiquidoException.java */

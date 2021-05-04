@@ -2,8 +2,11 @@ import Vue from "vue"
 import Router from "vue-router"
 import welcomeChat from "@/views/welcome-chat"
 import loginPage from "@/views/login-page"
+import teamHome from "@/views/team-home"
+import pollsPage from "@/views/polls"
 import config from "config"
 const log = require("loglevel")
+if (process.env.NODE_ENV === "development") log.enableAll()
 
 Vue.use(Router)
 
@@ -48,12 +51,13 @@ const routes = [
 	{
 		path: "/team",
 		name: "teamHome",
-		component: () => import("@/views/team-home"),
+		component: teamHome
 	},
 	{
 		path: "/polls",
 		name: "polls",
-		component: () => import("@/views/polls"),
+		component: pollsPage,
+		props: true  // status=ELABORATION|VOTING|FINISHED
 	},
 	{
 		path: "/polls/create",
@@ -128,6 +132,7 @@ async function tryToAuthenticate() {
 	if (router.app.$api.isAuthenticated()) return Promise.resolve(IS_ALREADY_AUTHENTICATED);  // although JWT could be expired, but this way we save one backend call
 	let jwt = localStorage.getItem(router.app.$api.LIQUIDO_JWT_KEY);
 	if (jwt) {
+		console.log("Trying to login with JWT", jwt)
 		return router.app.$api.loginWithJwt(jwt)
 			.then(res => {
 				log.info("Successfully authenticated from localStorage")
@@ -140,8 +145,10 @@ async function tryToAuthenticate() {
 					//TODO: Can I refresh the token in this case? Or should I forward returning user to login page?
 					log.debug("Removing expired JWT from localStorage")
 					router.app.$api.logout()
+				} else {
+					log.error("Cannot login with JWT", err)
 				}
-				return Promise.reject(errCode)
+				return Promise.reject(err)
 			})
 	}
 	else return Promise.reject(IS_ANONYMOUS) // no JWT, not authenticated at all
@@ -168,24 +175,25 @@ async function tryToAuthenticate() {
  *   ELSE forward to "/login"
  */
 router.beforeEach((routeTo, routeFrom, next) => {
-	log.debug("vue-router: routeTo.path="+routeTo.path)
 	//Keep in mind that next() must exactly be called once in this method.
+	//log.debug("beforeEach ENTER", routeFrom.path, "=>", routeTo.path)
 	tryToAuthenticate().then(() => {
+		log.debug("vue-router: authenticated", routeFrom.path, "=>", routeTo.path)
 		if (routeTo.path === "/" || routeTo.path === "/index.html") {
 			next({name: "teamHome"})
 		} else {
 			next()
 		}
 	}).catch(() => {
+		log.debug("vue-router: anonymous", routeFrom.path, "=>", routeTo.path)
 		if (routeTo.meta.public) {
 			next()
 		} else if (routeTo.path === "/" || routeTo.path === "/index.html") {
 			next({name: "welcome"})
 		}	else {		
-			log.debug("Forwarding to login")
 			next({name: "login"})
 		}
-	})	
+	})
 })
 
 export default router

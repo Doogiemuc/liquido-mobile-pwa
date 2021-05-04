@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h2 id="polls" class="page-title">
-			{{ pageTitleLoc }}
+			{{ $t('YourPolls') }}
 		</h2>
 
 		<div v-if="loading" class="my-3">
@@ -77,18 +77,12 @@
 				<i class="fas fa-shield-alt" /> {{ $t("createPoll") }} <i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
-
-		<pollsFooter 
-			:active-status="pollStatusFilter"
-			@setPollFilter="setPollFilter"
-		/>
 	</div>
 </template>
 
 <script>
 import liquidoInput from "../components/liquido-input"
 import pollPanel from "../components/poll-panel"
-import pollsFooter from "../components/polls-footer"
 
 export default {
 	i18n: {
@@ -101,6 +95,7 @@ export default {
 				butPollInVoting: "However there is a poll in which you can vote.",
 			},
 			de: {
+				YourPolls: "Eure Abstimmungen",
 				pollsInElaborationInfo: 
 					"<p>Bitte diskutiert die Wahlorschläge dieser Abstimmungen untereinander.</p>" +
 					"<p>Euer Teamadmin starten dann die jeweilige Abstimmungsphase.</p>",
@@ -119,7 +114,7 @@ export default {
 			},
 		},
 	},
-	components: { pollPanel, liquidoInput, pollsFooter },
+	components: { pollPanel, liquidoInput },
 	props: {
 		status: { type: String, required: false, default: undefined },
 	},
@@ -133,7 +128,7 @@ export default {
 		}
 	},
 	computed: {
-		
+		/*
 		pageTitleLoc() {
 			switch (this.pollStatusFilter) {
 				case "ELABORATION":
@@ -146,6 +141,7 @@ export default {
 					return this.$t("allPolls")
 			}
 		},
+		*/
 		userIsAdmin() {
 			return this.$api.isAdmin()
 		},
@@ -175,15 +171,20 @@ export default {
 			this.pollStatusFilter = this.status
 		}
 		this.loading = true
-		this.$api.getPolls().then(polls => {
-			this.polls = polls
-			this.loading = false
-			//console.log("polls", polls)
-		})
+		this.$api.getPolls()
+			.then(polls => {
+				this.polls = polls
+				this.loading = false
+				console.log("Loaded/fetched polls", this.polls)
+			})
+			.catch(err => {
+				this.polls = []
+				this.loading = false
+				console.error("Canont load polls", err)
+			})
 	},
 	mounted() {},
 	methods: {
-
 		setPollFilter(newFilterValue) {
 			if (this.pollStatusFilter === newFilterValue) {
 				this.pollStatusFilter = undefined

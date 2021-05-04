@@ -4,6 +4,7 @@
 		<transition :name="transitionName">
 			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
+		<navbar-bottom></navbar-bottom>
 		<popup-modal 
 			id="rootPopupModal"
 			ref="rootPopupModal"
@@ -21,8 +22,10 @@
 
 <script>
 import liquidoHeader from "@/components/liquido-header"
+import navbarBottom from "@/components/navbar-bottom"
 import popupModal from "@/components/popup-modal"
 import mobileLogViewer from "@/components/mobile-debug-log.vue"
+
 
 
 /** Pages will slide from right to left in this order */
@@ -42,12 +45,12 @@ const page_order = {
 /** Liquido Root App */
 export default {
 	name: "LiquidoApp",
-	components: { liquidoHeader, popupModal, mobileLogViewer },
-	// All these data attributes are reactive and available in every sub-component as e.g. this.$root.transitionName
+	components: { liquidoHeader, navbarBottom, popupModal, mobileLogViewer },
+	// vue-i18n is configured in main.js ! Do not overwrite it here!
+	// These data attributes are reactive and available in EVERY sub-component as this.$root.<attributeName>
 	data() { 
 		return {
 			transitionName: "", 	// CSS sliding transition between page components
-
 			// Global popup-modal
 			modalType: "success",
 			modalTitle: "",
@@ -98,7 +101,12 @@ export default {
 	},
 	created() {
 	},
-	mounted() {},
+	mounted() {
+		this.$api.pingApi()
+			.catch(() => {
+				this.$refs.rootPopupModal.showWarning(this.$t("BackendNotReachable"))
+			})
+	},
 	methods: {
 		//
 		// Here comes some HTML UX magic.

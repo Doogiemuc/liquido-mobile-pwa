@@ -82,8 +82,21 @@
 					/>
 
 					<liquido-input
-						id="emailInput"
-						ref="emailInput"
+						id="userMobilephoneInput"
+						ref="userMobilephoneInput"
+						v-model="user.mobilephone"
+						:label="$t('yourMobilephone')"
+						:placeholder="$t('mobilephonePlaceholder')"
+						:valid-func="isMobilephoneValid"
+						:maxlength="100"
+						:invalid-feedback="$t('mobilephoneInvalid')"
+						:disabled="flowState !== 10"
+						tabindex="2"
+					/>
+
+					<liquido-input
+						id="userEmailInput"
+						ref="userEmailInput"
 						v-model="user.email"
 						:label="$t('yourEMail')"
 						:placeholder="$t('emailPlaceholder')"
@@ -91,7 +104,7 @@
 						:maxlength="200"
 						:invalid-feedback="$t('emailInvalid')"
 						:disabled="flowState !== 10"
-						tabindex="2"
+						tabindex="3"
 					/>
 
 					<div class="d-flex justify-content-between align-items-center">
@@ -275,7 +288,7 @@ export default {
 				yourNickname: "Dein Spitzname",
 				userNameInvalid: "Bitte mindestens 4 Zeichen!",
 				niceToMeetYou: "Hallo <b>{nickname}</b> ! Schön dich kennen zu lernen.",
-				createOrJoin: "Möchtest du <ul><li>einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team</b> gründen?</li></ul>",
+				createOrJoin: "Möchtest du <ul><li>mit einem Einladungscode einem bestehenden <b>Team beitreten</b></li><li>oder möchtest du ein <b>neues Team gründen?</b></li></ul>",
 
 				joinTeamButton: "Team beitreten",
 				inviteCode: "Einladungscode",
@@ -288,8 +301,7 @@ export default {
 				emailInvalid: "E-Mail ungültig",
 
 				joinedTeamSuccessfully: 
-					"Herzlich willkommen im Team <b>{teamName}</b>. Du kannst nun deine Wahlvorschläge zu den Abstimmungen "+
-					"im Team hinzufügen. Viel Spaß beim wählen!",
+					"Herzlich willkommen im Team <b>{teamName}</b>. Viel Spaß beim Abstimmen und Wählen!",
 				goToTeam: "Zum Team",
 
 				createNewTeamButton: "Neues Team",
@@ -308,7 +320,6 @@ export default {
 					"seinen eigenen Wahlvorschlag (<i class='fas fa-vote-yea'></i>) hinzufügen.",
 				createPoll: "Abstimmung anlegen",
 
-				areYouOffline: "Der LIQUIDO Server ist gerade nicht erreichbar. Bist du vielleicht gerade offline? Bitte schalte dein WLAN ein.",
 				teamWithSameNameExists: "Ein Team mit diesem Namen existiert bereits. Bitte wählen einen anderen Namen für dein Team.",
 				cannotCreateNewTeam: "Es tut uns sehr leid, das neue Team konnt nicht angelegt werden. Bitte versuche es später noch einmal.",
 				cannotJoinTeam: "Du kannst diesem Team nicht beitreten.",
@@ -509,7 +520,7 @@ export default {
 					// https://babeljs.io/docs/en/babel-plugin-proposal-optional-chaining  Here Babel is cool. Ey, you need this cool top notch language feature. Just "install" it :-)
 					//MAYBE:  let errCode = err?.response?.data?.liquidoErrorCode  
 					if (errCode === this.$api.err.TEAM_WITH_SAME_NAME_EXISTS) {
-						this.$root.$refs.rootPopupModal.showError(this.$t("teamWithSameNameExists"), this.$t("Error"),)
+						this.$root.$refs.rootPopupModal.showError(this.$t("teamWithSameNameExists"), this.$t("Error"))
 					} else {
 						this.$root.$refs.rootPopupModal.showError(this.$t("cannotCreateNewTeam"), this.$t("Error"))
 						log.error("Cannot create new team", err)
@@ -570,7 +581,7 @@ export default {
 			let mediumDelay = 2500 // ms
 
 			// If we are running inside a Cypress test, then speedup animation.
-			if (window.Cypress) {
+			if (window.Cypress || process.env.NODE_ENV === "development") {
 				smallDelay = 100
 				mediumDelay = 200
 			}
@@ -609,13 +620,6 @@ export default {
 </script>
 
 <style lang="scss">
-
-.loginLink {
-	font-size: 0.8rem;
-	position: absolute;
-	left: 10px;
-	bottom: 10px;
-}
 
 .createOrJoinTable {
 	td {

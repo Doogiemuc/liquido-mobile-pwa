@@ -47,10 +47,15 @@ const globalTranslations = {
 		Cancel: "Cancel",
 	},
 	de: {
+		BackendNotReachable: "Du bist offline. Bitte schalte dein WLAN ein.",
+
 		HelloWorld: "Hallo Welt!",
 		Ok: "Ok",
 		Yes: "Ja",
 		No: "Nein",
+		Menue: "Menü",
+		Team: "Team",
+		
 		Save: "Speichern",
 		Cancel: "Abbrechen",
 		Back: "Zurück",
@@ -68,6 +73,7 @@ const globalTranslations = {
 		Proposals: "Vorschläge",
 		// Entscheidung zur deutschen Übersetzung von Poll == "Abstimmung" !!!
 		// Nein nicht "Wahl". Wir stimmen ab in LIQUIDO. Der Begriff "Wahl" passt eher zu einer Wahl von Kandidaten, also Personen.
+		vote: "abstimmen",   // Verb
 		Poll: "Abstimmung",
 		Polls: "Abstimmungen",
 		Law: "Regel",
@@ -90,7 +96,7 @@ const globalTranslations = {
 // Create VueI18n instance for translations.
 const i18n = new VueI18n({
 	locale: "de",
-	fallbackLocale: "en",
+	//fallbackLocale: "de",
 	silentFallbackWarn: true,
 	messages: globalTranslations,
 })

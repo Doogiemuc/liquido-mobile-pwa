@@ -8,29 +8,6 @@
 			<b-spinner small />&nbsp;{{ $t('Loading') }}
 		</div>
 		
-		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
-			<i class="fas fa-shield-alt float-right"></i>
-			<p v-html="$t('startVotingPhaseInfo')" />
-			<b-button id="startVoteButton" :disabled="startVoteLoading" variant="primary" class="float-right" @click="clickStartVote()">
-				<b-spinner v-if="startVoteLoading" small />
-				<i v-else class="fas fa-user-shield" />
-				{{ $t("startVotingPhase") }}
-			</b-button>
-		</div>
-		<div class="clearfix mb-3" />
-
-		<div v-if="showFinishVotingPhase" class="alert alert-admin mb-3">
-			<i class="fas fa-shield-alt float-right"></i>
-			<p v-html="$t('finishVotingPhaseInfo', {numBallots: poll.numBallots})" />
-			<b-button id="finishVoteButton" :disabled="finishVoteLoading" variant="primary" class="float-right" @click="clickFinishVote()">
-				<b-spinner v-if="finishVoteLoading" small />
-				<i v-else class="fas fa-user-shield" />
-				{{ $t("finishVotingPhase") }}
-			</b-button>
-		</div>
-
-		<div class="clearfix mb-3" />
-
 		<poll-panel v-if="poll.id" :poll="poll" :read-only="true" class="shadow mb-3" />
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
@@ -82,6 +59,28 @@
 			</p>
 		</div>
 
+		<div v-if="showStartVotingPhase" class="alert alert-admin mb-3">
+			<i class="fas fa-shield-alt float-right"></i>
+			<p v-html="$t('startVotingPhaseInfo')" />
+			<b-button id="startVoteButton" :disabled="startVoteLoading" variant="primary" class="float-right" @click="clickStartVote()">
+				<b-spinner v-if="startVoteLoading" small />
+				<i v-else class="fas fa-user-shield" />
+				{{ $t("startVotingPhase") }}
+			</b-button>
+		</div>
+		<div class="clearfix mb-3" />
+
+		<div v-if="showFinishVotingPhase" class="alert alert-admin mb-3">
+			<i class="fas fa-shield-alt float-right"></i>
+			<p v-html="$t('finishVotingPhaseInfo', {numBallots: poll.numBallots})" />
+			<b-button id="finishVoteButton" :disabled="finishVoteLoading" variant="primary" class="float-right" @click="clickFinishVote()">
+				<b-spinner v-if="finishVoteLoading" small />
+				<i v-else class="fas fa-user-shield" />
+				{{ $t("finishVotingPhase") }}
+			</b-button>
+		</div>
+		<div class="clearfix mb-3" />
+
 		<popup-modal 
 			id="votingPhaseStartedModal"
 			ref="votingPhaseStartedModal"
@@ -128,7 +127,11 @@ export default {
 	},
 	components: { pollPanel, popupModal },
 	props: {
-		pollId: { type: String, required: true }, // url parameter is passed as String
+		// Allow number or string that contains an integer. Url parameter is passed as String, 
+		// but $router.push({name: "pollShow", params: {pollId: 4711 }}) can be passed as number. We'll accept both
+		pollId: { required: true, validator: function(val) {
+			return !isNaN(val) | !isNaN(parseInt(val)) 
+		} }, 
 	},
 	data() {
 		return {
@@ -175,6 +178,10 @@ export default {
 	mounted() {},
 	methods: {
 		loadPoll() {
+			if (!this.pollId || this.pollId < 0) {
+				console.warn("Need pollId!")
+				return
+			} 
 			this.loadingPoll = true
 			// Here we do not force a refresh. Fetch from cache if possible.
 			// (When user clicks on cast vote we load everything freshly.)
