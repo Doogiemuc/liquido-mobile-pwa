@@ -58,7 +58,7 @@ const routes = [
 		path: "/polls",
 		name: "polls",
 		component: pollsPage,
-		props: true  // status=ELABORATION|VOTING|FINISHED
+		props: true  // status=ELABORATION|VOTING|FINISHED  or undefined
 	},
 	{
 		path: "/polls/create",
@@ -179,7 +179,7 @@ router.beforeEach((routeTo, routeFrom, next) => {
 	//Keep in mind that next() must exactly be called once in this method.
 	//log.debug("beforeEach ENTER", routeFrom.path, "=>", routeTo.path)
 	tryToAuthenticate().then(() => {
-		log.debug("vue-router: authenticated", routeFrom.path, "=>", routeTo.path)
+		log.debug("vue-router: authenticated", routeFrom.path, routeFrom.params, "=>", routeTo.path, routeTo.params)
 		if (routeTo.path === "/" || routeTo.path === "/index.html") {
 			next({name: "teamHome"})
 		} else {

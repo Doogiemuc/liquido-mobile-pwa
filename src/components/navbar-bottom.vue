@@ -8,21 +8,21 @@
 				</a>
 			</li>
 			<li :class="discussButtonClass">
-				<a href="#" aria-label="Polls with proposals to discuss" @click="goToPollsInDiscussion()">
+				<a href="#" aria-label="Polls with proposals to discuss" @click="clickPollsInDiscussion()">
 					<div v-if="pollsInElaboration.length > 0" class="counter-badge">{{ pollsInElaboration.length }}</div>
 					<i class="fas fa-comments" />
 					<div class="icon-title">{{ $t("discuss") }}</div>
 				</a>
 			</li>
 			<li :class="voteButtonClass">
-				<a href="#" aria-label="Go to vote" @click="goToVote()">
+				<a href="#" aria-label="Go to vote" @click="clickPollsInVoting()">
 					<div v-if="pollsInVoting.length > 0" class="counter-badge">{{ pollsInVoting.length }}</div>
 					<i class="fas fa-person-booth" />
 					<div class="icon-title">{{ $t("vote") }}</div>
 				</a>
 			</li>
 			<li :class="finishedButtonClass">
-				<a href="#" aria-label="Finished polls" @click="goToFinishedPolls()">
+				<a href="#" aria-label="Finished polls" @click="clickFinishedPolls()">
 					<div v-if="pollsFinished.length > 0" class="counter-badge">{{ pollsFinished.length }}</div>
 					<i class="fas fa-check-circle" />
 					<div class="icon-title">{{ $t("finished") }}</div>
@@ -54,7 +54,7 @@ export default {
 	},
 	data() { 
 		return {
-			selectedItem: -1,         // nothing is selected => show all polls
+			selectedItem: -1,         // -1 === show all polls
 			forceRefreshComputed: 0
 		} 
 	},
@@ -62,7 +62,7 @@ export default {
 		pollsInElaboration() {
 			this.forceRefreshComputed;
 			let res = this.$api.getCachedPolls("ELABORATION")
-			console.log("recompute pollsInElaboration", res)
+			//console.log("recompute pollsInElaboration", res)
 			return res
 		},
 		pollsInVoting() {
@@ -80,19 +80,19 @@ export default {
 		},
 		discussButtonClass() {
 			return { 
-				selected: this.selectedItem === 1,
+				selected: this.selectedItem === 1 || this.selectedItem === -1,
 				disabled: this.pollsInElaboration.length === 0
 			}
 		},
 		voteButtonClass() {
 			return { 
-				selected: this.selectedItem === 2,
+				selected: this.selectedItem === 2 || this.selectedItem === -1,
 				disabled: this.pollsInVoting.length === 0
 			}
 		},
 		finishedButtonClass() {
 			return { 
-				selected: this.selectedItem === 3,
+				selected: this.selectedItem === 3 || this.selectedItem === -1,
 				disabled: this.pollsFinished.length === 0
 			}
 		},
@@ -103,21 +103,38 @@ export default {
 		}
 	},
 	watch: {
+		// when navigating from login to teamHome
 		"$route.name": function(routeName) {
-			if (routeName === "teamHome") this.selectedItem = 0
-		}
+			console.log("navbar-bottom route.name changed to ", routeName)
+			this.updatedSelectedItem()
+		}		
 	},
 	created() {
+		console.log("navbar-bottom created")
 		EventBus.$on(EventBus.POLLS_LOADED, () => {  // MUST use arrow-function to keep `this` reference!
 			// hack to make computed properties refresh their value
 			// https://logaretm.com/blog/2019-10-11-forcing-recomputation-of-computed-properties/
 			this.forceRefreshComputed++;  
 		})
 		EventBus.$on(EventBus.POLL_LOADED, () => {
-			this.forceRefreshComputed++;  // hack to make computed properties refresh their value
+			this.forceRefreshComputed++;
 		})
+		EventBus.$on(EventBus.LOGIN, () => {
+			this.forceRefreshComputed++;
+		})
+		// Check what needs to be the selectedItem, depending on this.$route.name
+		this.updatedSelectedItem()
+	},
+	mounted() {
+		
 	},
 	methods: {
+		updatedSelectedItem() {
+			console.log("updating selected Iteam", this.$route.name)
+			if (this.$route.name === "teamHome") {
+				this.selectedItem = 0
+			}
+		},
 
 		goToTeam() {
 			if (this.selectedItem !== 0) {
@@ -126,43 +143,48 @@ export default {
 			}
 		},
 
-		goToPollsInDiscussion() {
-			if (this.selectedItem !== 1) {
+		clickPollsInDiscussion() {
+			let newPollStatusFilter = undefined
+			if (this.selectedItem === 1) {
+				this.selectedItem = -1
+				EventBus.$emit(EventBus.SET_POLLS_FILTER, undefined)
+			} else {
 				this.selectedItem = 1
-				if (this.pollsInElaboration.length === 1) {
-					this.$router.push({name: "showPoll", params: { pollId: this.pollsInElaboration[0].id }}).catch(() => {})
-				} else if (this.$route && this.$route.name === "polls") {
-					this.$router.replace({name: "polls", params: { status: "ELABORATION" }})	
-				} else {
-					//https://stackoverflow.com/questions/62223195/vue-router-uncaught-in-promise-error-redirected-from-login-to-via-a/62231211#62231211
-					this.$router.push({name: "polls", params: { status: "ELABORATION" }}).catch(() => {})
-				}
+				newPollStatusFilter = "ELABORATION"
+				EventBus.$emit(EventBus.SET_POLLS_FILTER, "ELABORATION")
+			}
+			if (this.$route && this.$route.name !== "polls") {
+				this.$router.push({name: "polls", params: { status: newPollStatusFilter }})
 			}
 		},
 
-		goToVote() {
-			if (this.selectedItem !== 2) {
+		clickPollsInVoting() {
+			let newPollStatusFilter = undefined
+			if (this.selectedItem === 2) {
+				this.selectedItem = -1
+				EventBus.$emit(EventBus.SET_POLLS_FILTER, undefined)
+			} else {
 				this.selectedItem = 2
-				if (this.pollsInVoting.length === 1) {
-					this.$router.push({name: "showPoll", params: { pollId: this.pollsInVoting[0].id}}).catch(() => {})
-				} else if (this.$route && this.$route.name === "polls") {
-					this.$router.replace({name: "polls", params: { status: "VOTING" }})	
-				} else {
-					this.$router.push({name: "polls", params: { status: "VOTING" }}).catch(() => {})
-				}
+				newPollStatusFilter = "VOTING"
+				EventBus.$emit(EventBus.SET_POLLS_FILTER, "VOTING")
+			}
+			if (this.$route && this.$route.name !== "polls") {
+				this.$router.push({name: "polls", params: { status: newPollStatusFilter }})
 			}
 		},
 
-		goToFinishedPolls() {
-			if (this.selectedItem !== 3) {
+		clickFinishedPolls() {
+			let newPollStatusFilter = undefined
+			if (this.selectedItem === 3) {
+				this.selectedItem = -1
+				EventBus.$emit(EventBus.SET_POLLS_FILTER, undefined)
+			} else {
 				this.selectedItem = 3
-				if (this.pollsFinished.length === 1) {
-					this.$router.push({name: "showPoll", params: { pollId: this.pollsFinished[0].id }}).catch(() => {})
-				} else if (this.$route && this.$route.name === "polls") {
-					this.$router.replace({name: "polls", params: { status: "FINISHED" }})	
-				} else {
-					this.$router.push({name: "polls", params: { status: "FINISHED" }}).catch(() => {})
-				}
+				newPollStatusFilter = "FINISHED"
+				EventBus.$emit(EventBus.SET_POLLS_FILTER, "FINISHED")
+			}
+			if (this.$route && this.$route.name !== "polls") {
+				this.$router.push({name: "polls", params: { status: newPollStatusFilter }})
 			}
 		},
 

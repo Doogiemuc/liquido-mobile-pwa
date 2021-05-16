@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h1 id="login-page">{{ $t('Login') }}</h1>
+		<h1 id="login-page" class="page-title">{{ $t('Login') }}</h1>
 
 		<div v-if="showDevLogin" class="mb-3">
 			<button type="button" class="btn btn-primary" @click="devLoginAdmin">
@@ -192,6 +192,9 @@ export default {
 			}
 		}
 	},
+	mounted() {
+		this.$root.scrollToTop()
+	},
 	methods: {
 		/** Quickly login as an admin user. This is available as a button in the mobile UI when in DEV env.  */
 		devLoginAdmin() {
@@ -309,8 +312,12 @@ export default {
 						this.tokenErrorMessage = this.$t("TokenInvalid") 
 					}					
 				})
+		},
+
+		clickRegister() {
+			this.$router.push({name: "welcome"})
 		}
-	},
+	}
 }
 </script>
 

@@ -35,6 +35,16 @@ if 2,3,4 is active, then a second click shows all polls.  <= support this in UI 
 See ./doc/screenshots
 
 
+# Settings in a team
+
+ - Who can invite new members? (default: only admin)
+ - Does the admin need to approve new members (default: no)
+ - Who can create new polls? Everyone or only the admin(default)
+ - 
+
+ 
+
+
 # Support nice developer experience
 
 ## Logging on Mobile Device when developping

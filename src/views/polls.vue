@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<h2 id="polls" class="page-title">
-			{{ $t('YourPolls') }}
-		</h2>
+		<div id="polls" class="alert alert-primary text-center">
+			<i :class="iconForFilter"></i>&nbsp;{{ pageTitleLoc }}
+		</div>
 
 		<div v-if="loading" class="my-3">
 			<b-spinner small />&nbsp;{{ $t('Loading') }}
@@ -42,38 +42,38 @@
 		</div>
 
 		<div v-if="pollStatusFilter === 'ELABORATION'">
-			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
+			<div v-if="hasPollInElaboration" class="alert alert-info">
 				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('pollsInElaborationInfo')" />
 			</div>
-
-			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
+			<div v-else class="alert alert-info">
 				<p v-html="$t('noPollsInElaboration')" />
 				<p v-if="hasPollInVoting" v-html="$t('butPollInVoting')" />
 			</div>
 		</div>
 
 		<div v-if="pollStatusFilter === 'VOTING'">
-			<div v-if="filteredPolls.length > 0" class="alert alert-info">
+			<div v-if="hasPollInVoting" class="alert alert-info">
 				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('pollsInVotingInfo')" />
 			</div>
-			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
+			<div v-else class="alert alert-info">
 				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('noPollsInVoting')" />
 				<p v-if="hasPollInElaboration" v-html="$t('butProposalsInDiscussion')" />
 			</div>
 		</div>
 
-		<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'FINISHED'" class="alert alert-info">
+		<div v-if="pollStatusFilter === 'FINISHED' && !hasFinishedPolls" class="alert alert-info">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('noFinishedPolls')" />
 			<p v-if="hasPollInVoting" v-html="$t('butPollInVoting')" />
 		</div>
 
 		<div v-if="userIsAdmin" class="my-5 alert alert-admin">
+			<i class="fas fa-shield-alt float-right"></i>
 			{{ $t('onlyAdminCanCreateNewPolls') }}
-			<b-button variant="primary" class="float-right" @click="createPoll()">
+			<b-button variant="primary" class="float-right" @click="gotoCreatePoll()">
 				<i class="fas fa-shield-alt" /> {{ $t("createPoll") }} <i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
@@ -83,6 +83,13 @@
 <script>
 import liquidoInput from "../components/liquido-input"
 import pollPanel from "../components/poll-panel"
+import EventBus from "@/services/event-bus"
+
+const pollStatusOrder = {
+	ELABORATION: 0,
+	VOTING: 1,
+	FINISHED: 2,
+}
 
 export default {
 	i18n: {
@@ -98,8 +105,8 @@ export default {
 				YourPolls: "Abstimmungen",
 				pollsInElaborationInfo: 
 					"<p>Bitte diskutiert die Wahlorschläge dieser Abstimmungen untereinander.</p>" +
-					"<p>Euer Teamadmin starten dann die jeweilige Abstimmungsphase.</p>",
-				pollsInVotingInfo: "In diesen Abstimmung kannst du jetzt deine Stimme abgeben.",
+					"<p>Wenn euer Teamadmin dann die Abstimmungsphase startet, könnt ihr eure Stimme abgeben.</p>",
+				pollsInVotingInfo: "In diesen Abstimmungen kannst du jetzt deine Stimme abgeben.",
 				noPollYet: "Euer Admin hat bisher noch keine Abstimmung erstellt.",
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
@@ -127,7 +134,6 @@ export default {
 		}
 	},
 	computed: {
-		/*
 		pageTitleLoc() {
 			switch (this.pollStatusFilter) {
 				case "ELABORATION":
@@ -140,7 +146,18 @@ export default {
 					return this.$t("allPolls")
 			}
 		},
-		*/
+		iconForFilter() {
+			switch (this.pollStatusFilter) {
+				case "ELABORATION":
+					return "fas fa-comments"
+				case "VOTING":
+					return "fas fa-person-booth"
+				case "FINISHED":
+					return "fas fa-check-circle"
+				default:
+					return "fas fa-vote-yea"
+			}
+		},
 		userIsAdmin() {
 			return this.$api.isAdmin()
 		},
@@ -150,7 +167,10 @@ export default {
 		filteredPolls() {
 			return this.$api.getCachedPolls(this.pollStatusFilter)
 				.filter((poll) => this.matchesSearch(poll))
-				.sort((p1,p2) => p1.id - p2.id)    //TODO: sort polls by status and then by createdAt
+				.sort((p1,p2) => {
+					//sort polls by status
+					return pollStatusOrder[p1.status] - pollStatusOrder[p2.status]
+				})    
 		},
 		searchResultIsEmpty() {
 			return this.filteredPolls.length === 0 && this.searchQuery && this.searchQuery.trim().length > 0
@@ -160,37 +180,40 @@ export default {
 		},
 		hasPollInVoting() {
 			return this.$api.getCachedPolls("VOTING").length > 0
+		},
+		hasFinishedPolls() {
+			return this.$api.getCachedPolls("FINISHED").length > 0
 		}
 	},
 	created() {
+		// status CAN be passed as parameter or Vue prop
 		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
 			this.pollStatusFilter = this.status
 		}
+		// or status can be changed with an event (navbar-bottom does that)
+		EventBus.$on(EventBus.SET_POLLS_FILTER, (newFilterValue) => this.setPollFilter(newFilterValue))
+
 		// update polls in cache when navigating to this page
 		this.loading = true
 		this.$api.getPolls()
-			.then(polls => {
-				this.loading = false
-				console.log("polls.vue: Loaded/fetched polls", polls)
-			})
+			.then(() => this.loading = false)
 			.catch(err => {
 				this.loading = false
 				console.error("Canont load polls", err)
 			})
 	},
 	mounted() {
-		//TODO: on setPollFilter event ...
+		
 	},
 	methods: {
+		/** set (or clear) the current pollStatusFilter */
 		setPollFilter(newFilterValue) {
-			if (this.pollStatusFilter === newFilterValue) {
-				this.pollStatusFilter = undefined
-			} else {
+			if (newFilterValue === undefined || newFilterValue.match(/ELABORATION|VOTING|FINISHED/)) {
 				this.pollStatusFilter = newFilterValue
 			}
 		},
 
-		createPoll() {
+		gotoCreatePoll() {
 			this.$router.push("/polls/create")
 		},
 
@@ -220,7 +243,13 @@ export default {
 .iconRight {
 	color: $primary;
 }
-
+#polls.polls-page-title {
+	font-size: 1rem;
+	font-weight: bold;
+	margin: 1rem 0;
+	border: 1px solid
+}
+/*
 .filter-buttons {
 	width: 100%;
 	button {
@@ -239,4 +268,5 @@ export default {
 		border: 1px solid $primary;
 	}
 }
+*/
 </style>

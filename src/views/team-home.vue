@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<h2 id="team-home" class="page-title">
+		<h1 id="team-home" class="page-title">
 			{{ team.teamName }}
-		</h2>
+		</h1>
 
 		<b-card id="team-home-user-welcome" class="chat-bubble shadow-sm mb-3">
 			<b-card-text>

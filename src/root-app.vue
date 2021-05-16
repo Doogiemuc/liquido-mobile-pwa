@@ -1,12 +1,10 @@
 <template>
 	<div id="app">
+		<liquido-header ref="liquido-header" :back-link="backLink" />
 		<transition :name="transitionName">
-			<div>
-				<liquido-header ref="liquido-header" :back-link="backLink" />
-				<router-view id="appContent" class="router-view container-lg" />
-			</div>
+			<router-view id="appContent" class="router-view container-lg" />
 		</transition>
-		<navbar-bottom></navbar-bottom>
+		<navbar-bottom v-if="showNavbarBottom"></navbar-bottom>
 		<popup-modal 
 			id="rootPopupModal"
 			ref="rootPopupModal"
@@ -47,10 +45,10 @@ const page_order = {
 /** Liquido Root App */
 export default {
 	name: "LiquidoApp",
+	// Remark: vue-i18n is configured in main.js! Do not overwrite it here by setting the i18n: property
 	components: { liquidoHeader, navbarBottom, popupModal, mobileLogViewer },
-	// vue-i18n is configured in main.js ! Do not overwrite it here!
-	// These data attributes are reactive and available in EVERY sub-component as this.$root.<attributeName>
 	data() { 
+		// These data attributes are reactive and available in EVERY sub-component as this.$root.<attributeName>
 		return {
 			transitionName: "", 	// CSS sliding transition between page components
 			// Global popup-modal
@@ -82,8 +80,8 @@ export default {
 			return undefined
 		},
 		/** which footer to show */
-		showPollsFooter() {
-			return this.$route.path === "/polls"
+		showNavbarBottom() {
+			return this.$route.path.match(/(team|polls)$/)
 		},
 		showDebugLog() {
 			return false
@@ -96,8 +94,9 @@ export default {
 			this.transitionName = ""
 			const fromOrder = page_order[from.name]
 			const toOrder = page_order[to.name]
-			if (fromOrder < toOrder)  { this.transitionName = "slide-left" } else
-			if (fromOrder > toOrder)  { this.transitionName = "slide-right"}
+			if (to.name === "login") { this.transitionName = "" } else 
+			if (fromOrder < toOrder) { this.transitionName = "slide-left" } else
+			if (fromOrder > toOrder) { this.transitionName = "slide-right"}
 			else { this.transitionName = "fade" }  // default is fade
 		},
 	},
@@ -114,10 +113,17 @@ export default {
 		// Here comes some HTML UX magic.
 		//
 
-		/** scroll to the very bottom of the content. Show last chat message */
+		/** scroll to top of page */
+		scrollToTop() {
+			this.$nextTick(() => {
+				document.getElementsByTagName("html")[0].scrollTop = 0
+			})
+		},
+
+		/** Animate scrolling to the very bottom of the page. */
 		scrollToBottom() {
 			this.$nextTick(() => {
-				$("#appContent").animate({ scrollTop: $("#app").height() }, 1000)
+				$("html").animate({ scrollTop: $("#app").height() }, 1000)
 			})
 		},
 
@@ -128,9 +134,9 @@ export default {
 		 * @param {Number} margin margin below headerHeight in pixels (default 0)
 		 */
 		scrollElemToTop(elem, margin = 0) {
-			let scrollTop = $("#appContent").scrollTop() + $(elem).offset().top - margin
+			let scrollTop = $("#app").scrollTop() + $(elem).offset().top - margin
 			this.$nextTick(() => {
-				$("#appContent").animate({ scrollTop: scrollTop }, 1000)
+				$("html").animate({ scrollTop: scrollTop }, 1000)
 			})
 		},
 
@@ -147,29 +153,8 @@ export default {
 </script>
 
 <style lang="scss">
-// Import liquido specific global styles
+// Import liquido global styles
 @import "styles/liquido.scss";
-
-#app {
-	max-width: 1140px; // bootstrap breakpoint of container-lg
-	height: 100vh;
-	margin: 0 auto;  
-	position: relative;
-	overflow-x: hidden;
-}
-
-/** 
- * Main app content below the header
- * no horizintal scrolling 
- */
-#appContent {
-	padding-top: 0;     // behind header. MUTS be padding!
-	padding-bottom: 70px;  // bottom because of navbar
-	padding-left: 10px;    // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
-	padding-right: 10px;
-	overflow-x: hidden;
-	height: 100%;
-}
 
 // Slide animation between pages
 .router-view {
@@ -212,7 +197,5 @@ export default {
 	-webkit-transform: translate(0, 0);
 	transform: translate(0, 0);
 }
-
-
 
 </style>

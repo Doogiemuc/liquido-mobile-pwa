@@ -15,6 +15,7 @@ const EventBus = new Vue({
 			LOGOUT: "logout",
 			POLLS_LOADED: "polls-loaded",  // array of polls was loaded
 			POLL_LOADED: "poll-loaded",    // ONE poll was loaded from the backend
+			SET_POLLS_FILTER: "set-polls-filter"   // Set the filter on the polls page
 		}
 	}
 })

@@ -43,8 +43,8 @@ const GRAPHQL = "/graphql"
  * @param {String} graphql GraphQL Query. This is NOT JSON! This is GraphQL syntax!
  * @returns GraphQL result as specified by GraphQL-spec { data: {}, errors: [] }
  */
-const graphQlQuery = function(query) {
-	return axios.post(GRAPHQL, {query: query})
+const graphQlQuery = function(query, variables) {
+	return axios.post(GRAPHQL, { query: query, variables: variables })
 		.then(res => {
 			if (res.errors && res.errors.length > 0) {
 				log.error("graphQlQueryy errors: ", JSON.stringify(res.errors))   // graphQL's way of returning errors
@@ -354,13 +354,16 @@ let graphQlApi = {
 	 * @param {Object} newTeam teamName, adminName, adminEmail and adminMobilephone
 	 */
 	async createNewTeam(teamName, admin) {
-		let adminJson = JSON.stringify(admin)
-		let graphQL = `mutation { createNewTeam(teamName: "${teamName}", admin: ${adminJson}) ` + 
-			`${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		let graphQL = `mutation createNewTeam($teamName: String!, $admin: UserModelInput!) { ` + 
+			` createNewTeam(teamName: $teamName, admin: $admin) ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		let variables = {
+			teamName: teamName,
+			admin: admin
+		}
 
 		//let graphQL = `mutation { createNewTeam(teamName: "${teamName}", adminName: "${admin.name}",` +
 		//	`adminMobilephone: "${admin.mobilephone}", adminEmail: "${admin.email}", adminPicture: "${admin.picture}") ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
-		return graphQlQuery(graphQL)
+		return graphQlQuery(graphQL, variables)
 			.then(res => {
 				let team = res.data.createNewTeam.team
 				this.login(

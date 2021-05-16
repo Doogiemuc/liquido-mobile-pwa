@@ -314,7 +314,7 @@ export default {
 				shareThisLink: "Teile diesen Link",
 				tellInvitationCode: "Sage ihnen deinen Einadungscode:",
 				scanQrCode: "Oder lass sie diesen QR code scannen:",
-				teamInfo: "Du findest diese Infos später jederzeit wieder unter dem Team Icon (<i class='fas fa-users'></i>) oben rechts.",
+				teamInfo: "Du findest diese Infos später jederzeit wieder auf der <a href='/team'>Team Seite</a> (<i class='fas fa-users'></i>).",
 				pollInfo: 
 					"Möchtest du jetzt gleich eine erste Abstimung (<i class='fas fa-poll'></i>) für dein Team erstellen. Jedes Teammitglied kann dann " +
 					"seinen eigenen Wahlvorschlag (<i class='fas fa-vote-yea'></i>) hinzufügen.",
@@ -416,6 +416,7 @@ export default {
 			this.startChatAnimation()
 		} else {
 			$(window).scroll(() => {
+				console.log("Windows is scrolling")
 				if (this.$root.isBottomInView("#welcomeBubble")) {
 					this.startChatAnimation()
 				}
