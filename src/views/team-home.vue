@@ -4,18 +4,13 @@
 			{{ team.teamName }}
 		</h2>
 
-		<b-card id="team-home-user-welcome" class="chat-bubble shadow-sm">
+		<b-card id="team-home-user-welcome" class="chat-bubble shadow-sm mb-3">
 			<b-card-text>
 				<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
 			</b-card-text>
 		</b-card>
 
-		<div v-if="isAdmin" class="alert alert-admin">
-			<i class="fas fa-shield-alt float-right"></i>
-			<p v-html="$t('introForOneAdmin')"></p>
-		</div>
-
-		<b-button
+		<!-- b-button
 			id="gotoPollsButton"
 			variant="primary"
 			size="m"
@@ -26,11 +21,8 @@
 			<i class="fas fa-angle-double-right" />
 		</b-button>
 
-		<div class="clearfix" />
+		<div class="clearfix" / -->
 
-		<h3 class="my-3">
-			{{ $t('teamMembers') }}
-		</h3>
 		<b-card-group id="memberCards" class="mb-3" deck>
 			<b-card v-for="admin in team.admins" :key="admin.id" :img-src="getImgUrl(admin.picture)" img-alt="Avatar" img-top>
 				<i class="fas fa-shield-alt admin-shield"></i>
@@ -44,6 +36,11 @@
 				</b-card-text>
 			</b-card>
 		</b-card-group>
+
+		<div v-if="isAdmin" class="alert alert-admin">
+			<i class="fas fa-shield-alt float-right"></i>
+			<p v-html="$t('introForOneAdmin')"></p>
+		</div>
 
 		<b-card 
 			id="teamInfo"

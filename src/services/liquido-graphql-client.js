@@ -24,7 +24,7 @@ import log from "@/components/mobile-debug-log.js"
 */
 
 
-//TODO: refactor out local-cache.js and liquido-auth.js  <= not that easy!
+//TODO: refactor / split into api-client.js, local-cache.js and liquido-auth.js  <= not that easy!
 
 if (!config || !config.LIQUIDO_API_URL) {
 	log.error("liquido-graphql-client: ERROR I have no config!")
@@ -67,25 +67,33 @@ const JQL_TEAM = `team {
 		inviteCode
 		admins  { id, email, name, website, picture, mobilephone }
 		members { id, email, name, website, picture, mobilephone }
+		polls { id, title
+			proposals ${JQL_PROPOSAL}
+		}
 	}`
 const JQL = {
 	TEAM: JQL_TEAM,
 	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
 	CREATE_OR_JOIN_TEAM_RESULT: `{ ${JQL_TEAM} user { id, email, name, website, picture, mobilephone } jwt }`,  // login data
 	//POLL_IN_ELABORATION:  `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} }`,
-	POLL: `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} numBallots winner ${JQL_PROPOSAL} duelMatrix { data } }`,
+	POLL: `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} winner ${JQL_PROPOSAL} numBallots duelMatrix { data } }`,
 }
 
 
 
+// ============ Client side cache for team and user data ================
+
 /**
- * Client side cache for team data   with fetchFunc
+ * This fetch func loads the team data from the backend
  */
 const fetchTeamFunc = function(path) {
 	if (path === "team") {
 		console.debug("fetchTeamFunc: Fetch own team from backend")
 		let graphQL = `query { team ${JQL.TEAM} }`
-		return graphQlQuery(graphQL).then(res => res.data.team)
+		return graphQlQuery(graphQL).then(res => {
+			EventBus.$emit(EventBus.POLLS_LOADED, res.data.team.polls)
+			return res.data.team
+		})
 	} else {
 		return Promise.reject(new Error("Invalid path fetchTeamFunc(path="+JSON.stringify(path)+")"))
 	}
@@ -98,21 +106,31 @@ const teamsCacheConfig = {
 	idAttr: "id",
 }
 
+const teamCache = new PopulatingCache(teamsCacheConfig)
 
+// ============ Client side cache for polls and their proposals ================
 
 /**
- * Client side cache for all polls in team   with fetchFunc
+ * Fetch all polls or one poll from backend
+ * @param path "polls" or {poll: 4711} for one specific poll
+ * @emits event POLL_LOADED or POLLS_LOADED
  */
 const fetchPollFunc = function(path) {
 	if (path[0] === "polls") {
-		console.debug("fetchPollFunc: Fetch all poll of team from backend")
+		console.debug("fetchPollFunc: Fetch all polls of team from backend")
 		let graphQL = `query { polls ${JQL.POLL} }`
-		return graphQlQuery(graphQL).then(res => res.data.polls)
+		return graphQlQuery(graphQL).then(res => {
+			EventBus.$emit(EventBus.POLLS_LOADED, res.data.polls)
+			return res.data.polls
+		})
 	} else if (path[0].polls) {
-		console.debug("Fetch Poll from backend: "+JSON.stringify(path))
+		console.debug("Fetch one poll from backend: "+JSON.stringify(path))
 		let pollId = path[0].polls
 		let graphQL = `query { poll(pollId:${pollId}) ${JQL.POLL} }`
-		return graphQlQuery(graphQL).then(res => res.data.poll)
+		return graphQlQuery(graphQL).then(res => {
+			EventBus.$emit(EventBus.POLL_LOADED, res.data.poll)  // notify listeners that ONE poll has been (re)loaded from the backend
+			return res.data.poll
+		})
 	} else {
 		return Promise.reject(new Error("Cannot fetch poll(s) at path: "+JSON.stringify(path)))
 	}
@@ -125,9 +143,8 @@ const pollsCacheConfig = {
 	idAttr: "id",
 }
 
-
-
-
+const pollsCache = new PopulatingCache(pollsCacheConfig)
+pollsCache.put("polls", [])  // make sure there is at least an empty array, until polls are loaded from backend (after login)
 
 
 /**
@@ -164,7 +181,7 @@ let graphQlApi = {
 	/**
 	 * Login user into team. Store JWT for future requests.
 	 * Will also put currentUser, team and jwt into the `teamCache`
-	 * @param {Object} team Team with members[]
+	 * @param {Object} team Team with members[] and polls[]
 	 * @param {Object} user currently logged in user
 	 * @param {String} jwt JsonWebToken
 	 */
@@ -174,6 +191,7 @@ let graphQlApi = {
 		if (team.admins.find(u => u.id === user.id)) user.isAdmin = true
 		this.teamCache.put(this.CURRENT_USER_KEY, user)
 		this.teamCache.put(this.JWT_KEY, jwt)
+		this.putPollsIntoCache(team.polls)
 		localStorage.setItem(this.LIQUIDO_JWT_KEY, jwt)
 		axios.defaults.headers.common["Authorization"] = "Bearer " + jwt
 		EventBus.$emit(EventBus.LOGIN, {team, user, jwt})
@@ -200,10 +218,11 @@ let graphQlApi = {
 
 	/** 
 	 * Synchrounously get the currently logged in user from local cache.
-	 * @return {Object} Currently logged in user from local cache or undefined if no one is logged in
+	 * May return undefined but will not throw when value is expired.
+	 * @return {Object} Currently logged in user from local cache or undefined if no one is logged in or login is expired
 	 */
 	getCachedUser() {
-		return this.teamCache.getSync(this.CURRENT_USER_KEY)  // get from cache, without calling the backend
+		return this.teamCache.getSync(this.CURRENT_USER_KEY, false)
 	},
 
 	/**
@@ -211,7 +230,7 @@ let graphQlApi = {
 	 * @returns currently logged in user (if any)
 	 */
 	getCachedTeam() {
-		return this.teamCache.getSync(this.TEAM_KEY)
+		return this.teamCache.getSync(this.TEAM_KEY, false)
 	},
 
 	/** 
@@ -224,8 +243,22 @@ let graphQlApi = {
 		if (!cachedUser || !team || !team.admins) return false
 		return team.admins.map(admin => admin.id).includes(cachedUser.id)
 	},
-	
 
+	/**
+	 * Put the given array of polls into the cache under their ids.
+	 * This will <b>replace</b> these polls in the cache.
+	 * @param {Array} pollsArray array of polls
+	 */
+	putPollsIntoCache(pollsArray) {
+		if (!Array.isArray(pollsArray)) {
+			log.warn("Need array of polls to putPollsIntoCache!")
+			return
+		}
+		EventBus.$emit(EventBus.POLLS_LOADED, pollsArray)
+		pollsArray.forEach(poll => {
+			this.pollsCache.put("polls/"+poll.id, poll)
+		})
+	},
 
 	/****************************************************************
 	 * API calls against backend
@@ -311,8 +344,8 @@ let graphQlApi = {
 			this.login(res.data.team, res.data.user, res.data.jwt)
 			return res.data
 		}).catch(err => { 
-			console.error("API: devLogin failed: ", err.response)
-			return Promise.reject("devLogin failed"+JSON.stringify(err.response))
+			console.error("API: devLogin failed: ", err)
+			return Promise.reject("devLogin failed"+JSON.stringify(err))
 		})
 	},
 
@@ -381,19 +414,40 @@ let graphQlApi = {
 		})
 	},
 
-	/** get all polls from cache. Will at least return an empty array. */
+	/** 
+	 * Fetch polls from cache. This might call the backend if polls are expired
+	 * @param {Boolean} force pass true, if you want to force a refresh from the backend
+	 * @returns {Promise} polls from cache (or empty array)
+	 */
 	async getPolls(force = false) {
 		return this.pollsCache.get("polls", {
 			callBackend: force ? this.pollsCache.FORCE_BACKEND_CALL : this.pollsCache.CALL_BACKEND_WHEN_EXPIRED
 		}).then(polls => polls || [])
 	},
 
-	getPollsByStatusSync(status) {
-		let polls = this.pollsCache.getSync("polls")
-		if (!Array.isArray(polls)) return []
-		return polls.filter(poll => poll.status === status)
+	/** 
+	 * Synchronously get a direct reference to currently cached polls.
+	 * We need the direct reference for VUE's computed properties.
+	 * 
+	 * @param {String} status Optionally filter by status. If ELABORATION|VOTING|FINISHED only polls of that status are returned. 
+	 *      If undefined, then all polls in the cache will be returned.
+	 * @returns {Array} array of polls
+	 */
+	getCachedPolls(status) {
+		let cacheData = this.pollsCache.getCacheData()
+		if (!cacheData || !cacheData.polls) return []
+		return cacheData.polls.filter(poll => !status ||  poll.status === status)
 	},
 
+	/**
+	 * Add a new proposal to a poll.
+	 * Keep in mind that a member may only add one proposal per poll. The backend will check this.
+	 * 
+	 * @param {String} pollId poll ID
+	 * @param {String} propTitle short title for new proposal
+	 * @param {String} propDescription longer description of proposal
+	 * @returns {Object} the complete poll with the added proposal
+	 */
 	async addProposal(pollId, propTitle, propDescription) {
 		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") ${JQL.POLL} }`
 		return graphQlQuery(graphQL)
@@ -527,8 +581,8 @@ let graphQlApi = {
 	},
 
 	/** client side caches */
-	teamCache: new PopulatingCache(teamsCacheConfig),
-	pollsCache: new PopulatingCache(pollsCacheConfig),
+	teamCache: teamCache,
+	pollsCache: pollsCache,
 
 	/** Keys for the above caches */
 	JWT_KEY: "jwt",

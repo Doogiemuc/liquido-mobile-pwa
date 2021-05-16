@@ -13,8 +13,8 @@
 					<i class="fas fa-university" />&nbsp;
 					<span class="liquido" @click="clickLiquidoTitle()" />
 				</div>
-				<div class="col header-right" :class="headerRightClass">
-					<i id="gotoTeamButton" class="fas fa-users" @click="clickTeamIcon()" />
+				<div class="col header-right">
+					<i v-if="isAuthenticated" id="toggleMenueButton" class="fas fa-menue" @click="toggleMenue()" />
 				</div>
 			</div>
 		</div>
@@ -47,15 +47,12 @@ export default {
 		height() {
 			return $("#liquidoHeader").height()
 		},
-		headerRightClass() {
-			return this.$route.path === "/team" ? "text-muted" : ""
-		}
 	},
 	mounted() {
 		// make header smaller when user scrolls down
-		$("#app").scroll(this.transitionHeader)
+		//$("#app").scroll(this.transitionHeader)
 
-		// Cannot simply do this without EventBus instead with a computed property, becasue this.$api.isAuthenticated is not reactive. Can we make it ?
+		// Cannot simply do this with a computed property, becasue this.$api.isAuthenticated is not reactive. TODO: Can we make it reactive? maybe with Vue.$set ?
 		EventBus.$on(EventBus.LOGIN, () => this.isAuthenticated = true)
 		EventBus.$on(EventBus.LOGOUT, () => this.isAuthenticated = false)
 	},
@@ -102,15 +99,17 @@ export default {
 
 <style lang="scss" scoped>
 .liquido-header {
+	/*
 	position: fixed;
 	top: 0;
 	left: 0;
+	*/
 	width: 100%;
 	z-index: 100;
 	transition: 0.3s; /* Add a transition effect when scrolling */
 	color: $primary;
 	background-color: $header-bg;
-	border-bottom: 1px solid rgba(0, 0, 255, 0.3);
+	border-bottom: 1px solid rgba(0, 123, 255, 0.3);
 	font-size: 1.5rem;
 
 	.liquido-title {
@@ -119,11 +118,9 @@ export default {
 	.header-right {
 		font-size: 1rem;
 		text-align: right;
-		//margin-right: 15px;
 	}
 	.header-left {
 		text-align: left;
-		//margin-left: 15px;
 	}
 }
 

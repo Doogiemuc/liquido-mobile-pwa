@@ -4,6 +4,7 @@ import welcomeChat from "@/views/welcome-chat"
 import loginPage from "@/views/login-page"
 import teamHome from "@/views/team-home"
 import pollsPage from "@/views/polls"
+import showPoll from "@/views/poll-show"
 import config from "config"
 const log = require("loglevel")
 if (process.env.NODE_ENV === "development") log.enableAll()
@@ -67,7 +68,7 @@ const routes = [
 	{
 		path: "/polls/:pollId",
 		name: "showPoll",
-		component: () => import("@/views/poll-show"),
+		component: showPoll,  // MUST import these directly, otherwiese navguard problems when using the navbar
 		props: true,
 	}, 
 	{
@@ -132,7 +133,7 @@ async function tryToAuthenticate() {
 	if (router.app.$api.isAuthenticated()) return Promise.resolve(IS_ALREADY_AUTHENTICATED);  // although JWT could be expired, but this way we save one backend call
 	let jwt = localStorage.getItem(router.app.$api.LIQUIDO_JWT_KEY);
 	if (jwt) {
-		console.log("Trying to login with JWT", jwt)
+		console.log("Attempting to login with JWT from localStorage ...", jwt)
 		return router.app.$api.loginWithJwt(jwt)
 			.then(res => {
 				log.info("Successfully authenticated from localStorage")

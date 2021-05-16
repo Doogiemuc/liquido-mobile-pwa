@@ -17,14 +17,17 @@ Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.v
 Title bar at the top
  * <  (GoBack)
  * LIQUIDO (Title)  => could link to something?
- * Team Icon (goto teamHome)
+
 
 Taskbar at the bottom (5 icons!)
- * Team Home
- * Polls in Discussion => add proposal
- * Polls in Voting (with number of polls in voting as badge) => if only one poll in voting, then jump directly to its cast vote page
- * ????  MAYBE: Finished Polls => check result of poll
+
+ * Team Home   (DE: "Team")
+ * Polls in elaboration (DE: "diskutieren")   
+ * Polls in voting      (DE: "abstimmen")
+ * Polls finished       (DE: "entschieden") ("abgeschlossen" is  zuu lang )  greyed out, when non finished poll yet
  * Menu (Settings, Switch Team, Join Another Team, overview of admin tasks, eg. start/finish running polls, accept new team members, )
+
+if 2,3,4 is active, then a second click shows all polls.  <= support this in UI somehow.  What to highlight, when all polls are shown? all three of them
 
 
 ## Screenflow
@@ -38,8 +41,7 @@ See ./doc/screenshots
 
  * https://github.com/christlee1989/vue-mobile-log
  * TODO: Use Visual Studio Code Chrome Debugger with Vue  https://medium.com/@brockreece/how-i-stopped-using-console-log-when-debugging-vue-components-14e0f7aa280d
- * TODO: Create a Vue Plugin that can show a loging component on mobile phone.
-
+ * Create a Vue Plugin that can show a loging component on mobile phone.  DONE!  mobile-debug-log.vue
 ## Client side storage and caching
 
 ### Library evaluation
@@ -48,6 +50,8 @@ See ./doc/screenshots
  * https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API   Mozilla IndexDB  -> complicated
  * https://www.npmjs.com/package/idb   Promise based wrapper around indexdb
  * https://github.com/mWater/minimongo  - or go the mongo way?
+ * https://pouchdb.com/  ->  in Browser CouchDB that syncs
+ * 
  * Wrote my (first :-)  own npm module  populating-cache
 
 

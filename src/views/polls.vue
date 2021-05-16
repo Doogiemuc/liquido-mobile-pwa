@@ -9,7 +9,7 @@
 		</div>
 
 		<liquido-input
-			v-if="polls.length > 3"
+			v-if="allPolls.length > 3"
 			id="searchInput"
 			v-model="searchQuery"
 			:label="$t('Search')"
@@ -33,7 +33,7 @@
 
 
 
-		<div v-if="polls.length === 0 && !loading" class="alert alert-info">
+		<div v-if="allPolls.length === 0 && !loading" class="alert alert-info">
 			<p v-html="$t('noPollYet')" />
 		</div>
 
@@ -49,7 +49,7 @@
 
 			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
 				<p v-html="$t('noPollsInElaboration')" />
-				<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
+				<p v-if="hasPollInVoting" v-html="$t('butPollInVoting')" />
 			</div>
 		</div>
 
@@ -61,14 +61,14 @@
 			<div v-if="filteredPolls.length === 0 && !searchQuery" class="alert alert-info">
 				<i class="fas fa-info-circle float-right" />
 				<p v-html="$t('noPollsInVoting')" />
-				<p v-if="pollsInElaboration > 0" v-html="$t('butProposalsInDiscussion')" />
+				<p v-if="hasPollInElaboration" v-html="$t('butProposalsInDiscussion')" />
 			</div>
 		</div>
 
 		<div v-if="filteredPolls.length === 0 && !searchQuery && pollStatusFilter === 'FINISHED'" class="alert alert-info">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('noFinishedPolls')" />
-			<p v-if="pollsInVoting > 0" v-html="$t('butPollInVoting')" />
+			<p v-if="hasPollInVoting" v-html="$t('butPollInVoting')" />
 		</div>
 
 		<div v-if="userIsAdmin" class="my-5 alert alert-admin">
@@ -95,7 +95,7 @@ export default {
 				butPollInVoting: "However there is a poll in which you can vote.",
 			},
 			de: {
-				YourPolls: "Eure Abstimmungen",
+				YourPolls: "Abstimmungen",
 				pollsInElaborationInfo: 
 					"<p>Bitte diskutiert die Wahlorschläge dieser Abstimmungen untereinander.</p>" +
 					"<p>Euer Teamadmin starten dann die jeweilige Abstimmungsphase.</p>",
@@ -104,7 +104,7 @@ export default {
 				noPollsMatchSearch: "Keine Treffer für diese Suche.",
 				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es läuft gerade keine Abstimmungen, in der du deine Stimmen abgegeben könntest.",
-				noFinishedPolls: "Es gibt bisher noch keine abgeschlossenen Abstimmungen.",
+				noFinishedPolls: "Es gibt in eurem Team noch keine abgeschlossenen Abstimmungen.",
 				butProposalsInDiscussion: "Es gibt jedoch Abstimmungen in Diskussion. Dort könnt ihr die Wahlvorschlägen diskutieren.",
 				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
 				onlyAdminCanCreateNewPolls: "Nur du als Admin dieses Teams kannst neue Abstimmungen erstellen. " +
@@ -121,7 +121,6 @@ export default {
 	data() {
 		return {
 			loading: true,
-			polls: [],
 			searchQuery: "",
 			/**current filter for poll status, undefined|ELABORATION|VOTING|FINISHED */
 			pollStatusFilter: undefined
@@ -145,45 +144,43 @@ export default {
 		userIsAdmin() {
 			return this.$api.isAdmin()
 		},
+		allPolls() {
+			return this.$api.getCachedPolls()
+		},
 		filteredPolls() {
-			return this.polls
-				.filter((poll) => {
-					return !this.pollStatusFilter || poll.status === this.pollStatusFilter
-				})
+			return this.$api.getCachedPolls(this.pollStatusFilter)
 				.filter((poll) => this.matchesSearch(poll))
 				.sort((p1,p2) => p1.id - p2.id)    //TODO: sort polls by status and then by createdAt
 		},
 		searchResultIsEmpty() {
 			return this.filteredPolls.length === 0 && this.searchQuery && this.searchQuery.trim().length > 0
 		},
-		pollsInElaboration() {
-			return this.polls.filter((poll) => poll.status === "ELABORATION").length
+		hasPollInElaboration() {
+			return this.$api.getCachedPolls("ELABORATION").length > 0
 		},
-		pollsInVoting() {
-			return this.polls.filter((poll) => poll.status === "VOTING").length
-		},
-		pollsFinished() {
-			return this.polls.filter((poll) => poll.status === "FINISHED").length
-		},
+		hasPollInVoting() {
+			return this.$api.getCachedPolls("VOTING").length > 0
+		}
 	},
 	created() {
 		if (this.status && this.status.match(/ELABORATION|VOTING|FINISHED/)) {
 			this.pollStatusFilter = this.status
 		}
+		// update polls in cache when navigating to this page
 		this.loading = true
 		this.$api.getPolls()
 			.then(polls => {
-				this.polls = polls
 				this.loading = false
-				console.log("Loaded/fetched polls", this.polls)
+				console.log("polls.vue: Loaded/fetched polls", polls)
 			})
 			.catch(err => {
-				this.polls = []
 				this.loading = false
 				console.error("Canont load polls", err)
 			})
 	},
-	mounted() {},
+	mounted() {
+		//TODO: on setPollFilter event ...
+	},
 	methods: {
 		setPollFilter(newFilterValue) {
 			if (this.pollStatusFilter === newFilterValue) {

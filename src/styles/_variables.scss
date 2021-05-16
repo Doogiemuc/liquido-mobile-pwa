@@ -4,7 +4,8 @@
   !!! When you change this file you must restart your dev server. !!!
  */
 
-$primary: #007bff;										// primary foreground for text and primary button backgrounds
+$primary: #007bff;										// primary color, titles and button backgrounds
+$primary-text: #ffffff;               // text for primary items
 $secondary: #6c757d;									// secondary text foreground
 $header-bg: rgb(220, 236, 255);				// background of fixed header
 $header-bg-dark: rgb(166, 206, 255);  // eg. for selected item in navbar

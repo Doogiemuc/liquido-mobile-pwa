@@ -1,8 +1,10 @@
 <template>
 	<div id="app">
-		<liquido-header ref="liquido-header" :back-link="backLink" />
 		<transition :name="transitionName">
-			<router-view id="appContent" class="router-view container-lg" />
+			<div>
+				<liquido-header ref="liquido-header" :back-link="backLink" />
+				<router-view id="appContent" class="router-view container-lg" />
+			</div>
 		</transition>
 		<navbar-bottom></navbar-bottom>
 		<popup-modal 
@@ -151,7 +153,7 @@ export default {
 #app {
 	max-width: 1140px; // bootstrap breakpoint of container-lg
 	height: 100vh;
-	margin: 0 auto;
+	margin: 0 auto;  
 	position: relative;
 	overflow-x: hidden;
 }
@@ -161,9 +163,9 @@ export default {
  * no horizintal scrolling 
  */
 #appContent {
-	padding-top: 50px;   // behind header. MUTS be padding!
-	padding-bottom: 50px;
-	padding-left: 10px;  // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
+	padding-top: 0;     // behind header. MUTS be padding!
+	padding-bottom: 70px;  // bottom because of navbar
+	padding-left: 10px;    // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
 	padding-right: 10px;
 	overflow-x: hidden;
 	height: 100%;
