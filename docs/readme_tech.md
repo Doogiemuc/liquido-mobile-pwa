@@ -21,7 +21,7 @@ Title bar at the top
 
 Taskbar at the bottom (5 icons!)
 
- * Team Home   (DE: "Team")
+ * Team Home            (DE: "Team")
  * Polls in elaboration (DE: "diskutieren")   
  * Polls in voting      (DE: "abstimmen")
  * Polls finished       (DE: "entschieden") ("abgeschlossen" is  zuu lang )  greyed out, when non finished poll yet

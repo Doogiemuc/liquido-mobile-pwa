@@ -61,22 +61,16 @@ const graphQlQuery = function(query, variables) {
 
 /** Shorthands for JQL return values */
 const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, createdBy { id name email } area { id } }"
-const JQL_TEAM = `team {
-		id
-		teamName
-		inviteCode
-		admins  { id, email, name, website, picture, mobilephone }
-		members { id, email, name, website, picture, mobilephone }
-		polls { id, title
-			proposals ${JQL_PROPOSAL}
-		}
-	}`
+const JQL_POLL = `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} winner ${JQL_PROPOSAL} numBallots duelMatrix { data } }`
+const JQL_TEAM = "team { id, teamName, inviteCode, " +
+		"admins  { id, email, name, website, picture, mobilephone } " +
+		"members { id, email, name, website, picture, mobilephone } " +
+		`polls ${JQL_POLL} }`
 const JQL = {
 	TEAM: JQL_TEAM,
-	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const abaove. :-(
+	PROPOSAL: JQL_PROPOSAL,  // Javascript cannot reference own object property. So JQL_PROPOSAL must be its own const above. :-(
 	CREATE_OR_JOIN_TEAM_RESULT: `{ ${JQL_TEAM} user { id, email, name, website, picture, mobilephone } jwt }`,  // login data
-	//POLL_IN_ELABORATION:  `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} }`,
-	POLL: `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} winner ${JQL_PROPOSAL} numBallots duelMatrix { data } }`,
+	POLL: JQL_POLL,
 }
 
 
@@ -256,6 +250,7 @@ let graphQlApi = {
 		}
 		EventBus.$emit(EventBus.POLLS_LOADED, pollsArray)
 		pollsArray.forEach(poll => {
+
 			this.pollsCache.put("polls/"+poll.id, poll)
 		})
 	},

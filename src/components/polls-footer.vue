@@ -39,6 +39,11 @@
 </template>
 
 <script>
+
+/************************** @DEPRECATED   see navbar-bottom.vue *********************** */
+
+
+
 export default {
 	name: "LiquidoFooter",
 	props: {
@@ -121,8 +126,7 @@ $arrowSize: 28px;
 	height: 0px;
 	border-style: solid;
 	border-width: $arrowSize 0 $arrowSize $arrowSize * 0.75;
-	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg
-		transparent;
+	border-color: $inactiveNavArrowBg $inactiveNavArrowBg $inactiveNavArrowBg transparent;
 	z-index: 150;
 	transition: 0.5s;
 }
