@@ -12,11 +12,12 @@
 				<liquido-input
 					id="propTitle"
 					v-model="proposal.title"
+					name="propTitle"
+					class="mb-3"
 					:label="$t('title')"
 					:valid-func="isProposalTitleValid"
 					:invalid-feedback="$t('titleInvalid', {minChars: titleMinLength})"
 					:maxlength="500"
-					name="propTitle"
 				/>
 
 				<textarea

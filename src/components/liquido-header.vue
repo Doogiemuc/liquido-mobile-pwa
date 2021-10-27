@@ -1,5 +1,5 @@
 <template>
-	<header id="liquidoHeader" class="liquido-header shadow-sm">
+	<header id="liquidoHeader" class="liquido-header">
 		<div class="container">
 			<div class="row no-gutters align-items-center">
 				<div class="col header-left">
@@ -14,7 +14,6 @@
 					<span class="liquido" @click="clickLiquidoTitle()" />
 				</div>
 				<div class="col header-right">
-					<i v-if="isAuthenticated" id="toggleMenueButton" class="fas fa-menue" @click="toggleMenue()" />
 				</div>
 			</div>
 		</div>
@@ -52,7 +51,7 @@ export default {
 		// make header smaller when user scrolls down
 		//$("#app").scroll(this.transitionHeader)
 
-		// Cannot simply do this with a computed property, becasue this.$api.isAuthenticated is not reactive. TODO: Can we make it reactive? maybe with Vue.$set ?
+		// Cannot simply do this with a computed property, because this.$api.isAuthenticated is not reactive. TODO: Can we make it reactive? maybe with Vue.$set ?
 		EventBus.$on(EventBus.LOGIN, () => this.isAuthenticated = true)
 		EventBus.$on(EventBus.LOGOUT, () => this.isAuthenticated = false)
 	},
@@ -99,17 +98,15 @@ export default {
 
 <style lang="scss" scoped>
 .liquido-header {
-	/*
 	position: fixed;
 	top: 0;
 	left: 0;
-	*/
 	width: 100%;
 	z-index: 100;
 	transition: 0.3s; /* Add a transition effect when scrolling */
 	color: $primary;
 	background-color: $header-bg;
-	border-bottom: 1px solid rgba(0, 123, 255, 0.3);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 	font-size: 1.5rem;
 
 	.liquido-title {

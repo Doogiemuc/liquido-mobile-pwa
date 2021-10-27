@@ -280,7 +280,7 @@ export default {
 .liquido-input {
 	position: relative;
 	padding-top: 12px;
-	margin-bottom: 1rem;
+	//margin-bottom: 1rem;
 	label {
 		position: absolute;
 		color: #666;

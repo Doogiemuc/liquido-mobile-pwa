@@ -80,8 +80,8 @@ const globalTranslations = {
 		Laws: "Regeln",
 
 		newPoll: "Neue Abstimmung",
-		pollInElaboration: "Abstimmung in Diskussion",
-		pollsInElaboration: "Abstimmungen in Diskussion",
+		pollInElaboration: "Abstimmung zur Diskussion",
+		pollsInElaboration: "Abstimmungen zur Diskussion",
 		pollInVoting: "Laufende Abstimmung",
 		pollsInVoting: "Laufende Abstimmungen",
 		finishedPoll: "Abgeschlossene Abstimmung",

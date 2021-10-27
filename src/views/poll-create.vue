@@ -8,6 +8,7 @@
 			<liquido-input
 				id="pollTitleInput"
 				v-model="pollTitle"
+				class="mb-3"
 				:label="$t('pollTitle')"
 				:valid-func="isPollTitleValid"
 				:invalid-feedback="pollTitleInvalidFeedback"

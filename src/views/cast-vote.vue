@@ -35,7 +35,13 @@
 				/>
 			</draggable>
 			<div class="collapse-icon-wrapper">
-				<a class="collapse-icon" href="#" @click="toggleBallotCollapse()">
+				<a
+					v-if="poll.proposals && poll.proposals.length > 0"
+					class="collapse-icon"
+					:class="{'collapsed' : collapsed}"
+					href="#"
+					@click="toggleBallotCollapse()"
+				>
 					<i class="fa" />
 				</a>
 			</div>
@@ -95,10 +101,6 @@
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('castVoteInfo')"></p>
 		</div>
-
-		<router-link :to="{name: 'polls'}" type="button" class="btn btn-primary">
-			<i class="fas fa-angle-double-left"></i>&nbsp;{{ $t("backToPolls") }}
-		</router-link>
 	</div>
 </template>
 
@@ -153,6 +155,7 @@ export default {
 			loading: true,
 			poll: undefined,
 			proposalsInBallot: [],
+			collapsed: true,
 			existingBallot: undefined,
 			voteCount: 0,
 			castVoteLoading: false,
@@ -226,8 +229,10 @@ export default {
 		/** Collapse the descriptions of all proposals in the ballot */
 		toggleBallotCollapse() {
 			this.$refs["proposalInBallot"].forEach(pollPanel => {
-				console.log("toogle collapse on", pollPanel)
-				pollPanel.toggleCollapse()})
+				//console.log("toogle collapse on", pollPanel)
+				pollPanel.toggleCollapse()
+			})
+			this.collapsed = !this.collapsed
 		},
 
 		async clickCastVote() {
@@ -335,15 +340,12 @@ export default {
 	}
 }
 
-.collapse-icon-wrapper {
-	background-color: $input-bg;
-	.collapse-icon {
-		position: absolute;
-		bottom: 5px;
-		right: 5px;
-		opacity: 0.5;
+.collapse-icon {
+	position: absolute;
+	bottom: 0;
+	right: 3px;
+	opacity: 0.5;
 	}
-}
 
 .collapse-icon .fa:before {
 	content: "\f139";

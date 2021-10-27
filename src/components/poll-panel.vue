@@ -1,5 +1,5 @@
 <template>
-	<b-card :id="pollCardId" :pollid="poll.id" :data-poll-status="poll.status" no-body class="poll-panel shadow-sm mb-3">
+	<b-card :id="pollCardId" :pollid="poll.id" :data-poll-status="poll.status" no-body class="poll-panel">
 		<template #header>
 			<h1 v-if="readOnly" class="read-only poll-panel-title">
 				<i :class="iconForPoll" />
@@ -11,10 +11,7 @@
 				&nbsp;{{ poll.title }}
 			</h1>
 		</template>
-		<div
-			v-if="!poll.proposals || poll.proposals.length === 0"
-			class="card-body"
-		>
+		<div v-if="!poll.proposals || poll.proposals.length === 0" class="card-body">
 			<p class="text-secondary">
 				<small>{{ $t("noProposalsInPollYet") }}</small>
 			</p>
@@ -161,8 +158,8 @@ $proposal_img_size: 32px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
-		.read-only {
-			color: black;
+		:not(.read-only) {
+			cursor: pointer;
 		}
 	}
 		
@@ -178,6 +175,14 @@ $proposal_img_size: 32px;
 		opacity: 0.5;
 	}
 
+	.collapse-icon .fa:before {
+		content: "\f139";
+	}
+
+	.collapse-icon.collapsed .fa:before {
+		content: "\f13a";
+	}
+
 	.card-body {
 		padding: 10px;
 	}
@@ -189,7 +194,7 @@ $proposal_img_size: 32px;
 		padding: 10px;
 		background-color: $proposal-bg;
 		transition: height 0.5s;
-		border-bottom: none;
+		border: none;
 		//box-shadow: inset 0 1px 3px rgba(0,0,0, 0.125);
 		&.collapsed-law-panel {
 			height: 18px + $proposal_img_size;
@@ -267,11 +272,4 @@ $proposal_img_size: 32px;
 	}
 }
 
-.collapse-icon .fa:before {
-	content: "\f139";
-}
-
-.collapse-icon.collapsed .fa:before {
-	content: "\f13a";
-}
 </style>

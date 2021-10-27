@@ -10,7 +10,7 @@ import Vue from "vue"
 const EventBus = new Vue({
 	data() {
 		return {
-			// "enum" for event names (these are case insensitive!)
+			// "enum" for event names (the keys are case insensitive.)
 			LOGIN: "login",								// called with {team, polls, jwt }
 			LOGOUT: "logout",
 			POLLS_LOADED: "polls-loaded",  // array of polls was loaded

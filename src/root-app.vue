@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<liquido-header ref="liquido-header" :back-link="backLink" />
+		<liquido-header ref="liquido-header" :back-link="backLink" class="shadow" />
 		<transition :name="transitionName">
 			<router-view id="appContent" class="router-view container-lg" />
 		</transition>

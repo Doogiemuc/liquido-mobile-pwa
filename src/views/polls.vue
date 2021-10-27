@@ -1,75 +1,61 @@
 <template>
 	<div>
-		<div id="polls" class="alert alert-primary text-center">
-			<i :class="iconForFilter"></i>&nbsp;{{ pageTitleLoc }}
-		</div>
-
-		<div v-if="loading" class="my-3">
-			<b-spinner small />&nbsp;{{ $t('Loading') }}
-		</div>
-
-		<liquido-input
-			v-if="allPolls.length > 3"
-			id="searchInput"
-			v-model="searchQuery"
-			:label="$t('Search')"
-			:status="null"
-			class="mb-4"
-		>
-			<template #iconRight>
-				<i class="fas fa-times mr-1" @click="searchQuery = undefined" />
+		<b-card id="polls" class="polls-card noselect my-3" no-body>
+			<template #header>
+				<h1 class="polls-list-title"><i :class="iconForFilter"></i>&nbsp;{{ pageTitleLoc }}</h1>
 			</template>
-		</liquido-input>
 
+			<b-list-group v-if="!loading" flush>
+				<b-list-group-item>
+					<div v-if="loading" class="my-3">
+						<b-spinner small />&nbsp;{{ $t('Loading') }}
+					</div>
+					<input
+						v-if="allPolls.length >= 3"
+						id="searchInput"
+						v-model="searchQuery"
+						class="form-control mb-3"
+						:placeholder="$t('Search')"
+					/>
 
-		<!-- list of polls -->
-		<poll-panel 
-			v-for="poll in filteredPolls"
-			:key="poll.id"
-			:poll="poll"
-			:collapse="true"
-			class="shadow mb-3"
-		/>
+					<!-- list of polls -->
+					<poll-panel 
+						v-for="poll in filteredPolls"
+						:key="poll.id"
+						:poll="poll"
+						:collapse="true"
+					/>
 
+					<p v-if="allPolls.length === 0 && !loading" v-html="$t('noPollYet')" />
 
+					<p v-if="searchResultIsEmpty" class="text-center" v-html="$t('noPollsMatchSearch')" />
+				</b-list-group-item>
+			</b-list-group>
 
-		<div v-if="allPolls.length === 0 && !loading" class="alert alert-info">
-			<p v-html="$t('noPollYet')" />
-		</div>
+			
+			<b-card-footer v-if="pollStatusFilter === undefined && allPolls.length > 0">
+				<p v-html="$t('allPollsInfo')" />
+			</b-card-footer>
 
-		<div v-if="searchResultIsEmpty" class="alert alert-info">
-			<p v-html="$t('noPollsMatchSearch')" />
-		</div>
+			<b-card-footer v-if="pollStatusFilter === 'ELABORATION'">
+				<p v-if="hasPollInElaboration" v-html="$t('pollsInElaborationInfo')" />
+				<p v-else v-html="$t('noPollsInElaboration')" />
+				<p v-if="!hasPollInElaboration && hasPollInVoting" v-html="$t('butPollInVoting')" />
+			</b-card-footer>
 
-		<div v-if="pollStatusFilter === 'ELABORATION'">
-			<div v-if="hasPollInElaboration" class="alert alert-info">
-				<i class="fas fa-info-circle float-right" />
-				<p v-html="$t('pollsInElaborationInfo')" />
-			</div>
-			<div v-else class="alert alert-info">
-				<p v-html="$t('noPollsInElaboration')" />
-				<p v-if="hasPollInVoting" v-html="$t('butPollInVoting')" />
-			</div>
-		</div>
+			<b-card-footer v-if="pollStatusFilter === 'VOTING'">
+				<p v-if="hasPollInVoting" v-html="$t('pollsInVotingInfo')" />
+				<p v-else v-html="$t('noPollsInVoting')" />
+				<p v-if="!hasPollInVoting && hasPollInElaboration" v-html="$t('butProposalsInDiscussion')" />
+			</b-card-footer>
 
-		<div v-if="pollStatusFilter === 'VOTING'">
-			<div v-if="hasPollInVoting" class="alert alert-info">
-				<i class="fas fa-info-circle float-right" />
-				<p v-html="$t('pollsInVotingInfo')" />
-			</div>
-			<div v-else class="alert alert-info">
-				<i class="fas fa-info-circle float-right" />
-				<p v-html="$t('noPollsInVoting')" />
-				<p v-if="hasPollInElaboration" v-html="$t('butProposalsInDiscussion')" />
-			</div>
-		</div>
-
-		<div v-if="pollStatusFilter === 'FINISHED' && !hasFinishedPolls" class="alert alert-info">
-			<i class="fas fa-info-circle float-right" />
-			<p v-html="$t('noFinishedPolls')" />
-			<p v-if="hasPollInVoting" v-html="$t('butPollInVoting')" />
-		</div>
-
+			<b-card-footer v-if="pollStatusFilter === 'FINISHED'">
+				<p v-if="hasFinishedPoll" v-html="$t('finishedPollsInfo')" />
+				<p v-else v-html="$t('noFinishedPolls')" />
+				<p v-if="!hasFinishedPoll && hasPollInVoting" v-html="$t('butPollInVoting')" />
+			</b-card-footer>
+		</b-card>
+	
 		<div v-if="userIsAdmin" class="my-5 alert alert-admin">
 			<i class="fas fa-shield-alt float-right"></i>
 			{{ $t('onlyAdminCanCreateNewPolls') }}
@@ -81,7 +67,7 @@
 </template>
 
 <script>
-import liquidoInput from "../components/liquido-input"
+//import liquidoInput from "../components/liquido-input"
 import pollPanel from "../components/poll-panel"
 import EventBus from "@/services/event-bus"
 
@@ -103,17 +89,19 @@ export default {
 			},
 			de: {
 				YourPolls: "Abstimmungen",
+				allPollsInfo: "Klicke auf eine Abstimmung für weitere Details.",
 				pollsInElaborationInfo: 
-					"<p>Bitte diskutiert die Wahlorschläge dieser Abstimmungen untereinander.</p>" +
-					"<p>Wenn euer Teamadmin dann die Abstimmungsphase startet, könnt ihr eure Stimme abgeben.</p>",
+					"Diese Abstimmungen stehen gerade zur Diskussion. Weitere Wahlvorschläge können hinzugefügt werden. " +
+					"Nachdem euer Admin dann die Abstimmungsphase gestartet hat, könnt ihr jeweils eure Stimme abgeben.",
 				pollsInVotingInfo: "In diesen Abstimmungen kannst du jetzt deine Stimme abgeben.",
+				finishedPollsInfo: "Diese Abstimmung sind abgschlossen.",
 				noPollYet: "Euer Admin hat bisher noch keine Abstimmung erstellt.",
-				noPollsMatchSearch: "Keine Treffer für diese Suche.",
-				noPollsInElaboration: "Aktuell gibt es gerade keine Wahlvorschläge die noch diskutiert werden können.",
+				noPollsMatchSearch: "- Keine Treffer für diese Suche -",
+				noPollsInElaboration: "Aktuell gibt es gerade keine Abstimmungen mit Wahlvorschläge die noch diskutiert werden können.",
 				noPollsInVoting: "Es läuft gerade keine Abstimmungen, in der du deine Stimmen abgegeben könntest.",
-				noFinishedPolls: "Es gibt in eurem Team noch keine abgeschlossenen Abstimmungen.",
+				noFinishedPolls: "In eurem Team gibt es bisher noch keine abgeschlossenen Abstimmungen.",
 				butProposalsInDiscussion: "Es gibt jedoch Abstimmungen in Diskussion. Dort könnt ihr die Wahlvorschlägen diskutieren.",
-				butPollInVoting: "Es gibt jedoch eine <b>laufende Wahl</b> in der du deine Stimme abgeben kannst.",
+				butPollInVoting: "Es gibt jedoch eine <b>laufende Abstimmung</b> in der du deine Stimme abgeben kannst.",
 				onlyAdminCanCreateNewPolls: "Nur du als Admin dieses Teams kannst neue Abstimmungen erstellen. " +
 					"Jeder im Team kann dann seinen Wahlvorschlag zur Abstimmung hinzufügen.",
 				createPoll: "Neue Abstimmung anlegen",
@@ -121,7 +109,7 @@ export default {
 			},
 		},
 	},
-	components: { pollPanel, liquidoInput },
+	components: { pollPanel },
 	props: {
 		status: { type: String, required: false, default: undefined },
 	},
@@ -171,6 +159,7 @@ export default {
 					//sort polls by status
 					return pollStatusOrder[p1.status] - pollStatusOrder[p2.status]
 				})    
+				
 		},
 		searchResultIsEmpty() {
 			return this.filteredPolls.length === 0 && this.searchQuery && this.searchQuery.trim().length > 0
@@ -220,7 +209,7 @@ export default {
 		/** Try to flexibly match as much as possible. Case insesitive */
 		matchesSearch(poll) {
 			if (!this.searchQuery || this.searchQuery.trim === "") return true
-			let Q = this.searchQuery.toUpperCase()
+			let Q = this.searchQuery.trim().toUpperCase()
 			if (poll.title && poll.title.toUpperCase().includes(Q)) return true
 			if (poll.proposals) {
 				poll.proposals.forEach((prop) => {
@@ -236,37 +225,34 @@ export default {
 }
 </script>
 
-<style lang="scss">
-#searchInput {
-	background-color: $input-bg;
+<style scoped lang="scss">
+.polls-card {
+	border-radius: 10px;
+	.card-header { 
+		h1 { 
+			font-size: 1.2rem !important; 
+			margin: 0;
+		}
+		padding: 10px;
+	}
+	.card-body {
+		padding: 10px;
+	}
+	.list-group-item {
+		padding: 10px;
+	}
+	.card-footer {
+		padding: 10px; 
+		p:last-of-type {
+			margin-bottom: 0;
+		}
+	}
+}
+.poll-panel {
+	margin-bottom: 1rem;
 }
 .iconRight {
 	color: $primary;
 }
-#polls.polls-page-title {
-	font-size: 1rem;
-	font-weight: bold;
-	margin: 1rem 0;
-	border: 1px solid
-}
-/*
-.filter-buttons {
-	width: 100%;
-	button {
-		color: $primary;
-		border: 1px solid rgba(0, 0, 0, 0.125);
-		background-color: rgb(220, 236, 255);
-		font-size: 1.7rem;
-	}
-	.icon-title {
-		font-size: 10px;
-		line-height: 1;
-	}
-	.btn-secondary:not(:disabled).active {
-		color: white;
-		background-color: $primary;
-		border: 1px solid $primary;
-	}
-}
-*/
+
 </style>

@@ -32,12 +32,13 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 	opacity: 0;
 }
 
-/*
+
 //TODO: find right base font size for everything, MAYBE depending on screen size
 html {
-	font-size: 16px;   
+	// font-size: 16px;   
+	background-color: $app-background;
 }
-*/
+
 
 
 /** 
@@ -45,7 +46,8 @@ html {
  * no horizintal scrolling 
  */
 #appContent {
-	padding-top: 10px;    // behind header. MUST be padding!
+	margin-top: 2rem;  // margin-top is behind header!
+	padding-top: 0.5rem;
 	padding-bottom: 100px;  // space behind navbar-bottom!
 	padding-left: 10px;     // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
 	padding-right: 10px;
@@ -60,7 +62,7 @@ html {
 	width: 100%;
 	overflow-x: hidden;
 	overflow-y: scroll;
-
+	background-color: $app-background;
 	.page-title {
 		font-family: 'Libre Baskerville', serif;
 		margin: 0.5rem 0;
@@ -159,11 +161,18 @@ html {
 	}
 }
 
+.alert-info {
+	color: #DDE !important;
+	background-color: #686876 !important;	
+	border: 1px solid #aaaabb !important;
+}
+
 /** 
  * Background for message to admin. 
  * Always used with <i class="fas fa-shield-alt"></i>
  */
 .alert-admin {
-	background-color: #ccccff;
+	color: #DDE !important;
+	background-color: #824e68 !important;	
 	border: 1px solid #aaaabb !important;
 }

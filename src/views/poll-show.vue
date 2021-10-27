@@ -1,14 +1,16 @@
 <template>
 	<div>
+		<!--
 		<h2 id="poll-show" class="page-title">
 			{{ pageTitleLoc }}
 		</h2>
+		-->
 
 		<div v-if="loadingPoll" class="my-3">
 			<b-spinner small />&nbsp;{{ $t('Loading') }}
 		</div>
 		
-		<poll-panel v-if="poll.id" :poll="poll" :read-only="true" class="shadow mb-3" />
+		<poll-panel v-if="poll.id" :poll="poll" :read-only="true" class="shadow my-3" />
 
 		<div v-if="showError"	class="alert alert-danger mb-3">
 			<div v-html="$t('cannotFindPoll', {pollId: pollId})" />
@@ -81,6 +83,11 @@
 		</div>
 		<div class="clearfix mb-3" />
 
+		<span class="text-muted" @click="goToPolls()">
+			<i class="fas fa-angle-left" />
+			{{ $t("backToPolls") }}
+		</span>
+
 		<popup-modal 
 			id="votingPhaseStartedModal"
 			ref="votingPhaseStartedModal"
@@ -122,6 +129,7 @@ export default {
 					"kannst du in <span class='liquido'></span> die Prio Reihenfolge auf deinem Stimmzettel auch noch ändern wenn du möchstest.</p>",
 				finishedPollInfo: "Diese Abstimmung ist abgeschlossen. Gewonnen hat der Vorschlag '{winnerTitle}'. " +
 					"Es wurden {numBallots} Stimmen abgegeben.",
+				backToPolls: "zurück",
 			},
 		},
 	},
