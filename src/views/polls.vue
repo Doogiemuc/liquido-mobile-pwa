@@ -19,12 +19,14 @@
 					/>
 
 					<!-- list of polls -->
-					<poll-panel 
-						v-for="poll in filteredPolls"
-						:key="poll.id"
-						:poll="poll"
-						:collapse="true"
-					/>
+					<transition-group name="poll-list" tag="div">
+						<poll-panel 
+							v-for="poll in filteredPolls"
+							:key="poll.id"
+							:poll="poll"
+							:collapse="true"
+						/>
+					</transition-group>
 
 					<p v-if="allPolls.length === 0 && !loading" v-html="$t('noPollYet')" />
 
@@ -162,7 +164,7 @@ export default {
 				
 		},
 		searchResultIsEmpty() {
-			return this.filteredPolls.length === 0 && this.searchQuery && this.searchQuery.trim().length > 0
+			return this.filteredPolls.length === 0 // && this.searchQuery && this.searchQuery.trim().length > 0
 		},
 		hasPollInElaboration() {
 			return this.$api.getCachedPolls("ELABORATION").length > 0
@@ -170,7 +172,7 @@ export default {
 		hasPollInVoting() {
 			return this.$api.getCachedPolls("VOTING").length > 0
 		},
-		hasFinishedPolls() {
+		hasFinishedPoll() {
 			return this.$api.getCachedPolls("FINISHED").length > 0
 		}
 	},
@@ -230,7 +232,8 @@ export default {
 	border-radius: 10px;
 	.card-header { 
 		h1 { 
-			font-size: 1.2rem !important; 
+			font-size: 16px !important; 
+			//font-weight: bold;
 			margin: 0;
 		}
 		padding: 10px;
@@ -250,7 +253,22 @@ export default {
 }
 .poll-panel {
 	margin-bottom: 1rem;
+	transition: all 1s;
+	max-height: 300px;
 }
+/* Vue list transitions */
+.poll-list-enter, .poll-list-leave-to {
+	opacity: 0;
+	max-height: 0;
+	margin-bottom: 0;
+}
+/*
+.poll-list-leave-active {
+	border: 1px solid red;
+}
+*/
+
+
 .iconRight {
 	color: $primary;
 }

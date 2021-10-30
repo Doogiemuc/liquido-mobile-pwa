@@ -40,9 +40,7 @@
 				</div>
 
 				<div class="d-flex justify-content-between align-items-center">
-					<small class="ml-1">
-						<a href="#" @click="gotoPoll">{{ $t("Cancel") }}</a>
-					</small>
+					<span class="cancel-link" @click="goBack">{{ $t("Cancel") }}</span>
 					<button
 						id="saveProposalButton"
 						:disabled="saveButtonDisabled"
@@ -173,14 +171,24 @@ export default {
 				})
 		},
 
-		/** Called on successfull save or also on cancel. */
+		/** Called on successfull save. */
 		gotoPoll() {
 			this.$router.push("/polls/" + this.poll.id)
-		}
+		},
+		
+		goBack() {
+			this.$router.go(-1)
+		},
 	}
 
 }
 </script>
 
 <style lang="scss">
+.cancel-link {
+	font-size: 12px;
+	color: $secondary;
+	margin-left: 0.5em;
+	cursor: pointer;
+}
 </style>

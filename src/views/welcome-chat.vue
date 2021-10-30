@@ -9,7 +9,7 @@
 				<b-card-text v-html="$t('whatsYourName')" />
 			</b-card>
 
-			<b-card :class="{ 'hide-right': flowState < 3 }" class="chat-bubble chat-right">
+			<b-card :class="{ 'hide-right': flowState < 3 }" class="chat-bubble shadow-sm chat-right">
 				<liquido-input
 					id="userNameInput"
 					ref="userNameInput"

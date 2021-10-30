@@ -429,7 +429,7 @@ let graphQlApi = {
 	 * 
 	 * @param {String} status Optionally filter by status. If ELABORATION|VOTING|FINISHED only polls of that status are returned. 
 	 *      If undefined, then all polls in the cache will be returned.
-	 * @returns {Array} array of polls
+	 * @returns {Array} array of locally cached polls or empty array if nothing is there
 	 */
 	getCachedPolls(status) {
 		let cacheData = this.pollsCache.getCacheData()

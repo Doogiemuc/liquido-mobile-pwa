@@ -6,7 +6,7 @@
 					<i
 						v-if="backLink"
 						class="fas fa-angle-left"
-						@click="goBack()"
+						@click="goBack"
 					/>
 				</div>
 				<div class="col-8 liquido-title">
@@ -67,6 +67,7 @@ export default {
 		},
 
 		goBack() {
+			console.log("liquido-header goBack "+this.backLink)
 			if (this.backLink === "BACK") this.$router.go(-1)
 			else if (this.backLink) this.$router.push(this.backLink)
 		},
@@ -88,10 +89,6 @@ export default {
 			}
 		},
 
-		/** check if current $route.path starts with the given pathPrefix. so that we can add the .active class to the outer li element */
-		isPathActive(pathPrefix) {
-			return this.$route.path.indexOf(pathPrefix) === 0
-		},
 	},
 }
 </script>

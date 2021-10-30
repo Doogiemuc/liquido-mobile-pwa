@@ -81,7 +81,7 @@ export default {
 		},
 		/** which footer to show */
 		showNavbarBottom() {
-			return this.$route.path.match(/(team|polls)$/)
+			return this.$route.path.match(/(team|polls|polls\/\d+)$/)
 		},
 		showDebugLog() {
 			return false

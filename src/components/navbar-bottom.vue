@@ -52,7 +52,7 @@ export default {
 	},
 	data() { 
 		return {
-			selectedItem: -1,         // -1 === show all polls
+			selectedItem: -1,         // selectedItem in navbar.  -1 - show all polls,  0 - teamhome, 
 			menueOpen: false,
 			forceRefreshComputed: 0   
 		} 
@@ -61,7 +61,6 @@ export default {
 		pollsInElaboration() {
 			this.forceRefreshComputed;
 			let res = this.$api.getCachedPolls("ELABORATION")
-			console.log("======== recompute pollsInElaboration", res)
 			return res
 		},
 		pollsInVoting() {
@@ -103,39 +102,60 @@ export default {
 		}
 	},
 	watch: {
-		// when navigating from login to teamHome
-		"$route.name": function(routeName) {
-			console.log("navbar-bottom route.name changed to ", routeName)
-			this.updatedSelectedItem()
+		// when navigating via URL, updated navbar accordingly
+		"$route.name": function(/*routeName*/) {
+			//console.log("navbar-bottom route.name changed to ", routeName)
+			this.updateNavBar()
 		}		
 	},
 	created() {
-		console.log("navbar-bottom created")
 		EventBus.$on(EventBus.POLLS_LOADED, () => {  // MUST use arrow-function to keep `this` reference!
 			// hack to make computed properties refresh their value
 			// https://logaretm.com/blog/2019-10-11-forcing-recomputation-of-computed-properties/
-			console.log("POLLS_LOADED .........")
+			//console.log("POLLS_LOADED .........")
 			this.forceRefreshComputed++;  
 		})
 		EventBus.$on(EventBus.POLL_LOADED, () => {
-			console.log("navbar-bottom POLLS_LOADED")
+			//console.log("navbar-bottom POLLS_LOADED")
 			this.forceRefreshComputed++;
 		})
 		EventBus.$on(EventBus.LOGIN, () => {
-			console.log("LOGIN ====")
+			//console.log("LOGIN ====")
 			this.forceRefreshComputed++;
 		})
 		// Check what needs to be the selectedItem, depending on this.$route.name
-		this.updatedSelectedItem()
+		this.updateNavBar()
 	},
 	mounted() {
 		//console.log("navbar-bottom mounted: forceRefreshComputed")
 		//this.forceRefreshComputed++;
 	},
 	methods: {
-		updatedSelectedItem() {
+
+		/**
+		 * When the current route was changed by navigation
+		 * then update the navbar accordingly.
+		 */
+		updateNavBar() {
 			if (this.$route.name === "teamHome") {
 				this.selectedItem = 0
+			} else if (this.$route.name === "polls") {
+				if (this.$route.params) {	
+					switch (this.$route.params.status) {
+						case "ELABORATION":
+							this.selectedItem = 1
+							break
+						case "VOTING":
+							this.selectedItem = 2
+							break
+						case "FINISHED":
+							this.selectedItem = 3
+							break
+						default:
+							this.selectedItem = -1
+					}
+					EventBus.$emit(EventBus.SET_POLLS_FILTER, this.$route.params.status)
+				}
 			}
 		},
 
@@ -232,14 +252,6 @@ $arrowGap: 5px;
 	justify-content: space-between;
 	align-items: center;
 	
-  /*
-	.team-button, .menue-button {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-	}
-	*/
-
 	.team-button, .discuss-button, .vote-button, .finished-button, .menue-button {
 		text-align: center;
 		margin: 0;
@@ -392,7 +404,7 @@ $arrowGap: 5px;
 }
 
 
-
+/* DEPRECATED: This was from an old layout with a larger circle in the middle
 .circle-1 {
 	background: white;
 	width: 50px;
@@ -405,5 +417,6 @@ $arrowGap: 5px;
 	left: 50%;
 	transform: translateX(-50%);
 }
+*/
 
 </style>

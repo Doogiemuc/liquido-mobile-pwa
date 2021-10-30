@@ -36,7 +36,7 @@
 			</draggable>
 			<div class="collapse-icon-wrapper">
 				<a
-					v-if="poll.proposals && poll.proposals.length > 0"
+					v-if="poll && poll.proposals && poll.proposals.length > 0"
 					class="collapse-icon"
 					:class="{'collapsed' : collapsed}"
 					href="#"

@@ -4,24 +4,24 @@
 			{{ team.teamName }}
 		</h1>
 
-		<b-card id="team-home-user-welcome" class="chat-bubble shadow-sm mb-3">
-			<b-card-text>
-				<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
-			</b-card-text>
-		</b-card>
+		<div class="alert alert-info mb-3">
+			<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
+			<b-button
+				v-if="teamHasPolls"
+				id="gotoPollsButton"
+				variant="primary"
+				size="m"
+				class="float-right mb-3"
+				@click="gotoPolls()"
+			>
+				{{ $t("gotoPolls") }}
+				<i class="fas fa-angle-double-right" />
+			</b-button>
+		</div>
 
-		<!-- b-button
-			id="gotoPollsButton"
-			variant="primary"
-			size="m"
-			class="float-right mb-3"
-			@click="gotoPolls()"
-		>
-			{{ $t("gotoPolls") }}
-			<i class="fas fa-angle-double-right" />
-		</b-button>
+		
 
-		<div class="clearfix" / -->
+		<div class="clearfix" />
 
 		<b-card-group id="memberCards" class="mb-3" deck>
 			<b-card v-for="admin in team.admins" :key="admin.id" :img-src="getImgUrl(admin.picture)" img-alt="Avatar" img-top>
@@ -42,11 +42,10 @@
 			<p v-html="$t('introForOneAdmin')"></p>
 		</div>
 
-		<b-card 
-			id="teamInfo"
-			class="chat-bubble shadow-sm"
-			:title="$t('inviteNewMembers')"
-		>
+		<b-card id="teamInfo">
+			<template #header>
+				<h2>{{ $t("inviteNewMembers") }}</h2>
+			</template>
 			<p>
 				{{ $t("inviteLink") }}
 				<a id="inviteLink" :href="inviteLinkURL" @click.prevent="shareLink()">
@@ -105,7 +104,6 @@ export default {
 			},
 		},
 	},
-	components: { },
 	data() {
 		return {
 			team: {}
@@ -118,6 +116,9 @@ export default {
 		},
 		isAdmin() {
 			return this.$api.isAdmin()
+		},
+		teamHasPolls() {
+			return this.$api.getCachedPolls().length > 0
 		},
 		inviteLinkURL() {
 			return config.inviteLinkPrefix + this.team.inviteCode
@@ -199,5 +200,16 @@ export default {
 	}
 }
 
-
+#teamInfo {
+	.card-header {
+		padding: 10px;
+		h2 {
+			font-size: 1.2rem;
+			margin: 0;
+		}
+	}
+	.card-body {
+		padding: 10px;
+	}
+}
 </style>
