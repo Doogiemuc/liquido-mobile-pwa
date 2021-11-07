@@ -16,6 +16,7 @@
 				<b-spinner small />&nbsp;{{ $t('Loading') }}
 			</div>
 			<draggable v-else
+				id="myDraggable"
 				v-model="proposalsInBallot"
 				class="draggable"
 				:disabled="loading || castVoteLoading"
@@ -25,13 +26,12 @@
 				:can-scroll-x="false"
 			>
 				<law-panel
-					v-for="(prop, idx) in proposalsInBallot"
+					v-for="(prop) in proposalsInBallot"
 					ref="proposalInBallot"
 					:key="prop.id"
 					:law="prop"
 					:read-only="true"
 					:collapse="true"
-					:class="getLawPanelClass(idx)"
 				/>
 			</draggable>
 			<div class="collapse-icon-wrapper">
@@ -177,23 +177,36 @@ export default {
 	created() {
 		this.loading = true
 		
-		//force refresh of the poll. Load it from the backend
+		/** 
+		 * Force refresh of the poll we want to cast a vote on. Load the from the backend.
+		 */
 		let loadPoll = () => this.$api.getPollById(this.pollId, true).then(poll => {
 			this.poll = poll
 			if (!this.poll) throw new Error("Cannot find poll(id=" + this.pollId + ")") //TODO: show user error message to user. offer back button
 			return poll
 		}).catch(err => console.warn("Cannot get poll.id="+this.pollId, err))
 		
+		/**
+		 * Get the user's voter token.
+		 * TODO: We could make this more secury by letting the user provide his own voterTokenSecret.
+		 *       But then a human would need to remember a secret. And humans are not good in remembering things.
+		 */
 		let getVoterToken = () => this.$api.getVoterToken(config.voterTokenSecret)
 			.catch(err => console.warn("Cannot get voterToken of user", err))
 
+		/**
+		 * Check if current user already coted in this poll. Then he would have a ballot.
+		 * Keep in mind, that the ballot of a user can only be fetched, if the user's secret voterToken is known.
+		 */
 		let getExistingBallot = (voterToken) => this.$api.getBallot(this.pollId, voterToken).then(ballot => {
 			this.existingBallot = ballot  // may be undefined!
 			if (this.existingBallot) this.isFirstVote = false
 			return ballot
 		}).catch(err => console.warn("Cannot get ballot of user", err))
 
-		/*
+		/**
+		 * TODO: when the user has already voted, then sort the proposals in this poll according to the user's vote.
+		 *
 		let setVoteOrder = () => {
 			let proposalsById = {}
 			this.poll.proposals.forEach(prop => proposalsById[prop.id] = prop)
@@ -207,12 +220,62 @@ export default {
 		}
 		*/
 
+		let delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+		
+		/**
+		 * Some math magic :-) taken from https://spicyyoghurt.com/tools/easing-functions
+     * @param {Number} t current "time", e.g. 0 to 1
+     * @param {Number} b start value
+     * @param {Number} c value delta (b + c = end value)
+     * @param {Number} d final value of time at the end, e.g. 1
+		 */
+		function easeOutCubic (t, b, c, d) {
+			return c * ((t = t / d - 1) * t * t + 1) + b;
+		}
+
+		/**
+		 * If this is the first time that the user votes at all,
+		 * then show a little UX animation as a hint, that proposals can be dragged.
+		 */
+		let showDraggingHint = async function() {
+			let element = $("#myDraggable > div").first()
+			element.addClass("sortable-chosen")
+			const delayMs = 10
+			const dragHeight = element.height() * 3
+			const dragWidth  = 15;
+			const elemPos = element.offset()
+			const steps = dragHeight / 2
+			for (let time = 0; time < 1; time = time + 1/steps) {
+				let i  = easeOutCubic(time, 0, 1, 1)
+				let dx = Math.sin(i * Math.PI) * 20
+				let dy = i * dragHeight
+				element.offset({ top: elemPos.top + dy, left: elemPos.left + dx })
+				await delay(delayMs)
+			}
+			for (let time = 1; time >= 0; time = time - 1/steps) {
+				let i  = easeOutCubic(time, 0, 1, 1)
+				let dx = Math.sin(i * Math.PI) * dragWidth
+				let dy = i * dragHeight
+				element.offset({ top: elemPos.top + dy, left: elemPos.left + dx })
+				await delay(delayMs)
+			}
+			element.offset(elemPos)		
+			element.removeClass("sortable-chosen")
+		}
+
 		loadPoll()
 			.then(getVoterToken)
 			.then(voterToken => getExistingBallot(voterToken))
 			.then(() => {
 				this.proposalsInBallot = _.cloneDeep(this.poll.proposals)
+				//TODO: if there is an existing ballot, then sort proposals in that order
 				this.loading = false
+			})
+			.then(() => {
+				setTimeout(function() {
+					showDraggingHint()
+				}, 1000)
+				
 			})
 			.catch(err => {
 				console.error("Cannot get data to cast vote!", err)
@@ -274,11 +337,6 @@ export default {
 			})
 		},
 
-		getLawPanelClass(/*idx*/) {
-			/* if (idx === 0 && this.isFirstVote) return "simulate-drag" else */ 
-			return ""
-		},
-
 	},
 }
 </script>
@@ -307,37 +365,30 @@ export default {
 		cursor: grab;
 	}
 
-
 	.law-panel.simulate-drag {
-		z-index: 500;  // above second proposal
+		z-index: 999;  // above second proposal
 		transition: all 1s;
 		animation: slide-down 0.5s ease 1s 2 alternate;
 	}
 
 	@keyframes slide-down {
-		50% {
-			transform: translate(5px, 20px);
-			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
-		}
 		to {
-			transform: translate(0px, 50px);
+			transform: translate(0px, 4em);
 		}
 	}
-	@keyframes slide-up {
-		to {
-			transform: translate(5px, -20px)
-		}
-	}
+
 
 	.sortable-ghost {
 		opacity: 0.1;
 	}
 	.sortable-chosen {
-		border: 1px solid $primary;
+		//border: 1px solid $primary;
+		z-index: 999;
 		-webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
-		transform: translate(5px, 5px);
+		transform: translate(3px, 3px);
 	}
+	
 }
 
 .collapse-icon {
