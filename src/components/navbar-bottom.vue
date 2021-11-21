@@ -251,11 +251,10 @@ $arrowGap: 5px;
 	padding: 10px;
 	margin: 0;
 	box-shadow: 0 0 0.25rem rgba(0,0,0,0.6);
-	background-color: $header-bg;
+	background-color: $navbar-bg;
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: space-between;
-	//align-items: center;
 	
 	.team-button, .discuss-button, .vote-button, .finished-button, .menue-button {
 		text-align: center;

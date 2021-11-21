@@ -143,6 +143,10 @@ export default {
 $proposal_img_size: 32px;
 
 .poll-panel {
+	&:not(.read-only) {
+		cursor: pointer;
+	}
+
 	.card-header {
 		margin: 0;
 		padding: 0;
@@ -157,9 +161,6 @@ $proposal_img_size: 32px;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-		}
-		:not(.read-only) {
-			cursor: pointer;
 		}
 	}
 		

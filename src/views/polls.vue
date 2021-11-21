@@ -1,62 +1,63 @@
 <template>
 	<div>
-		<b-card id="polls" class="polls-card noselect my-3" no-body>
-			<template #header>
-				<h1 class="polls-list-title"><i :class="iconForFilter"></i>&nbsp;{{ pageTitleLoc }}</h1>
-			</template>
+		<h1 class="polls-list-title">{{ pageTitleLoc }}</h1>
 
-			<b-list-group v-if="!loading" flush>
-				<b-list-group-item>
-					<div v-if="loading" class="my-3">
-						<b-spinner small />&nbsp;{{ $t('Loading') }}
-					</div>
-					<input
-						v-if="allPolls.length >= 3"
-						id="searchInput"
-						v-model="searchQuery"
-						class="form-control mb-3"
-						:placeholder="$t('Search')"
-					/>
+		<div v-if="loading" class="my-3">
+			<b-spinner small />&nbsp;{{ $t('Loading') }}
+		</div>
 
-					<!-- list of polls -->
-					<transition-group name="poll-list" tag="div">
-						<poll-panel 
-							v-for="poll in filteredPolls"
-							:key="poll.id"
-							:poll="poll"
-							:collapse="true"
-						/>
-					</transition-group>
+		<!-- list of polls -->
+		<div v-if="!loading" class="poll-list">
+			<transition-group name="poll-list" tag="div">
+				<poll-panel 
+					v-for="poll in filteredPolls"
+					:key="poll.id"
+					:poll="poll"
+					:collapse="true"
+					class="shadow-sm"
+				/>
+			</transition-group>
 
-					<p v-if="allPolls.length === 0 && !loading" v-html="$t('noPollYet')" />
+			<p v-if="allPolls.length === 0 && !loading" v-html="$t('noPollYet')" />
 
-					<p v-if="searchResultIsEmpty" class="text-center" v-html="$t('noPollsMatchSearch')" />
-				</b-list-group-item>
-			</b-list-group>
+			<p v-if="searchResultIsEmpty" class="text-center" v-html="$t('noPollsMatchSearch')" />
 
-			
-			<b-card-footer v-if="pollStatusFilter === undefined && allPolls.length > 0">
-				<p v-html="$t('allPollsInfo')" />
-			</b-card-footer>
+			<div class="search-icon-wrapper">
+				<i class="fas fa-search search-icon"></i>
+			</div>
+			<input
+				v-if="showSearch"
+				id="searchInput"
+				v-model="searchQuery"
+				class="form-control mb-4"
+				:placeholder="$t('Search')"
+			/>
 
-			<b-card-footer v-if="pollStatusFilter === 'ELABORATION'">
-				<p v-if="hasPollInElaboration" v-html="$t('pollsInElaborationInfo')" />
-				<p v-else v-html="$t('noPollsInElaboration')" />
-				<p v-if="!hasPollInElaboration && hasPollInVoting" v-html="$t('butPollInVoting')" />
-			</b-card-footer>
+		</div>
 
-			<b-card-footer v-if="pollStatusFilter === 'VOTING'">
-				<p v-if="hasPollInVoting" v-html="$t('pollsInVotingInfo')" />
-				<p v-else v-html="$t('noPollsInVoting')" />
-				<p v-if="!hasPollInVoting && hasPollInElaboration" v-html="$t('butProposalsInDiscussion')" />
-			</b-card-footer>
 
-			<b-card-footer v-if="pollStatusFilter === 'FINISHED'">
-				<p v-if="hasFinishedPoll" v-html="$t('finishedPollsInfo')" />
-				<p v-else v-html="$t('noFinishedPolls')" />
-				<p v-if="!hasFinishedPoll && hasPollInVoting" v-html="$t('butPollInVoting')" />
-			</b-card-footer>
-		</b-card>
+		
+		<div v-if="pollStatusFilter === undefined && allPolls.length > 0" class="alert text-muted">
+			<p v-html="$t('allPollsInfo')" />
+		</div>
+
+		<div v-if="pollStatusFilter === 'ELABORATION'" class="alert text-muted">
+			<p v-if="hasPollInElaboration" v-html="$t('pollsInElaborationInfo')" />
+			<p v-else v-html="$t('noPollsInElaboration')" />
+			<p v-if="!hasPollInElaboration && hasPollInVoting" v-html="$t('butPollInVoting')" />
+		</div>
+
+		<div v-if="pollStatusFilter === 'VOTING'" class="alert text-muted">
+			<p v-if="hasPollInVoting" v-html="$t('pollsInVotingInfo')" />
+			<p v-else v-html="$t('noPollsInVoting')" />
+			<p v-if="!hasPollInVoting && hasPollInElaboration" v-html="$t('butProposalsInDiscussion')" />
+		</div>
+
+		<div v-if="pollStatusFilter === 'FINISHED'" class="alert text-muted">
+			<p v-if="hasFinishedPoll" v-html="$t('finishedPollsInfo')" />
+			<p v-else v-html="$t('noFinishedPolls')" />
+			<p v-if="!hasFinishedPoll && hasPollInVoting" v-html="$t('butPollInVoting')" />
+		</div>
 	
 		<div v-if="userIsAdmin" class="my-5 alert alert-admin">
 			<i class="fas fa-shield-alt float-right"></i>
@@ -96,7 +97,6 @@ export default {
 				butPollInVoting: "However there is a poll in which you can vote.",
 			},
 			de: {
-				YourPolls: "Abstimmungen",
 				allPollsInfo: "Klicke auf eine Abstimmung für weitere Details.",
 				pollsInElaborationInfo: 
 					"Diese Abstimmungen stehen gerade zur Diskussion. Weitere Wahlvorschläge können hinzugefügt werden. " +
@@ -113,7 +113,6 @@ export default {
 				onlyAdminCanCreateNewPolls: "Nur du als Admin dieses Teams kannst neue Abstimmungen erstellen. " +
 					"Jeder im Team kann dann seinen Wahlvorschlag zur Abstimmung hinzufügen.",
 				createPoll: "Neue Abstimmung anlegen",
-				allPolls: "Alle eure Abstimmungen",
 			},
 		},
 	},
@@ -234,34 +233,33 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.polls-card {
-	border-radius: 10px;
-	.card-header { 
-		h1 { 
-			font-size: 16px !important; 
-			//font-weight: bold;
-			margin: 0;
-		}
-		padding: 10px;
-	}
-	.card-body {
-		padding: 10px;
-	}
-	.list-group-item {
-		padding: 10px;
-	}
-	.card-footer {
-		padding: 10px; 
-		p:last-of-type {
-			margin-bottom: 0;
-		}
-	}
+
+.polls-list-title {
+	text-align: center;
+	margin: 1rem;
+}
+
+.search-icon-wrapper {
+	text-align: right;
+}
+.search-icon {
+	color: $primary-text;
+	margin-top: 1rem;
+}
+.poll-list {
+	margin: 0 -10px 0 -10px;
+	padding: 2rem 10px 10px 10px;
+	background-color: $poll-list-background;
 }
 .poll-panel {
-	margin-bottom: 1rem;
 	transition: all 1s;
 	max-height: 300px;
+	&:not(:last-child) {
+		margin-bottom: 1rem;
+	}
+	
 }
+
 /* Vue list transitions */
 .poll-list-enter, .poll-list-leave-to {
 	opacity: 0;
@@ -273,7 +271,6 @@ export default {
 	border: 1px solid red;
 }
 */
-
 
 .iconRight {
 	color: $primary;
