@@ -69,6 +69,12 @@
 </template>
 
 <script>
+/**
+ * This is by far the most important view in the whole app.
+ * I think meanwhile I redesigned it dozens of times ... and yet it's not perfect :-)
+ */
+
+
 //import liquidoInput from "../components/liquido-input"
 import pollPanel from "../components/poll-panel"
 import EventBus from "@/services/event-bus"

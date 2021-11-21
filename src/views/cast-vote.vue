@@ -126,9 +126,9 @@ export default {
 			de: {
 				castVoteTitle: "Abstimmen",
 				castVoteInfo: 
-					"<p>In <span class='liquido'></span> stimmst du nicht nur für <em>einen</em> Vorschlag, sondern du sortierst " +
-					"alle Vorschläge in deine persönlich bevorzugte Reihenfolge.</p>" +
-					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne dann alle anderen Vorschläge gemäß deiner Präferenz darunter an.</p>",
+					"<p>In <span class='liquido'></span> stimmst du nicht nur für <em>einen</em> der Vorschläg, sondern du sortierst " +
+					"<em>alle</em> Vorschläge nach deiner Präferenz.</p>" +
+					"<p>Schiebe deinen Favoriten ganz nach oben. Ordne alle anderen Vorschläge gemäß deiner persönlichen Reihenfolge darunter an.</p>",
 				voteCountedNTimes: "Deine Stimme als Proxy wurde {voteCount} mal gezählt.",
 				yourBallot: "Dein Stimmzettel:",
 				updateBallotButton: "Eigene Stimme aktualisieren",
@@ -342,6 +342,11 @@ export default {
 </script>
 
 <style lang="scss">
+#app .page-title {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
 .ballot-card {
 	.card-header {
 		padding: 0.5rem;
@@ -360,11 +365,13 @@ export default {
 .draggable {
 	background-color: $input-bg;
 	padding: 1rem;
+
 	.law-panel {
 		margin-bottom: 1rem;  // need some space between proposals to make it easier to drag & sort them
 		cursor: grab;
 	}
 
+/*
 	.law-panel.simulate-drag {
 		z-index: 999;  // above second proposal
 		transition: all 1s;
@@ -376,17 +383,16 @@ export default {
 			transform: translate(0px, 4em);
 		}
 	}
-
+*/
 
 	.sortable-ghost {
 		opacity: 0.1;
 	}
 	.sortable-chosen {
-		//border: 1px solid $primary;
 		z-index: 999;
 		-webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
-		transform: translate(3px, 3px);
+		//transform: translate(3px, 3px);
 	}
 	
 }

@@ -1,33 +1,39 @@
 <template>
 	<nav id="navbar">
-		<div :class="teamButtonClass" class="team-button">
+		<div v-if="false" :class="teamButtonClass" class="team-button">
 			<a href="#" aria-label="Team Home" @click="goToTeam()">
 				<i class="fas fa-users" />
 				<div class="icon-title">{{ $t("Team") }}</div>
 			</a>
 		</div>
 		<div :class="discussButtonClass" class="discuss-button">
-			<a href="#" aria-label="Polls with proposals to discuss" @click="clickPollsInDiscussion()">
-				<div v-if="pollsInElaboration.length > 0" class="counter-badge">{{ pollsInElaboration.length }}</div>
-				<i class="fas fa-comments" />
+			<a href="#" aria-label="Polls to discuss" @click="clickPollsInDiscussion()">
+				<div class="icon-with-badge">
+					<i class="fas fa-comments"></i>
+					<span v-if="pollsInElaboration.length > 0" class="counter-badge">{{ pollsInElaboration.length }}</span>
+				</div>
 				<div class="icon-title">{{ $t("discuss") }}</div>
 			</a>
 		</div>
 		<div :class="voteButtonClass" class="vote-button">
-			<a href="#" aria-label="Go to vote" @click="clickPollsInVoting()">
-				<div v-if="pollsInVoting.length > 0" class="counter-badge">{{ pollsInVoting.length }}</div>
-				<i class="fas fa-person-booth" />
+			<a href="#" aria-label="Polls in voting" @click="clickPollsInVoting()">
+				<div class="icon-with-badge">
+					<i class="fas fa-person-booth"></i>
+					<span v-if="pollsInVoting.length > 0" class="counter-badge">{{ pollsInVoting.length +222 }}</span>
+				</div>
 				<div class="icon-title">{{ $t("vote") }}</div>
 			</a>
 		</div>
 		<div :class="finishedButtonClass" class="finished-button">
 			<a href="#" aria-label="Finished polls" @click="clickFinishedPolls()">
-				<div v-if="pollsFinished.length > 0" class="counter-badge">{{ pollsFinished.length }}</div>
-				<i class="fas fa-check-circle" />
+				<div class="icon-with-badge">
+					<i class="fas fa-check-circle"></i>
+					<span v-if="pollsFinished.length > 0" class="counter-badge">{{ pollsFinished.length }}</span>
+				</div>
 				<div class="icon-title">{{ $t("finished") }}</div>
 			</a>
 		</div>
-		<div :class="menueButtonClass" class="menue-button">
+		<div v-if="false" :class="menueButtonClass" class="menue-button">
 			<a href="#" aria-label="Toggle menue" @click="toggleMenue">
 				<i class="fas fa-bars" />
 				<div class="icon-title">{{ $t("Menue") }}</div>
@@ -236,40 +242,44 @@ $arrowGap: 5px;
 #navbar {
 	position: fixed;
 	width: 100%;
-	height: 2 * $arrowHeight + 4 * $arrowGap;
+	//height: 2 * $arrowHeight + 4 * $arrowGap;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	z-index: 999;
 	font-size: 1.7rem;
-	padding: 0;
+	padding: 10px;
 	margin: 0;
 	box-shadow: 0 0 0.25rem rgba(0,0,0,0.6);
 	background-color: $header-bg;
-
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: space-between;
-	align-items: center;
+	//align-items: center;
 	
 	.team-button, .discuss-button, .vote-button, .finished-button, .menue-button {
 		text-align: center;
 		margin: 0;
 		padding: 0;
-		height: 2 * $arrowHeight;
+		height: 2 * $arrowHeight;   // Buttons MUST have a fixed height!
 		position: relative;
 		transition: background-color 0.5s;
 		a { 
 			position: relative;
 			text-decoration: none;
-			display: inline-block;
 			width: 100%;
 			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
 		}
 	} 
 
 	.discuss-button, .vote-button, .finished-button {
 		min-width: 60px;
+		flex-grow: 1;
+		line-height: 1.1;
 		background-color: $arrowColor;
 		&::after {
 			-webkit-transition: background-color 0.5s ease, border-color 0.5s ease;
@@ -301,7 +311,7 @@ $arrowGap: 5px;
 		position: relative;
 		border-top-left-radius: 10px;
 		border-bottom-left-radius: 10px;
-		margin-left: 5px;
+		//margin-left: 5px;
 		margin-right: $arrowWidth + $arrowGap;
 		flex-grow: 2;
 		&::after {
@@ -350,7 +360,7 @@ $arrowGap: 5px;
 		flex-grow: 2;
 		border-top-right-radius: 10px;
 		border-bottom-right-radius: 10px;
-		margin-right: 5px;
+		//margin-right: 5px;
 		padding: 0;
 		background-color: $arrowColor;
 		&::before {
@@ -372,11 +382,7 @@ $arrowGap: 5px;
 		border-bottom-left-radius: 10px;
 	}
 
-	.icon-title {
-		font-size: 11px;
-		line-height: 1;
-		text-decoration: none;
-	}
+	
 	.selected {
 		a {	color: white !important; }
 		background-color: $primary;
@@ -387,21 +393,36 @@ $arrowGap: 5px;
 	.disabled.selected {
 		a { color: lightgray !important; }
 	}
+
+	.icon-with-badge {
+		position: relative;
+		display: inline-block;
+	}
 	.counter-badge {
 		position: absolute;
-		top: 2px;
-		right: 10px;
-		color: white;
-		background-color: $primary;
-		border: 1px solid $header-bg;
-		border-radius: 50%;
-		width: 18px;
-		height: 18px;
-		font-family: Geneva, sans-serif;
-		font-size: 14px;
-		line-height: 16px;
+		text-align: center;
+		top: 0;
+		right: 0;
+		color: $primary;
+		background-color: white;
+		border: 1px solid $primary;
+		border-radius: 1em;
+		font-size: 0.4em;
+		height: 1.2em;
+		min-width: 1.2em;
+		max-width: 4em;		
+		padding: 0 3px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1;
+		transform: translate(66%, -40%)
 	}
-}
+	.icon-title {
+		font-size: 12px;
+		text-decoration: none;
+	}
+
+}	
 
 
 /* DEPRECATED: This was from an old layout with a larger circle in the middle
