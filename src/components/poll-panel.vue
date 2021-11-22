@@ -1,11 +1,18 @@
 <template>
-	<b-card :id="pollCardId" :pollid="poll.id" :data-poll-status="poll.status" no-body class="poll-panel">
+	<b-card 
+		:id="pollCardId"
+		:pollid="poll.id"
+		:data-poll-status="poll.status"
+		no-body
+		class="poll-panel" 
+		@click="goToPoll(poll.id)"
+	>
 		<template #header>
 			<h1 v-if="readOnly" class="read-only poll-panel-title">
 				<i :class="iconForPoll" />
 				&nbsp;{{ poll.title }}
 			</h1>
-			<h1 v-else class="poll-panel-title" @click="goToPoll(poll.id)">
+			<h1 v-else class="poll-panel-title">
 				<i class="fas fa-angle-double-right goto-poll-icon" />
 				<i :class="iconForPoll" />
 				&nbsp;{{ poll.title }}
@@ -57,7 +64,7 @@
 			class="collapse-icon"
 			:class="{'collapsed' : collapsed}"
 			href="#"
-			@click="toggleCollapse()"
+			@click.stop.prevent="toggleCollapse()"
 		>
 			<i class="fa" />
 		</a>

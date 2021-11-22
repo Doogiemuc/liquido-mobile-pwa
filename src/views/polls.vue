@@ -20,22 +20,13 @@
 
 			<p v-if="allPolls.length === 0 && !loading" v-html="$t('noPollYet')" />
 
-			<p v-if="searchResultIsEmpty" class="text-center" v-html="$t('noPollsMatchSearch')" />
+			<p v-if="searchResultIsEmpty" class="text-center" @click="clearSearch" v-html="$t('noPollsMatchSearch')" />
 
-			<div class="search-icon-wrapper">
+			<div class="search-wrapper">
+				<input id="searchInput" v-model="searchQuery" type="text" :placeholder="$t('Search')">
 				<i class="fas fa-search search-icon"></i>
 			</div>
-			<input
-				v-if="showSearch"
-				id="searchInput"
-				v-model="searchQuery"
-				class="form-control mb-4"
-				:placeholder="$t('Search')"
-			/>
-
 		</div>
-
-
 		
 		<div v-if="pollStatusFilter === undefined && allPolls.length > 0" class="alert text-muted">
 			<p v-html="$t('allPollsInfo')" />
@@ -228,6 +219,10 @@ export default {
 			}
 			return false
 		},
+
+		clearSearch() {
+			this.searchQuery = undefined
+		}
 	},
 }
 </script>
@@ -239,13 +234,26 @@ export default {
 	margin: 1rem;
 }
 
-.search-icon-wrapper {
-	text-align: right;
+.search-wrapper {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	margin: 1rem 0.5rem 0.5rem 0.5rem;
+	color: $secondary;
 }
-.search-icon {
-	color: $primary-text;
-	margin-top: 1rem;
+#searchInput {
+	color: $secondary;
+	border: 0;
+	flex-grow: 1;
+	max-width: 200px;
+	border-bottom: 1px solid $secondary;
+	background-color: $poll-list-background;
+	&:focus {
+    outline: 0;
+	}
 }
+
 .poll-list {
 	margin: 0 -10px 0 -10px;
 	padding: 2rem 10px 10px 10px;

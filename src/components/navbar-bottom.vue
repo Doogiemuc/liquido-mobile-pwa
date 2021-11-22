@@ -19,7 +19,7 @@
 			<a href="#" aria-label="Polls in voting" @click="clickPollsInVoting()">
 				<div class="icon-with-badge">
 					<i class="fas fa-person-booth"></i>
-					<span v-if="pollsInVoting.length > 0" class="counter-badge">{{ pollsInVoting.length +222 }}</span>
+					<span v-if="pollsInVoting.length > 0" class="counter-badge">{{ pollsInVoting.length }}</span>
 				</div>
 				<div class="icon-title">{{ $t("vote") }}</div>
 			</a>

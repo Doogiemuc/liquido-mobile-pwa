@@ -1,21 +1,18 @@
 <template>
 	<header id="liquidoHeader" class="liquido-header">
-		<div class="container">
-			<div class="row no-gutters align-items-center">
-				<div class="col header-left">
-					<i
-						v-if="backLink"
-						class="fas fa-angle-left"
-						@click="goBack"
-					/>
-				</div>
-				<div class="col-8 liquido-title">
-					<i class="fas fa-university" />&nbsp;
-					<span class="liquido" @click="clickLiquidoTitle()" />
-				</div>
-				<div class="col header-right">
-				</div>
-			</div>
+		<div class="header-left">
+			<a v-if="backLink" href="#" @click="goBack">
+				<i class="fas fa-angle-left" />
+			</a>
+		</div>
+		<div class="liquido-title">
+			<i class="fas fa-university" />&nbsp;
+			<span class="liquido" @click="clickLiquidoTitle()" />
+		</div>
+		<div class="header-right">
+			<a v-if="isAuthenticated" href="#" aria-label="Team Home" @click="clickTeamIcon()">
+				<i class="fas fa-users" />
+			</a>
 		</div>
 	</header>
 </template>
@@ -52,7 +49,7 @@ export default {
 		//$("#app").scroll(this.transitionHeader)
 
 		// Cannot simply do this with a computed property, because this.$api.isAuthenticated is not reactive. TODO: Can we make it reactive? maybe with Vue.$set ?
-		EventBus.$on(EventBus.LOGIN, () => this.isAuthenticated = true)
+		EventBus.$on(EventBus.LOGIN,  () => this.isAuthenticated = true)
 		EventBus.$on(EventBus.LOGOUT, () => this.isAuthenticated = false)
 	},
 	methods: {
@@ -97,25 +94,33 @@ export default {
 .liquido-header {
 	position: fixed;
 	top: 0;
-	left: 0;
 	width: 100%;
+	max-width: 1140px;  // same as .container
 	z-index: 100;
 	transition: 0.3s; /* Add a transition effect when scrolling */
 	color: $primary;
 	background-color: $header-bg;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 	font-size: 1.5rem;
+	display: flex;
+	flex-direction: row;
+	
 
+	.header-left {
+		width: 2em;
+		text-align: left;
+		padding-left: 10px;
+	}
 	.liquido-title {
+		flex-grow: 1;	
 		text-align: center;
 	}
 	.header-right {
-		font-size: 1rem;
+		width: 2em;
 		text-align: right;
+		padding-right: 10px;
 	}
-	.header-left {
-		text-align: left;
-	}
+	
 }
 
 .liquido-header.scrolled {
