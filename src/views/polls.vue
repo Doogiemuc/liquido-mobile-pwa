@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h1 class="polls-list-title">{{ pageTitleLoc }}</h1>
+		<h1 id="polls" class="polls-list-title">{{ pageTitleLoc }}</h1>
 
 		<div v-if="loading" class="my-3">
 			<b-spinner small />&nbsp;{{ $t('Loading') }}

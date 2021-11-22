@@ -4,7 +4,7 @@
 			{{ team.teamName }}
 		</h1>
 
-		<div class="alert alert-info mb-3">
+		<div id="team-home-user-welcome" class="alert alert-info mb-3">
 			<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
 			<b-button
 				v-if="teamHasPolls"
@@ -18,8 +18,6 @@
 				<i class="fas fa-angle-double-right" />
 			</b-button>
 		</div>
-
-		
 
 		<div class="clearfix" />
 

@@ -28,8 +28,9 @@ context('Happy Case', () => {
 	before(() => {
 		fix.userName   = 'Cypress User-'+now
 		fix.userEmail  = 'cypressUser-'+now+'@liquido.me'
+		fix.userMobilePhone = '+49 555 '+now
 		fix.adminName  = 'Cypress Admin-'+now
-		fix.adminMobilephone = '+49151555'+now
+		fix.adminMobilephone = '+49 666 '+now
 		fix.adminEmail = 'cypressAdmin-'+now+'@liquido.me'
 		fix.teamName   = 'Cypress Team '+now
 		fix.devLoginToken = Cypress.env("devLoginToken")
@@ -145,6 +146,7 @@ context('Happy Case', () => {
 		//GIVEN inviteCode and data for new member
 		assert.isString(fix.inviteCode, "Need inviteCode to test joinTeam")
 		assert.isString(fix.userName)
+		assert.isString(fix.userMobilePhone)
 		assert.isString(fix.userEmail)
 		assert.isString(fix.pollTitle, "Need existing poll to test joinTeam")
 		assert.isString(fix.proposalTitle, "Need existing proposal to test joinTeam")
@@ -157,7 +159,9 @@ context('Happy Case', () => {
 		cy.get('#userNameInput', {timeout: 8000}).type(fix.userName).type("{enter}")  // implicitly checks that #userNameInput is not disabled
 		cy.get('#joinTeamButton').click()
 		cy.get('#inviteCodeInput').type(fix.inviteCode)
-		cy.get('#emailInput').type(fix.userEmail)
+		cy.get('#userMobilephoneInput').type(fix.userMobilePhone)
+		cy.get('#userEmailInput').type(fix.userEmail)
+
 		cy.get('#joinTeamOkButton').click()
 
 		//THEN team-home is shown
@@ -214,7 +218,7 @@ context('Happy Case', () => {
 		//WHEN going to polls
 		cy.get('#gotoPollsButton').click()
 		//THEN we see our poll in elaboration with the correct title
-		cy.get("#elaborationArrow").click()
+		cy.get("#pollsInDiscussionArrow").click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 		
 		// WHEN user adds a proposal
@@ -259,7 +263,7 @@ context('Happy Case', () => {
 		
 		// AND a poll in voting
 		cy.get('#gotoPollsButton').click()
-		cy.get("#votingArrow").click()
+		cy.get("#pollsInVotingArrow").click()
 		cy.contains(".poll-panel-title", fix.pollTitle).click()
 		cy.get("#goToCastVoteButton").click()
 		cy.get("#cast-vote-page")

@@ -32,7 +32,7 @@
 
 		<b-list-group v-else flush>
 			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item" :class="proposalListGroupItemClasses(law.id)">
-				<div class="proposal-header d-flex" @click="goToPoll(poll.id)">
+				<div class="proposal-header d-flex">
 					<div>
 						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
 					</div>

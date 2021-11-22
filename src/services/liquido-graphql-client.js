@@ -374,10 +374,14 @@ let graphQlApi = {
 			// Further up some UI method will do something about the error, e.g. show an meaningful error message to the user.
 	},
 
-	async joinTeam(inviteCode, userName, userEmail) {
-		let graphQL = `mutation {	joinTeam(inviteCode: "${inviteCode}", userName: "${userName}", userEmail: "${userEmail}") ` +
-			JQL.CREATE_OR_JOIN_TEAM_RESULT + "}"
-		return graphQlQuery(graphQL)
+	async joinTeam(inviteCode, member) {
+		let graphQL = `mutation joinTeam($inviteCode: String!, $member: UserModelInput!) { ` + 
+			` joinTeam(inviteCode: $inviteCode, member: $member) ${JQL.CREATE_OR_JOIN_TEAM_RESULT} }`
+		let variables = {
+			inviteCode: inviteCode,
+			member: member
+		}
+		return graphQlQuery(graphQL, variables)
 			.then(res => {
 				let team = res.data.joinTeam.team
 				this.login(

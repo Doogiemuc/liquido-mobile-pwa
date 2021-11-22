@@ -48,7 +48,8 @@ export default {
 		// make header smaller when user scrolls down
 		//$("#app").scroll(this.transitionHeader)
 
-		// Cannot simply do this with a computed property, because this.$api.isAuthenticated is not reactive. TODO: Can we make it reactive? maybe with Vue.$set ?
+		// Cannot simply do this with a computed property, because this.$api.isAuthenticated is not reactive.
+		//TODO: Can we make it reactive? maybe with Vue.$set ?
 		EventBus.$on(EventBus.LOGIN,  () => this.isAuthenticated = true)
 		EventBus.$on(EventBus.LOGOUT, () => this.isAuthenticated = false)
 	},
@@ -64,7 +65,6 @@ export default {
 		},
 
 		goBack() {
-			console.log("liquido-header goBack "+this.backLink)
 			if (this.backLink === "BACK") this.$router.go(-1)
 			else if (this.backLink) this.$router.push(this.backLink)
 		},

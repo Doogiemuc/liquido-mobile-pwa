@@ -422,7 +422,7 @@ export default {
 			this.startChatAnimation()
 		} else {
 			$(window).scroll(() => {
-				console.log("Windows is scrolling")
+				//console.log("Window is scrolling")
 				if (this.$root.isBottomInView("#welcomeBubble")) {
 					this.startChatAnimation()
 				}
@@ -555,8 +555,15 @@ export default {
 		/** Join an existing team */
 		joinTeam() {
 			this.flowState = 11
-			log.info(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.invite)
-			this.$api.joinTeam(this.inviteCode, this.user.name, this.user.email, this.user.mobilephone, "Avatar1.png")
+			log.info(this.user.name + " <" + this.user.email + "> joins team with invite code " + this.inviteCode)
+			let newMember = {
+				name: this.user.name,
+				mobilephone: this.user.mobilephone,
+				email: this.user.email,
+				picture: "Avatar1.png",      //TODO: let user change his Avatar later
+				//website: ...
+			}
+			this.$api.joinTeam(this.inviteCode, newMember)
 				.then(team => {
 					this.flowState = 12
 					this.team = team

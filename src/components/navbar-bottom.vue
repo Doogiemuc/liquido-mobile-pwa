@@ -1,12 +1,6 @@
 <template>
 	<nav id="navbar">
-		<div v-if="false" :class="teamButtonClass" class="team-button">
-			<a href="#" aria-label="Team Home" @click="goToTeam()">
-				<i class="fas fa-users" />
-				<div class="icon-title">{{ $t("Team") }}</div>
-			</a>
-		</div>
-		<div :class="discussButtonClass" class="discuss-button">
+		<div id="pollsInDiscussionArrow" :class="discussButtonClass" class="discuss-button">
 			<a href="#" aria-label="Polls to discuss" @click="clickPollsInDiscussion()">
 				<div class="icon-with-badge">
 					<i class="fas fa-comments"></i>
@@ -15,7 +9,7 @@
 				<div class="icon-title">{{ $t("discuss") }}</div>
 			</a>
 		</div>
-		<div :class="voteButtonClass" class="vote-button">
+		<div id="pollsInVotingArrow" :class="voteButtonClass" class="vote-button">
 			<a href="#" aria-label="Polls in voting" @click="clickPollsInVoting()">
 				<div class="icon-with-badge">
 					<i class="fas fa-person-booth"></i>
@@ -24,19 +18,13 @@
 				<div class="icon-title">{{ $t("vote") }}</div>
 			</a>
 		</div>
-		<div :class="finishedButtonClass" class="finished-button">
+		<div id="finishedPollsArrow" :class="finishedButtonClass" class="finished-button">
 			<a href="#" aria-label="Finished polls" @click="clickFinishedPolls()">
 				<div class="icon-with-badge">
 					<i class="fas fa-check-circle"></i>
 					<span v-if="pollsFinished.length > 0" class="counter-badge">{{ pollsFinished.length }}</span>
 				</div>
 				<div class="icon-title">{{ $t("finished") }}</div>
-			</a>
-		</div>
-		<div v-if="false" :class="menueButtonClass" class="menue-button">
-			<a href="#" aria-label="Toggle menue" @click="toggleMenue">
-				<i class="fas fa-bars" />
-				<div class="icon-title">{{ $t("Menue") }}</div>
 			</a>
 		</div>
 	</nav>

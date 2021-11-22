@@ -1,10 +1,8 @@
 <template>
 	<div>
-		<!--
-		<h2 id="poll-show" class="page-title">
+		<h2 id="poll-show" class="page-title text-center">
 			{{ pageTitleLoc }}
 		</h2>
-		-->
 
 		<div v-if="loadingPoll" class="my-3">
 			<b-spinner small />&nbsp;{{ $t('Loading') }}
