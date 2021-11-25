@@ -7,7 +7,6 @@
 		<div id="team-home-user-welcome" class="alert alert-info mb-3">
 			<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
 			<b-button
-				v-if="teamHasPolls"
 				id="gotoPollsButton"
 				variant="primary"
 				size="m"
@@ -84,7 +83,7 @@ export default {
 		messages: {
 			en: {
 				introYourTeam: "",
-				teamAdmin: "Teama admin | Team Admin | Team Admins",
+				teamAdmin: "Team admin | Team Admin | Team Admins",
 				teamMembers: "Team members",
 			},
 			de: {

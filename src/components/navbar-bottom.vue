@@ -230,14 +230,13 @@ $arrowGap: 5px;
 #navbar {
 	position: fixed;
 	width: 100%;
+	max-width: $max-width;
 	//height: 2 * $arrowHeight + 4 * $arrowGap;
 	bottom: 0;
-	left: 0;
-	right: 0;
 	z-index: 999;
 	font-size: 1.7rem;
 	padding: 10px;
-	margin: 0;
+	margin: 0 auto;
 	box-shadow: 0 0 0.25rem rgba(0,0,0,0.6);
 	background-color: $navbar-bg;
 	display: flex;

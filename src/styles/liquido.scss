@@ -36,30 +36,34 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 //TODO: find right base font size for everything, MAYBE depending on screen size
 html {
 	// font-size: 16px;   
+}
+body {
 	background-color: $app-background;
 }
 
-
 /** 
- * Main app content below the header
- * no horizintal scrolling 
+ * #app is the container div that scrolls up and down.
  */
 #appContent {
+	margin: 0;	
 	background-color: $app-background;
-	margin-top: 2rem;  // margin-top is behind header!
-	padding-top: 0.5rem;
+	
+	padding-top: 2rem;			// space behind liquido-header
 	padding-bottom: 100px;  // space behind navbar-bottom!
 	padding-left: 10px;     // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
 	padding-right: 10px;
 }
 
-// need to be more CSS specific than bootstrap's default. So therefore the #app
+/*
+ The outer wrapper of the Vue app
+ need to be more CSS specific than bootstrap's default. So therefore the #app
+ */
 #app {
-	max-width: 1140px; // bootstrap breakpoint of container-lg
 	margin: 0 auto;  
 	position: relative;
-	height: 100%;
+	height: 100vh;		// make sure the app is at least as high as the screen, so that background color is shown.
 	width: 100%;
+	max-width: $max-width;	// eg. when app is shown in the browser
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background-color: $app-background;

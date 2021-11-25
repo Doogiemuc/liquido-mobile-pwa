@@ -40,18 +40,22 @@
 						<h2 class="law-title">
 							{{ law.title }}
 						</h2>
-						<div class="law-subtitle">
-							<div :class="{ supported: law.supportedByCurrentUser }" class="like-button">
-								<i :class="{
-										far: !law.supportedByCurrentUser,
-										fas: law.supportedByCurrentUser,
-									}"
-									class="fa-thumbs-up"
-								/>
-								&nbsp;{{ law.numSupporters }}
+						<div :class="lawSubtitleClasses(law)">
+							<div v-if="canLike(law)" class="like-button" @click.stop.prevent="clickLike(poll.id, law.id)">
+								<i class="far fa-thumbs-up" />&nbsp;{{ law.numSupporters }}
 							</div>
-							<i class="created-date far fa-clock" />&nbsp;{{ formatDate(law.createdAt) }}
-							<i class="createdby-user far fa-user" />&nbsp;{{ law.createdBy.name }}
+							<div v-else class="like-button" @click.stop.prevent="">
+								<i class="fas fa-thumbs-up" />&nbsp;{{ law.numSupporters }}
+							</div>
+							<div class="created-date">
+								<i class="far fa-clock" />&nbsp;{{ formatDate(law.createdAt) }}
+							</div>
+							<div v-if="isCreatedByCurrentUser(law)" class="createdby-user">
+								<i class="fas fa-user" />&nbsp;{{ law.createdBy.name }}
+							</div>
+							<div v-else class="createdby-user">
+								<i class="far fa-user" />&nbsp;{{ law.createdBy.name }}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -128,6 +132,28 @@ export default {
 				"winner": this.poll.status === "FINISHED" && isWinner,
 				"lost": this.poll.status === "FINISHED" && !isWinner,
 			}
+		},
+
+		lawSubtitleClasses(law) {
+			let currentUser = this.$api.getCachedUser() || {}
+			return { 
+				"law-subtitle": true,
+				"liked": law.isLikedByCurrentUser, 
+				"own-proposal": law.createdBy.id === currentUser.id
+			}
+		},
+
+		isCreatedByCurrentUser(law) {
+			let currentUser = this.$api.getCachedUser() || {}
+			return law.createdBy.id === currentUser.id
+		},
+
+		canLike(law) {
+			return !law.isLikedByCurrentUser && !this.isCreatedByCurrentUser(law)
+		},
+
+		clickLike(pollId, proposalId) {
+			this.$api.likeProposal(pollId, proposalId)
 		},
 
 		toggleCollapse() {
@@ -222,7 +248,26 @@ $proposal_img_size: 32px;
 		.law-subtitle {
 			font-size: 10px;
 			color: #bbb;
+			font-family: Helvetica, sans-serif;
+			.like-button {
+				display: inline;
+			}
+			&.liked .like-button {
+				color: green;
+			}
+			.created-date {
+				display: inline;
+				margin-left: 5px;
+			}
+			.createdby-user {
+				display: inline;
+				margin-left: 5px;
+			}
+			&.own-proposal {
+				color: green;
+			}
 		}
+
 		.law-image {
 			border-radius: 5px;
 			min-width: $proposal_img_size;
@@ -238,17 +283,9 @@ $proposal_img_size: 32px;
 			font-size: 12px;
 			overflow: hidden;
 		}
-		.like-button {
-			display: inline;
-		}
-		.supported {
-			color: green;
-		}
-		.created-date {
-			margin-left: 5px;
-		}
-		.createdby-user {
-			margin-left: 5px;
+		//TODO: only in browser (not on mobile) -  only for polls in ELABORATION
+		.like-button:hover {
+			color: green !important;
 		}
 	}
 

@@ -11,11 +11,11 @@ const EventBus = new Vue({
 	data() {
 		return {
 			// "enum" for event names (the keys are case insensitive.)
-			LOGIN: "login",								// called with {team, polls, jwt }
-			LOGOUT: "logout",
-			POLLS_LOADED: "polls-loaded",  // array of polls was loaded
-			POLL_LOADED: "poll-loaded",    // ONE poll was loaded from the backend
-			SET_POLLS_FILTER: "set-polls-filter"   // Set the filter on the polls page
+			LOGIN: "login",													// Fires after a successfull login. Event param is { team, polls, jwt }
+			LOGOUT: "logout",												// Fires after logout is completed.
+			POLLS_LOADED: "polls-loaded",  					// Fires when an array of polls was loaded from backend. Event param is the list of newly loaded polls
+			POLL_LOADED: "poll-loaded",    					// One poll was loaded from the backend. Event param is that one poll
+			SET_POLLS_FILTER: "set-polls-filter"		// Can be fired to set the filter on the polls page
 		}
 	}
 })

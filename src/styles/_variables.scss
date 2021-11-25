@@ -13,9 +13,11 @@ $navbar-bg: rgba(220, 236, 255, 0.8);	// transparent background for bottom navba
 $app-background: #a5b4c6;
 $poll-list-background: #22418c;
 
-$input-bg: #c3cce6; //rgb(180, 171, 255); 			 	// background for chat bubbles where user has to enter something
+$input-bg: #c3cce6; //rgb(180, 171, 255); // background for chat bubbles where user has to enter something
 
 $proposal-bg: #f5f5f5;
+
+$max-width: 1140px;											// maximum width, eg. when shown in a browser
 
 /*
 $black : hsl(0, 0%, 4%);

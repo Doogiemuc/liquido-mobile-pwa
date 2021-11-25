@@ -60,7 +60,7 @@ const graphQlQuery = function(query, variables) {
 
 
 /** Shorthands for JQL return values */
-const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, createdBy { id name email } area { id } }"
+const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, isLikedByCurrentUser, createdBy { id name email } area { id } }"
 const JQL_POLL = `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} winner ${JQL_PROPOSAL} numBallots duelMatrix { data } }`
 const JQL_TEAM = "team { id, teamName, inviteCode, " +
 		"admins  { id, email, name, website, picture, mobilephone } " +
@@ -394,9 +394,9 @@ let graphQlApi = {
 			})
 	},
 
-	/****************************************************************
-	 * API calls against backend that need to be authenticated with JWT
-	 *****************************************************************/
+	/**********************************************************************
+	 * API calls against backend that need to be authenticated with a JWT
+	 **********************************************************************/
 
 	async createPoll(pollTitle) {
 		let graphQL = `mutation {	createPoll(title: "${pollTitle}") ${JQL.POLL}	}`
@@ -428,8 +428,7 @@ let graphQlApi = {
 	},
 
 	/** 
-	 * Synchronously get a direct reference to currently cached polls.
-	 * We need the direct reference for VUE's computed properties.
+	 * Synchronously get currently cached polls (optionally filterd by status).
 	 * 
 	 * @param {String} status Optionally filter by status. If ELABORATION|VOTING|FINISHED only polls of that status are returned. 
 	 *      If undefined, then all polls in the cache will be returned.
@@ -438,17 +437,18 @@ let graphQlApi = {
 	getCachedPolls(status) {
 		let cacheData = this.pollsCache.getCacheData()
 		if (!cacheData || !cacheData.polls) return []
-		return cacheData.polls.filter(poll => !status ||  poll.status === status)
+		return cacheData.polls.filter(poll => !status ||  poll.status === status)  // Keep in mind that "filter" creates a copy of the polls array!
 	},
 
 	/**
 	 * Add a new proposal to a poll.
 	 * Keep in mind that a member may only add one proposal per poll. The backend will check this.
+	 * Will update the poll in local pollsCache
 	 * 
 	 * @param {String} pollId poll ID
 	 * @param {String} propTitle short title for new proposal
 	 * @param {String} propDescription longer description of proposal
-	 * @returns {Object} the complete poll with the added proposal
+	 * @returns {Object} the updated poll with the added proposal
 	 */
 	async addProposal(pollId, propTitle, propDescription) {
 		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") ${JQL.POLL} }`
@@ -457,6 +457,26 @@ let graphQlApi = {
 				let poll = res.data.addProposal
 				this.pollsCache.put("polls/"+poll.id, poll)
 				console.debug("Added proposal to poll:", poll)
+				return poll
+			})
+	},
+
+	/**
+	 * Like ("support") a proposal in a poll.
+	 * Will update the poll in pollsCache and notify listeners POLL_LOADED
+	 * 
+	 * @param {Number} pollId a poll
+	 * @param {Number} proposalId a proposal in that poll
+	 * @returns {Object} the updated poll
+	 */
+	async likeProposal(pollId, proposalId) {
+		let graphQL = `mutation { likeProposal(pollId: "${pollId}", proposalId: "${proposalId}") ${JQL.POLL} }`
+		return graphQlQuery(graphQL)
+			.then(res => {
+				let poll = res.data.likeProposal
+				this.pollsCache.put("polls/"+poll.id, poll)
+				console.debug(`User likes proposal.id=${proposalId} in poll.id=${pollId}`)
+				EventBus.$emit(EventBus.POLL_LOADED, poll)
 				return poll
 			})
 	},

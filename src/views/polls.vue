@@ -116,7 +116,8 @@ export default {
 			loading: true,
 			searchQuery: "",
 			/**current filter for poll status, undefined|ELABORATION|VOTING|FINISHED */
-			pollStatusFilter: undefined
+			pollStatusFilter: undefined,
+			forceRefreshComputed: 0   
 		}
 	},
 	computed: {
@@ -148,9 +149,19 @@ export default {
 			return this.$api.isAdmin()
 		},
 		allPolls() {
-			return this.$api.getCachedPolls()
+			// Implementation note:
+			// We could hold a local copy of all polls in this component. 
+			// But that would need to be updated whenver polls are loaded from the backend.
+			// So we reference the list of polls from the cache.
+			// Sadly the javascript Arry.filter method creates a copy of the array.
+			// So VUE's reactive updates do not work when the data changes in the cache.
+			// Therefore we have to force a recompute of this "computed" value with a nice hack:
+			this.forceRefreshComputed;		
+			let polls = this.$api.getCachedPolls()
+			return polls
 		},
 		filteredPolls() {
+			this.forceRefreshComputed;
 			return this.$api.getCachedPolls(this.pollStatusFilter)
 				.filter((poll) => this.matchesSearch(poll))
 				.sort((p1,p2) => {
@@ -179,11 +190,15 @@ export default {
 		}
 		// or status can be changed with an event (navbar-bottom does that)
 		EventBus.$on(EventBus.SET_POLLS_FILTER, (newFilterValue) => this.setPollFilter(newFilterValue))
+		EventBus.$on(EventBus.POLL_LOADED, () => this.pollsChanged())
+		EventBus.$on(EventBus.POLLS_LOADED, () => this.pollsChanged())  // event param "polls" is not used here
 
 		// update polls in cache when navigating to this page
 		this.loading = true
 		this.$api.getPolls()
-			.then(() => this.loading = false)
+			.then(() => {
+				this.loading = false
+			})
 			.catch(err => {
 				this.loading = false
 				console.error("Canont load polls", err)
@@ -198,6 +213,15 @@ export default {
 			if (newFilterValue === undefined || newFilterValue.match(/ELABORATION|VOTING|FINISHED/)) {
 				this.pollStatusFilter = newFilterValue
 			}
+		},
+
+		/**
+		 * Called when the data of one or all polls was updated or reloaded from the backend
+		 * Force a refresh of computed values to update the view.
+		 */
+		pollsChanged() {
+			//console.log("pollsChanged")
+			this.forceRefreshComputed++
 		},
 
 		gotoCreatePoll() {
