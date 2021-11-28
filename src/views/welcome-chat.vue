@@ -111,7 +111,7 @@
 						tabindex="3"
 					/>
 
-					<div class="d-flex justify-content-between align-items-center">
+					<div class="d-flex justify-content-between align-items-end">
 						<small :class="{ invisible: flowState !== 10 }" class="ml-1">
 							<a href="#" tabindex="4" @click="cancelJoinTeam()">{{ $t("Cancel") }}</a>
 						</small>
@@ -195,7 +195,7 @@
 
 					<small class="ml-1 mb-1">{{ $t("youWillBecomeAdmin") }}</small>
 
-					<div class="d-flex justify-content-between align-items-center">
+					<div class="d-flex justify-content-between align-items-end">
 						<small :class="{ invisible: flowState !== 20 }" class="ml-1">
 							<a href="#" tabindex="4" @click="cancelCreateNewTeam()">{{ $t("Cancel") }}</a>
 						</small>
@@ -680,5 +680,9 @@ label {
 .qr-code {
 	width: 80%;
 	max-width: 300px;
+}
+
+.opacity0 {
+	opacity: 0;
 }
 </style>

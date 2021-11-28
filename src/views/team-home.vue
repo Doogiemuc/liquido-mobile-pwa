@@ -4,7 +4,7 @@
 			{{ team.teamName }}
 		</h1>
 
-		<div id="team-home-user-welcome" class="alert alert-info mb-3">
+		<div id="team-home-user-welcome" class="alert liquido-info mb-3">
 			<p v-html="$t('introYourTeam', {name: currentUserName })"></p>
 			<b-button
 				id="gotoPollsButton"

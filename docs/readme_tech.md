@@ -9,8 +9,16 @@ Liquido Mobile has a uch simpler concept than the larger web based www.Liquido.v
 
 # Devlepment Roadmap
 
- * Local data store/cache for polls with proposals => liquido-store or VueApollo InMemoryStore
+ * Local data store/cache for polls with proposals => liquido-store or VueApollo InMemoryStore   [done]  wrote my own store ! :-)
  * Replace Jquery with Bootstrap.native Javascript http://thednp.github.io/bootstrap.native/index.html
+ * Team page / Config for admin:
+   * Switch Team
+	 * Join Another team
+	 * Overview of admin tasks (start/finish) running polls, accept team members
+
+
+Mid-term: Reports, Data and Overview graphics
+
 
 # User Interface (UI) / User Experience (UX)
 
@@ -20,12 +28,9 @@ Title bar at the top
 
 
 Taskbar at the bottom (5 icons!)
-
- * Team Home            (DE: "Team")
  * Polls in elaboration (DE: "diskutieren")   
  * Polls in voting      (DE: "abstimmen")
  * Polls finished       (DE: "entschieden") ("abgeschlossen" is  zuu lang )  greyed out, when non finished poll yet
- * Menu (Settings, Switch Team, Join Another Team, overview of admin tasks, eg. start/finish running polls, accept new team members, )
 
 if 2,3,4 is active, then a second click shows all polls.  <= support this in UI somehow.  What to highlight, when all polls are shown? all three of them
 
@@ -35,9 +40,9 @@ if 2,3,4 is active, then a second click shows all polls.  <= support this in UI 
 See ./doc/screenshots
 
 
-# Settings in a team
+# Settings in a team (done by the admin)
 
- - Who can invite new members? (default: only admin)
+ - Who may invite new members? (default: only admin)
  - Does the admin need to approve new members (default: no)
  - Who can create new polls? Everyone or only the admin(default)
  - 

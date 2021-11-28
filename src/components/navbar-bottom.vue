@@ -230,7 +230,7 @@ $arrowGap: 5px;
 #navbar {
 	position: fixed;
 	width: 100%;
-	max-width: $max-width;
+	max-width: $app-max-width;
 	//height: 2 * $arrowHeight + 4 * $arrowGap;
 	bottom: 0;
 	z-index: 999;

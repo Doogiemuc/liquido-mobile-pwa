@@ -35,9 +35,6 @@ import moment from "moment"
 
 export default {
 	name: "LawCard",
-	components: {},
-	filters: {},
-	mixins: [],
 	props: {
 		law: { type: Object, required: true },
 		readOnly: { type: Boolean, required: false, default: false },
@@ -94,7 +91,6 @@ $proposal_img_size: 32px;
 	overflow: hidden;
 	padding: 10px;
 	transition: height 0.5s;
-	background-color: $proposal-bg;
 	&.collapse-law-panel {
 		height: 18px + $proposal_img_size;
 	}

@@ -4,7 +4,21 @@
 			{{ $t("addProposal") }}
 		</h2>
 
-		<div class="card input-bubble mb-5">
+		<div v-if="!poll.proposals || poll.proposals.length == 0" class="alert liquido-info mb-3">
+			<i class="fas fa-info-circle float-right" />
+			<p v-html="$t('noProposalYet', {pollTitle: poll.title})" />
+		</div>
+
+		<div v-if="poll && poll.proposals && poll.proposals.length > 0">
+			<poll-panel
+				:poll="poll"
+				:collapse="true"
+				:read-only="true"
+				class="shadow-sm mb-3"
+			/>
+		</div>
+
+		<div class="card input-bubble shadow-sm mb-3">
 			<div class="card-header">
 				{{ $t("yourProposal") }}
 			</div>
@@ -20,26 +34,60 @@
 					:maxlength="500"
 				/>
 
-				<textarea
-					id="propDescription"
-					v-model="proposal.description"
-					:class="descriptionValidClass"
-					:placeholder="$t('describeYourProposal')"
-					name="description"
-					class="form-control"
-					rows="3"
-					@blur="validateDescription()"
-					@keyup="validateDescription()"
-				/>
-
-				<div class="text-small ml-2">
-					{{ descriptionCharCounter }}
+				<div class="description liquido-input mb-3">
+					<label>
+						{{ $t('proposalDescription') }}
+					</label>
+					<textarea
+						id="propDescription"
+						v-model="proposal.description"
+						:class="descriptionValidClass"
+						:placeholder="$t('describeYourProposal')"
+						name="description"
+						class="form-control"
+						rows="3"
+						@blur="validateDescription(true)"
+						@keyup="validateDescription()"
+					/>
+					<div class="description-char-counter">
+						{{ descriptionCharCounter }}
+					</div>
+					<div v-if="!descriptionState" class="invalid-feedback is-invalid">
+						{{ $t("descriptionTooShort") }}
+					</div>
 				</div>
-				<div v-if="descriptionState === false" class="invalid-feedback">
-					{{ $t("descriptionTooShort") }}
-				</div>
-
-				<div class="d-flex justify-content-between align-items-center">
+				
+				<div class="d-flex">
+					<div class="flex-fill">
+						<liquido-input
+							id="iconSearch"
+							v-model="iconSearch"
+							name="iconSearch"
+							:placeholder="chosenIcon"
+							:label="$t('ChooseIcon')"
+							:maxlength="100"
+							:valid-func="isIconSearchValid"
+							autocomplete="off"
+							@blur="iconSearch=''"
+						/>
+					</div>
+					<div class="chosen-icon">
+						<i class="fas fa-fw" :class="'fa-' + chosenIcon" />
+					</div>
+				</div>				
+			</div>
+			<ul class="list-group list-group-flush icon-list">
+				<li class="list-group-item">
+					<span v-for="faIconName in filteredIconList" :key="faIconName" class="icon-in-list">
+						<i class="fas fa-fw" :class="getListIconClass(faIconName)" @click="chooseIcon(faIconName)" />
+					</span>
+					<p v-if="filteredIconList.length === 0" class="text-muted text-center">
+						{{ $t('noIconsMatchSearch') }}
+					</p>
+				</li>
+			</ul>
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-end">
 					<span class="cancel-link" @click="goBack">{{ $t("Cancel") }}</span>
 					<button
 						id="saveProposalButton"
@@ -54,20 +102,6 @@
 			</div>
 		</div>
 
-		<div v-if="!poll.proposals || poll.proposals.length == 0" class="alert alert-secondary mb-3">
-			<i class="fas fa-info-circle float-right" />
-			<p v-html="$t('noProposalYet', {pollTitle: poll.title})" />
-		</div>
-
-		<div v-if="poll && poll.proposals && poll.proposals.length > 0">
-			<poll-panel
-				:poll="poll"
-				:expanded="false"
-				:read-only="true"
-				class="shadow mb-3"
-			/>
-		</div>
-
 		<popup-modal
 			id="proposalSuccessfullyAddedModal"
 			ref="proposalSuccessfullyAddedModal"
@@ -75,15 +109,14 @@
 			:message="$t('createdSuccessfully')"
 			:primary-button-text="$t('gotoPoll')"
 			@clickPrimary="gotoPoll"
-		>
-		</popup-modal>
-
+		/>
+		
 		<popup-modal 
 			id="proposalAddErrorModal"
 			ref="proposalAddErrorModal"
 			type="error"
 			:message="$t('proposalAddError')"
-		></popup-modal>
+		/>
 	</div>
 </template>
 
@@ -91,6 +124,7 @@
 import pollPanel from "../components/poll-panel"
 import liquidoInput from "../components/liquido-input"
 import popupModal from "@/components/popup-modal"
+import faSolidIconsFree from "@/styles/fontawesome-solid-icons-free.json"
 
 export default {
 	i18n: {
@@ -101,9 +135,12 @@ export default {
 				yourProposal: "Dein neuer Vorschlag",
 				title: "Titel",
 				titleInvalid: "Titel zu kurz: Bitte mindestens {minChars} Zeichen!",
-				describeYourProposal: "Beschreibe deinen Wahlvorschlag ...",
+				proposalDescription: "Beschreibung",
+				describeYourProposal: "Beschreibe deinen Wahlvorschlag in wenigen Sätzen.",
 				descriptionInfo: "(Mindestes {minChars} Zeichen)",
 				descriptionTooShort: "Bitte beschreibe deinen Vorschlag etwas ausführlicher.",
+				ChooseIcon: "Icon Wählen",
+				noIconsMatchSearch: "Kein passendes Icon gefunden.",
 				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Dein Vorschlag wird der Erste sein.",
 				createdSuccessfully: "Ok, dein Vorschlag wurde in die Abstimmung mit aufgenommen.",
 				proposalAddError: "Es gab einen Fehler beim Hinzufügen deines Vorschlages.",
@@ -123,6 +160,9 @@ export default {
 			descriptionValidated: false,
 			descriptionMinLength: 20,
 			descriptionState: null,
+			iconSearch: "",
+			chosenIcon: "atom",
+			faIconList: faSolidIconsFree["fontawesome-solid-icons-free"],
 		}
 	},
 	computed: {
@@ -139,6 +179,13 @@ export default {
 				"is-invalid": this.descriptionState === false,
 			} // status === null will set no class at all
 		},
+		filteredIconList() {
+			return this.faIconList.filter(iconName => {
+				let regex = new RegExp(this.iconSearch, "i")
+				//console.log(iconName, this.iconSearch, "=>", iconName.match(regex))
+				return iconName.match(regex) !== null  // case insensitive match
+			})
+		},
 		saveButtonDisabled() {
 			return !this.isProposalTitleValid(this.proposal.title) || !this.descriptionState
 		},
@@ -146,24 +193,46 @@ export default {
 	created() {
 		this.$api.getPollById(this.pollId, true).then(poll => this.poll = poll)
 	},
-	mounted() {},
+	mounted() {	},
 	methods: {
+		/** Proposal title must have a minimum length */
 		isProposalTitleValid(val) {
 			return val !== undefined && val !== null && val.trim().length >= this.titleMinLength
 		},
 
+		/** Make searach input field red, when search result is empty */
+		isIconSearchValid() {
+			return this.filteredIconList.length > 0
+		},
+
 		/** validate description. Only set to invalid, and show error message, if it description been valid before. */
-		validateDescription() {
+		validateDescription(force = false) {
 			if (this.proposal.description &&	this.proposal.description.trim().length >= this.descriptionMinLength) {
 				this.descriptionState = true
 			} else {
-				if(this.descriptionState !== null ) this.descriptionState = false
+				if(force || this.descriptionState !== null ) this.descriptionState = false
 			}
-			
 		},
 
+		/** List of icons, selected one is emphasized */
+		getListIconClass(iconName) {
+			return { 
+				["fa-" + iconName] : true, 
+				"selected": iconName === this.chosenIcon
+			}
+		},
+
+		/** 
+		 * When user clicks on an icon it is selected as the chosen icon.
+		 * The searchString is *not* altered here. So user can select other similar icons that match the search.
+		 */
+		chooseIcon(iconName) {
+			this.chosenIcon = iconName
+		},
+
+		/** Save newly added proposal in backend. */
 		saveProposal() {
-			this.$api.addProposal(this.poll.id, this.proposal.title, this.proposal.description)
+			this.$api.addProposal(this.poll.id, this.proposal)
 				.then(() => this.$refs["proposalSuccessfullyAddedModal"].show())
 				.catch(err => {
 					console.error("Cannot add proposal", err)
@@ -185,10 +254,58 @@ export default {
 </script>
 
 <style lang="scss">
+.invalid-feedback {
+	margin-top: 0;
+}
+
+.description {
+	position: relative;
+}
+.description-char-counter {
+	color: grey;
+	font-size: 0.8rem;
+	position: absolute;
+	right: 5px;
+	bottom: 3px;
+}
+
+.icon-chooser {
+	text-align: center;
+	width: 3em;
+}
+.icon-for-proposal {
+	font-size: 1.5em;
+}
+.icon-list {
+	max-height: 200px;
+	overflow-y: scroll;
+	.list-group-item {
+		padding: 10px;
+		background-color: $input-bg;
+	}
+}
+.icon-in-list {
+	color: #666;
+	font-size: 1.5em;
+	padding: 0 3px;
+	.selected {
+		color: $primary;
+	}
+}
+.chosen-icon {
+	font-size: 2em;
+	color: $primary;
+	background-color: white;
+	background-color: #fff;
+	border: 1px solid #ced4da;
+	border-radius: 0.25rem;
+	padding: 0 0.25rem;
+	margin-left: 0.5rem;
+}
+
 .cancel-link {
 	font-size: 12px;
 	color: $secondary;
-	margin-left: 0.5em;
 	cursor: pointer;
 }
 </style>

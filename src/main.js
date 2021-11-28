@@ -4,6 +4,7 @@
 import config from "config"  // automatically mapped to environment specific config file config/config.<env>.jsin vue.config.js as a webpack alias
 const log = require("loglevel")
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+	Vue.config.debug = true
 	log.enableAll()
 	console.log("NODE_ENV="+process.env.NODE_ENV+"   LIQUIDO configuration:\n", config)
 }
@@ -11,9 +12,9 @@ if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
 import Vue from "vue"
 import RootApp from "@/root-app.vue"
 import router from "@/services/router"
-import "@/registerServiceWorker"
-import { BootstrapVue } from "bootstrap-vue"
+// import "@/registerServiceWorker"
 import "bootstrap/dist/css/bootstrap.css"
+import { BootstrapVue } from "bootstrap-vue"
 import "bootstrap-vue/dist/bootstrap-vue.css"
 import VueI18n from "vue-i18n"
 
@@ -31,7 +32,8 @@ const liquidoApiPlugin = {
 Vue.use(liquidoApiPlugin)
 
 Vue.config.productionTip = false
-Vue.config.debug = true
+
+
 
 /** 
  * Global translations that are available to all components 

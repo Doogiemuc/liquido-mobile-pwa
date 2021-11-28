@@ -55,12 +55,12 @@
 			</b-button>
 		</div>
 
-		<div v-if="isUpdatableBallot" id="isUpdateableBallotInfo" class="alert alert-info">
+		<div v-if="isUpdatableBallot" id="isUpdateableBallotInfo" class="alert liquido-info">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('updateBallotInfo')"></p>
 		</div>
 
-		<div v-if="hasBallot" class="alert alert-info">
+		<div v-if="hasBallot" class="alert liquido-info">
 			<p>
 				{{ $t("checksumOfYourBallot") }}
 			</p>
@@ -97,7 +97,7 @@
 			:message="$t('voteCastError')"
 		></popup-modal>
 		
-		<div class="alert alert-info">
+		<div class="alert liquido-info">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('castVoteInfo')"></p>
 		</div>

@@ -22,12 +22,6 @@
 			<p class="text-secondary">
 				<small>{{ $t("noProposalsInPollYet") }}</small>
 			</p>
-			<div v-if="showAddProposalButton" class="mb-1 text-right">
-				<b-button variant="primary" @click="goToAddProposal(poll.id)">
-					{{ $t("addProposal") }}
-					<i class="fas fa-angle-double-right" />
-				</b-button>
-			</div>
 		</div>
 
 		<b-list-group v-else flush>
@@ -93,7 +87,6 @@ export default {
 	props: {
 		poll: { type: Object, required: true },
 		readOnly: { type: Boolean, required: false, default: false },
-		showAddProposalButton: { type: Boolean, required: false, default: false },
 		collapse: { type: Boolean, required: false, default: false },
 	},
 	data() {
@@ -118,7 +111,7 @@ export default {
 		}
 	},
 	mounted() {
-		//console.log("poll panel", this.poll)
+
 	},
 	methods: {
 		formatDate(dateVal) {
@@ -149,7 +142,7 @@ export default {
 		},
 
 		canLike(law) {
-			return !law.isLikedByCurrentUser && !this.isCreatedByCurrentUser(law)
+			return !this.readOnly && !law.isLikedByCurrentUser && !this.isCreatedByCurrentUser(law)
 		},
 
 		clickLike(pollId, proposalId) {
@@ -183,7 +176,6 @@ $proposal_img_size: 32px;
 	.card-header {
 		margin: 0;
 		padding: 0;
-		background-color: $secondary-bg;
 		border-bottom: none;
 		.poll-panel-title {
 			// same as .law-title
@@ -226,10 +218,8 @@ $proposal_img_size: 32px;
 		height: 8rem;
 		overflow: hidden;
 		padding: 10px;
-		background-color: $proposal-bg;
 		transition: height 0.5s;
 		border: none;
-		//box-shadow: inset 0 1px 3px rgba(0,0,0, 0.125);
 		&.collapsed-law-panel {
 			height: 18px + $proposal_img_size;
 		}			

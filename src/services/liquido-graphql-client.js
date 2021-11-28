@@ -60,8 +60,8 @@ const graphQlQuery = function(query, variables) {
 
 
 /** Shorthands for JQL return values */
-const JQL_PROPOSAL =  "{ id, title, description, status, createdAt, numSupporters, isLikedByCurrentUser, createdBy { id name email } area { id } }"
-const JQL_POLL = `{ id, title, status, area { id } votingStartAt votingEndAt proposals ${JQL_PROPOSAL} winner ${JQL_PROPOSAL} numBallots duelMatrix { data } }`
+const JQL_PROPOSAL =  "{ id, title, description, icon, status, createdAt, numSupporters, isLikedByCurrentUser, createdBy { id name email } }"
+const JQL_POLL = `{ id, title, status, votingStartAt votingEndAt proposals ${JQL_PROPOSAL} winner ${JQL_PROPOSAL} numBallots duelMatrix { data } }`
 const JQL_TEAM = "team { id, teamName, inviteCode, " +
 		"admins  { id, email, name, website, picture, mobilephone } " +
 		"members { id, email, name, website, picture, mobilephone } " +
@@ -446,13 +446,17 @@ let graphQlApi = {
 	 * Will update the poll in local pollsCache
 	 * 
 	 * @param {String} pollId poll ID
-	 * @param {String} propTitle short title for new proposal
-	 * @param {String} propDescription longer description of proposal
+	 * @param {String} proposal a proposal with title, description and icon
 	 * @returns {Object} the updated poll with the added proposal
 	 */
-	async addProposal(pollId, propTitle, propDescription) {
-		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${propTitle}", description: "${propDescription}") ${JQL.POLL} }`
-		return graphQlQuery(graphQL)
+	async addProposal(pollId, proposal) {
+		let graphQL = `mutation addProposal($pollId: Long!, $proposal: LawModelInput!) { ` + 
+		` addProposal(pollId: $pollId, proposal: $proposal) ${JQL.POLL} }`
+		let variables = {
+			pollId: pollId,
+			proposal: proposal
+		}
+		return graphQlQuery(graphQL, variables)
 			.then(res => {
 				let poll = res.data.addProposal
 				this.pollsCache.put("polls/"+poll.id, poll)
@@ -533,7 +537,7 @@ let graphQlApi = {
 	/** Get voter's ballot if he voted already. MAY return null if not. */
 	async getBallot(pollId, voterToken) {
 		let graphQL = `query { ballot(pollId: "${pollId}", voterToken: "${voterToken}") ` +
-			`{ level checksum voteOrder { id } area { id } } }`
+			`{ level checksum voteOrder { id } } }`
 		return graphQlQuery(graphQL)
 			.then(res => {
 				console.debug("User's ballot in poll(id="+pollId+") is", res.data.ballot)

@@ -3,6 +3,22 @@
  */
 
 
+/** LIQUIDO - beautifull brand mark */
+.liquido:after {
+	content: "LIQUIDO";
+	font-family: 'Libre Baskerville', serif;
+	color: $primary;
+}
+
+/* TODO: How to find right base font size for everything? MAYBE depending on screen size?
+html {
+	font-size: 16px;   
+}
+*/
+body {
+	background-color: $app-background;
+}
+
 /** No iOS native button and input styling */
 button, [type="button"], [type="reset"], [type="submit"], input {
 	-webkit-appearance: none !important;
@@ -21,37 +37,14 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 																	supported by Chrome, Opera and Firefox */
 }
 
-/** LIQUIDO - beautifull brand mark */
-.liquido:after {
-	content: "LIQUIDO";
-	font-family: 'Libre Baskerville', serif;
-	color: $primary;
-}
-
-.opacity0 {
-	opacity: 0;
-}
-
-
-//TODO: find right base font size for everything, MAYBE depending on screen size
-html {
-	// font-size: 16px;   
-}
-body {
-	background-color: $app-background;
-}
-
-/** 
- * #app is the container div that scrolls up and down.
+/*
+ no margin-bottom after last paragraph in alers and card-bodies. 
+ Why is this not the default in bootstrap???
  */
-#appContent {
-	margin: 0;	
-	background-color: $app-background;
-	
-	padding-top: 2rem;			// space behind liquido-header
-	padding-bottom: 100px;  // space behind navbar-bottom!
-	padding-left: 10px;     // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
-	padding-right: 10px;
+.alert, .card-body {
+	p:last-child {
+		margin-bottom: 0;					
+	}
 }
 
 /*
@@ -61,21 +54,29 @@ body {
 #app {
 	margin: 0 auto;  
 	position: relative;
-	height: 100vh;		// make sure the app is at least as high as the screen, so that background color is shown.
+	height: 100vh;					// make sure the app is at least as high as the screen, so that background color is shown.
 	width: 100%;
-	max-width: $max-width;	// eg. when app is shown in the browser
+	max-width: $app-max-width;	// eg. when app is shown in the browser
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background-color: $app-background;
+
+	/* #app is the container div that scrolls up and down. */
+	#appContent {
+		margin: 0;	
+		background-color: $app-background;
+		
+		padding-top: 2.5rem;		// space behind liquido-header
+		padding-bottom: 100px;  // space behind navbar-bottom!
+		padding-left: 10px;     // smaller than bootsraps default 15px. But still enough for iOS scrollbar.
+		padding-right: 10px;
+	}
+
+	/* Top headline for all pages */
 	.page-title {
 		font-family: 'Libre Baskerville', serif;
 		margin: 1rem 0;
-	}
-
-	.alert, .card-body {
-		p:last-child {
-			margin-bottom: 0;					// Why is this not the default in bootstrap???
-		}
+		text-align: center;
 	}
 
 	h1,h2,h3,h4,h5,h6 {
@@ -95,7 +96,6 @@ body {
 	}
 
 	.chat-bubble {
-		//background-color: $secondary-bg;
 		margin-bottom: 1rem;
 		opacity: 1;
 		transform: none;
@@ -163,20 +163,19 @@ body {
 		border: none;
 		*/
 	}
-}
 
-.alert-info {
-	color: #DDE !important;
-	background-color: #686876 !important;	
-	border: 1px solid #aaaabb !important;
-}
+	/* Info bubble for user */
+	.liquido-info {
+		color: #DDE;
+		background-color: #1e1e50;	
+		border: 1px solid #aaaabb;
+	}
 
-/** 
- * Background for message to admin. 
- * Always used with <i class="fas fa-shield-alt"></i>
- */
-.alert-admin {
-	color: #DDE !important;
-	background-color: #824e68 !important;	
-	border: 1px solid #aaaabb !important;
+	/* Message to admin. Always used with <i class="fas fa-shield-alt"></i>	*/
+	.alert-admin {
+		color: #DDE !important;
+		background-color: #302e41 !important;	
+		border: 1px solid #aaaabb !important;
+	}
+	
 }

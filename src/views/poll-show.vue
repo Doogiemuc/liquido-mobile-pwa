@@ -17,12 +17,12 @@
 			</b-button>
 		</div>
 
-		<div v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert alert-info mb-3">
+		<div v-if="poll.status === 'ELABORATION' && poll.proposals && poll.proposals.length > 0" class="alert liquido-info mb-3">
 			<i class="fas fa-info-circle float-right" />
 			<p v-html="$t('pollInElaborationInfo')" />
 		</div>
 
-		<div v-if="showAddProposal" class="alert alert-info mb-3">
+		<div v-if="showAddProposal" class="alert liquido-info mb-3">
 			<p v-html="$t('addProposalInfo')" />
 			<b-button id="addProposalButton" variant="primary" class="float-right" @click="clickAddProposal()">
 				{{ $t("addProposal") }}
@@ -31,7 +31,7 @@
 		</div>
 		<div class="clearfix mb-3" />
 
-		<div v-if="poll.status === 'VOTING' && !poll.usersBallot" class="alert alert-info mb-3">
+		<div v-if="poll.status === 'VOTING' && !poll.usersBallot" class="alert liquido-info mb-3">
 			<p v-html="$t('votingPhaseInfo')" />
 			<b-button id="goToCastVoteButton" variant="primary" class="float-right" @click="clickCastVote()">
 				<i class="fas fa-person-booth" />
@@ -41,7 +41,7 @@
 		</div>
 		<div class="clearfix mb-3" />
 
-		<div v-if="poll.status === 'VOTING' && poll.usersBallot" class="alert alert-info mb-3">
+		<div v-if="poll.status === 'VOTING' && poll.usersBallot" class="alert liquido-info mb-3">
 			<p v-html="$t('alreadyVotedInfo')" />
 			<b-button variant="primary" class="float-right" @click="clickCastVote()">
 				<i class="fas fa-person-booth" />
@@ -50,7 +50,7 @@
 			</b-button>
 		</div>
 
-		<div v-if="poll.status === 'FINISHED'" id="finishedPollInfo" class="alert alert-info mb-3">
+		<div v-if="poll.status === 'FINISHED'" id="finishedPollInfo" class="alert liquido-info mb-3">
 			<p>
 				{{ $t('finishedPollInfo', {
 					winnerTitle: poll.winner ? poll.winner.title : "",

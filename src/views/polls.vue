@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h1 id="polls" class="polls-list-title">{{ pageTitleLoc }}</h1>
+		<h1 id="polls" class="page-title">{{ pageTitleLoc }}</h1>
 
 		<div v-if="loading" class="my-3">
 			<b-spinner small />&nbsp;{{ $t('Loading') }}
@@ -252,11 +252,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
-.polls-list-title {
-	text-align: center;
-	margin: 1rem;
-}
 
 .search-wrapper {
 	display: flex;
