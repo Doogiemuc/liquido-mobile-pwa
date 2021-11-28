@@ -190,8 +190,6 @@ context('Happy Case', () => {
 		assert.isString(fix.userJWT, "Need userJWT to show team and polls")
 		localStorage.setItem("LIQUIDO_JWT", fix.userJWT)
 
-		//TODO: replace this with setJWT and the normal cy.visit("/")
-		//cy.devLogin(fix.userEmail, fix.teamName, fix.devLoginToken)
 		//WHEN logged in user opens the mobile app
 		cy.visit("/")
 		
@@ -231,6 +229,33 @@ context('Happy Case', () => {
 		//THEN the poll is shown with that proposal
 		cy.get('#poll-show')
 		cy.get('.law-title').should('contain.text', fix.proposalTitle2)
+	})
+
+	it("[User] User likes proposal", function() {
+		assert.isString(fix.userJWT, "Need userJWT to like a proposal")
+		assert.isString(fix.proposalTitle, "Need proposal title to like it")
+
+		//GIVEN a logged in user
+		localStorage.setItem("LIQUIDO_JWT", fix.userJWT)
+		cy.visit("/")
+		
+		// AND our proposal that can be liked
+		cy.get('#gotoPollsButton').click()
+		cy.get('.proposal-header-text').contains(fix.proposalTitle).get('.like-button > .far').parent().as('likeButton')
+		
+		let numLikes = -999
+		cy.get('@likeButton')
+			// AND like button has no likes yet
+			.then($likeButton => {
+				numLikes = new Number($likeButton[0].textContent)
+				assert.isTrue(numLikes == 0, "Initial number of likes should be 0 here")
+			})
+			// WHEN clicking on the like button of our proposal
+			.click()
+			// THEN there should be exactly one more like
+			.then($likeButton => {
+				cy.wrap($likeButton).should('contain.text', numLikes + 1)
+			})
 	})
 
 	it("[Admin] Admin starts voting phase", function() {
