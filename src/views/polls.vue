@@ -274,8 +274,8 @@ export default {
 }
 
 .poll-list {
-	margin: 0 -10px 0 -10px;
-	padding: 2rem 10px 10px 10px;
+	margin: 0 -3px;
+	padding: 10px;
 	background-color: $poll-list-background;
 }
 .poll-panel {

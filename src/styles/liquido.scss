@@ -48,8 +48,8 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 }
 
 /*
- The outer wrapper of the Vue app
- need to be more CSS specific than bootstrap's default. So therefore the #app
+ * The outer wrapper of the Vue app
+ * Need to be more CSS specific than bootstrap's default! So therefore MUTS wrap everything in #app 
  */
 #app {
 	margin: 0 auto;  
@@ -60,6 +60,11 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background-color: $app-background;
+
+	/* All links, including header and footer. */
+	a {
+		color: $primary
+	}
 
 	/* #app is the container div that scrolls up and down. */
 	#appContent {
@@ -167,7 +172,7 @@ button, [type="button"], [type="reset"], [type="submit"], input {
 	/* Info bubble for user */
 	.liquido-info {
 		color: #DDE;
-		background-color: #1e1e50;	
+		background-color: $liquido-info-background;	
 		border: 1px solid #aaaabb;
 	}
 

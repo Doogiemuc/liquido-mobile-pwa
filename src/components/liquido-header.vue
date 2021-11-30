@@ -1,5 +1,5 @@
 <template>
-	<header id="liquidoHeader" class="liquido-header">
+	<header id="liquidoHeader" class="liquido-header shadow-sm">
 		<div class="header-left">
 			<a v-if="backLink" href="#" @click="goBack">
 				<i class="fas fa-angle-left" />
@@ -100,7 +100,7 @@ export default {
 	transition: 0.3s; /* Add a transition effect when scrolling */
 	color: $primary;
 	background-color: $header-bg;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 	font-size: 1.5rem;
 	display: flex;
 	flex-direction: row;
