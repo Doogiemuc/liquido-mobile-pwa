@@ -107,9 +107,14 @@
 			ref="proposalSuccessfullyAddedModal"
 			type="success"
 			:message="$t('createdSuccessfully')"
-			:primary-button-text="$t('gotoPoll')"
-			@clickPrimary="gotoPoll"
-		/>
+		>
+			<template #modal-footer>
+				<button id="modalPrimaryButton" type="button" class="btn btn-primary flex-grow-1" data-dismiss="modal" @click="gotoPoll">
+					{{ $t('gotoPoll') }}
+					<i class="fas fa-angle-double-right" />
+				</button>
+			</template>
+		</popup-modal>
 		
 		<popup-modal 
 			id="proposalAddErrorModal"
@@ -142,7 +147,7 @@ export default {
 				ChooseIcon: "Icon Wählen",
 				noIconsMatchSearch: "Kein passendes Icon gefunden.",
 				noProposalYet: "Die Abstimmung '{pollTitle}' enthält bisher noch keine Wahlvorschläge. Dein Vorschlag wird der Erste sein.",
-				createdSuccessfully: "Ok, dein Vorschlag wurde in die Abstimmung mit aufgenommen.",
+				createdSuccessfully: "Ok, dein Vorschlag wurde zur Abstimmung mit aufgenommen.",
 				proposalAddError: "Es gab einen Fehler beim Hinzufügen deines Vorschlages.",
 				gotoPoll: "Zur Abstimmung",
 			},
@@ -232,7 +237,7 @@ export default {
 
 		/** Save newly added proposal in backend. */
 		saveProposal() {
-			this.$api.addProposal(this.poll.id, this.proposal)
+			this.$api.addProposal(this.poll.id, this.proposal.title, this.proposal.description, this.iconName)
 				.then(() => this.$refs["proposalSuccessfullyAddedModal"].show())
 				.catch(err => {
 					console.error("Cannot add proposal", err)

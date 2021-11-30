@@ -104,8 +104,19 @@ export default {
 	},
 	mounted() {
 		this.$api.pingApi()
-			.catch(() => {
-				this.$refs.rootPopupModal.showWarning(this.$t("BackendNotReachable"))
+			.catch(res => {
+				if (res.response && res.response.status === 401) {
+					console.info("Login is expired")
+					if (this.$route.name !== "login") this.$router.push({name: "login"})
+				} else
+				if (res.response && res.response.status > 200) {
+					console.error("Network seems ok, but cannot ping backend", res)
+					this.$refs.rootPopupModal.showWarning(this.$t("BackendNotReachable"))
+				} else {
+					// This can only happen when backend is down while client clicks.
+					console.error("Backend is not reachable at all", res)  
+					this.$refs.rootPopupModal.showWarning(this.$t("NetworkOffline"))
+				}
 			})
 	},
 	methods: {

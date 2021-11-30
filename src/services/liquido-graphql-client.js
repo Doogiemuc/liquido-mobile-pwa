@@ -399,6 +399,7 @@ let graphQlApi = {
 	 **********************************************************************/
 
 	async createPoll(pollTitle) {
+		//TODO: BUGFIX: Do I need the brackets after mutation ?
 		let graphQL = `mutation {	createPoll(title: "${pollTitle}") ${JQL.POLL}	}`
 		return graphQlQuery(graphQL)
 			.then(res => {
@@ -446,17 +447,14 @@ let graphQlApi = {
 	 * Will update the poll in local pollsCache
 	 * 
 	 * @param {String} pollId poll ID
-	 * @param {String} proposal a proposal with title, description and icon
+	 * @param {String} title proposal title
+	 * @param {String} description proposal description
+	 * @param {String} icon name of fontawesome icon (without any "fa-" prefix. Just the name)
 	 * @returns {Object} the updated poll with the added proposal
 	 */
-	async addProposal(pollId, proposal) {
-		let graphQL = `mutation addProposal($pollId: Long!, $proposal: LawModelInput!) { ` + 
-		` addProposal(pollId: $pollId, proposal: $proposal) ${JQL.POLL} }`
-		let variables = {
-			pollId: pollId,
-			proposal: proposal
-		}
-		return graphQlQuery(graphQL, variables)
+	async addProposal(pollId, title, description, icon) {
+		let graphQL = `mutation { addProposal(pollId: "${pollId}", title: "${title}", description: "${description}", icon: "${icon}") ${JQL.POLL} }`
+		return graphQlQuery(graphQL)
 			.then(res => {
 				let poll = res.data.addProposal
 				this.pollsCache.put("polls/"+poll.id, poll)

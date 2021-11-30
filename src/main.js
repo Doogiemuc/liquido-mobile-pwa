@@ -49,8 +49,6 @@ const globalTranslations = {
 		Cancel: "Cancel",
 	},
 	de: {
-		BackendNotReachable: "Du bist offline. Bitte schalte dein WLAN ein.",
-
 		HelloWorld: "Hallo Welt!",
 		Ok: "Ok",
 		Yes: "Ja",
@@ -93,6 +91,9 @@ const globalTranslations = {
 		Elaboration: "Diskussion",	
 		InVoting: "Wahl läuft", 		// Abstimmung im Status "die Wahl läuft gerade"
 		Finished: "Abgeschlossen",
+
+		NetworkOffline: "Du bist offline. Bitte schalte dein WLAN ein.",
+		BackendNotReachable: "Ich kann den LIQUIDO Server gerade nicht erreichen. Bitte veruche es später noch einmal.",
 	},
 }
 

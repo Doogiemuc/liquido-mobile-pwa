@@ -118,7 +118,7 @@ export default {
 				startVotingPhase: "Wahlphase starten",
 				finishVotingPhaseInfo: "Hallo Admin! Bisher wurden in dieser Abstimmung {numBallots} Stimmen abgegeben.",
 				finishVotingPhase: "Wahlphase schließen",
-				votingPhaseStartedSuccessfully: "Ok, die Wahlphase dieser Abstimmung ist jetzt gestartet.",
+				votingPhaseStartedSuccessfully: "Die Wahlphase dieser Abstimmung ist jetzt gestartet.",
 				votingPhaseInfo: "Die Wahlphase dieser Abstimmung läuft gerade und du kannst jetzt hier deine Stimme abgeben.",
 				goToCastVote: "Stimme abgeben",
 				editOwnVote: "Stimmzettel ändern",

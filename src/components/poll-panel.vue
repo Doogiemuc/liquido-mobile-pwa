@@ -27,8 +27,9 @@
 		<b-list-group v-else flush>
 			<b-list-group-item v-for="law in poll.proposals" :key="law.id" class="proposal-list-group-item" :class="proposalListGroupItemClasses(law.id)">
 				<div class="proposal-header d-flex">
-					<div>
-						<img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image">
+					<div class="law-image">
+						<i class="fas fa-fw" :class="'fa-' + law.icon" />
+						<!--img :src="'https://picsum.photos/seed/' + law.id + '/100'" alt="Law image" class="law-image" -->
 					</div>
 					<div class="proposal-header-text d-flex flex-column text-truncate">
 						<h2 class="law-title">
@@ -247,11 +248,11 @@ $proposal_img_size: 32px;
 			}
 			.created-date {
 				display: inline;
-				margin-left: 5px;
+				margin-left: 1em;
 			}
 			.createdby-user {
 				display: inline;
-				margin-left: 5px;
+				margin-left: 1em;
 			}
 			&.own-proposal {
 				color: green;
@@ -259,7 +260,12 @@ $proposal_img_size: 32px;
 		}
 
 		.law-image {
-			border-radius: 5px;
+			color: white;
+			background-color: lightgray;
+			border-radius: 50%;
+			border: 1px solid lightgray;
+			text-align: center;
+			font-size: 1.2em;
 			min-width: $proposal_img_size;
 			max-width: $proposal_img_size;
 			width: $proposal_img_size;

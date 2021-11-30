@@ -186,7 +186,8 @@ router.beforeEach((routeTo, routeFrom, next) => {
 			next()
 		}
 	}).catch(() => {
-		log.debug("vue-router: anonymous", routeFrom.path, "=>", routeTo.path)
+		if (process.env.NODE_ENV === "development")
+			log.debug("vue-router: anonymous", routeFrom.path, "=>", routeTo.path)
 		if (routeTo.meta.public) {
 			next()
 		} else if (routeTo.path === "/" || routeTo.path === "/index.html") {
