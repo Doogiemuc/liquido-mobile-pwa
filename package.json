@@ -17,7 +17,7 @@
 		"cypress": "cross-env NODE_ENV=test cypress open"
 	},
 	"dependencies": {
-		"axios": "^0.21.1",
+		"axios": "^0.21.2",
 		"babel-eslint": "^10.1.0",
 		"bootstrap": "^4.6.0",
 		"bootstrap-vue": "^2.21.2",
