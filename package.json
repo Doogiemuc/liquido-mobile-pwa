@@ -28,7 +28,7 @@
 		"jquery": "^3.6.0",
 		"lodash": "^4.17.21",
 		"loglevel": "^1.7.1",
-		"moment": "^2.29.1",
+		"moment": "^2.29.2",
 		"path": "^0.12.7",
 		"populating-cache": "^5.7.0",
 		"qrcode": "^1.4.4",
